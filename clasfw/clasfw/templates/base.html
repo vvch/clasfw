@@ -1,0 +1,60 @@
+{# %- import "macros.html" as macros -% #}
+<!doctype html>
+<html lang="en">
+<head>
+{#
+##- TODO: no '//' when 'title' block is not present
+#}
+<title>
+{%- block fulltitle -%}
+    {% block title %}{% endblock -%}
+    {%- if self.title() %} // {# block 'title' is not empty #}{% endif -%}
+    CLAS Analysis Framework
+{%- endblock -%}
+</title>
+<meta name="author" content="Vitaly Chesnokov">
+<script type="text/javascript"
+    src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+{% assets "css_screen" -%}
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+{% endassets -%}
+
+{% block extrahead %}{% endblock -%}
+
+</head>
+<body>
+{% block body %}
+{#
+{{ macros.noscript() }}
+#}
+
+<div id="wrapper">
+<div id="wrapper-row">
+
+<div class="header">
+    <h1>CLAS Analysis Framework</h1>
+{#
+    {% include "topmenu.html" %}
+#}
+</div>
+
+<div class="content">
+{% block content %}{% endblock %}
+</div>
+
+</div>
+
+<div class="footer">
+    <div class="powered">
+        Created by
+        <a href="http://www.sinp.msu.ru">SINP</a>
+        <a href="https://www.msu.ru">MSU</a>,
+        <a href="https://uconn.edu/">UCONN</a>,
+        <a href="https://clasweb.jlab.org">CLAS Collaboration</a>
+    </div>
+</div>
+
+</div>
+{% endblock %}
+</body>
+</html>

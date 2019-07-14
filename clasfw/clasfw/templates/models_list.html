@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title -%}
+	Models list
+{%- endblock %}
+
+{% block content %}
+<h1>Available Models</h1>
+
+<table class="models">
+<thead>
+<tr>
+	<th>Name</th>
+	<th>Author</th>
+	<th>Description</th>
+	<th>Data points</th>
+</tr>
+</thead>
+{% for m in models %}
+<tr>
+	<td>
+		<a href="{{ url_for('.model_data', model_id=m.id) }}">
+			{{ m.name }}
+		</a>
+	</td>
+	<td>
+		{{ m.author }}
+	</td>
+	<td>
+		{{ m.description }}
+	</td>
+	<td>
+		{{ m.count_ampl }}
+	</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock%}

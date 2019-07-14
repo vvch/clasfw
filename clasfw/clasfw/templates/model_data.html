@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title -%}
+	Model data
+{%- endblock %}
+
+{% block content %}
+<div class="model-data">
+
+<h1>Model <em>{{ model.name }}</em> data</h1>
+
+<dl>
+	<dt>Author</dt>
+	<dd>{{ model.author }}</dd>
+	<dt>Description</dt>
+	<dd class="description">
+		{{ model.description }}
+	</dd>
+</dl>
+
+<table class="amplitudes">
+<thead>
+<tr>
+	<th>Q²</th>
+	<th>W</th>
+	<th class="split">cos θ</th>
+	<th></th>
+	<th></th>
+	<th></th>
+	<th></th>
+	<th></th>
+	<th></th>
+</tr>
+</thead>
+{% for a in model.amplitudes %}
+<tr>
+	<td>{{ a.q2 }}</td>
+	<td>{{ a.w }}</td>
+	<td class="split">{{ a.cos_theta }}</td>
+	{% set complex_format = "{:.2g}" %}
+	<td>{{ complex_format.format(a.t1) }}</td>
+	<td></td>
+	<td></td>
+	<td></td>
+	<td></td>
+	<td></td>
+	{#
+	<td>{{ complex_format.format(a.t1) }}</td>
+	<td>{{ complex_format.format(a.t2) }}</td>
+	<td>{{ complex_format.format(a.t3) }}</td>
+	<td>{{ complex_format.format(a.t4) }}</td>
+	<td>{{ complex_format.format(a.t5) }}</td>
+	<td>{{ complex_format.format(a.t6) }}</td>
+	#}
+</tr>
+{% endfor %}
+</table>
+</div>
+{% endblock%}

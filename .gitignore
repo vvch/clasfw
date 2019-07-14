@@ -1,0 +1,11 @@
+settings_local.py
+.htaccess
+
+*.sqlite
+*.sqlite3
+
+__pycache__
+*.pyc
+*.bak
+clasfw/static/.webassets-cache
+.pytest_cache
