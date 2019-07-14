@@ -2,9 +2,6 @@
 <!doctype html>
 <html lang="en">
 <head>
-{#
-##- TODO: no '//' when 'title' block is not present
-#}
 <title>
 {%- block fulltitle -%}
     {% block title %}{% endblock -%}
@@ -33,9 +30,7 @@
 
 <div class="header">
     <h1>CLAS Analysis Framework</h1>
-{#
     {% include "topmenu.html" %}
-#}
 </div>
 
 <div class="content">

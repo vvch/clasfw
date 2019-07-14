@@ -1,0 +1,18 @@
+{%- macro delim() -%}
+    <span>|</span>
+{%- endmacro -%}
+
+<div class="top-menu">
+    <a href="{{ url_for('.index') }}"
+        accesskey="S"
+        title="">Start</a>
+
+    {{delim()}}
+
+    <a href="{{ url_for('.models_list') }}"
+        accesskey="L"
+        title="List of all available models">Models</a>
+    {{delim()}}
+
+</div>
+
