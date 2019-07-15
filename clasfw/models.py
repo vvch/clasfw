@@ -1,5 +1,5 @@
 __all__ = [
-    'Amplitudes', 'Models'
+    'Amplitude', 'Model', 'Channel',
 ]
 
 from database import Base, Column, \
@@ -13,12 +13,12 @@ from sqlalchemy.ext.hybrid import hybrid_property
 import re
 
 
-class StatusMixin(object):
+class StatusMixin:
     id             = Column(Integer, primary_key=True, autoincrement=True)
     status         = Column(Integer, default=0)
 
 
-class DatesMixin(object):
+class DatesMixin:
     mdate = Column(DateTime, nullable=False,
         default=func.now(), server_default=func.now(),
         onupdate=func.now(), server_onupdate=func.now())
@@ -53,7 +53,11 @@ def default_html_value(context):
     # return context.current_parameters['name']
     if not context:  # creating new object via admin form
         return
-    return context.current_parameters['text']
+    # return context.current_parameters['text']
+    return context.current_parameters['name']
+    # return context.current_parameters[
+    #     DictionaryMixin.name.
+    # ]
 
 
 class ExtDictionaryMixin(DictionaryMixin):
@@ -71,7 +75,6 @@ class ExtDictionaryMixin(DictionaryMixin):
 
 
 class Model(DictionaryMixin, Base):
-    pass
     author         = Column(String, nullable=False,
         default='')
     comment        = Column(Text, nullable=False,
@@ -79,7 +82,7 @@ class Model(DictionaryMixin, Base):
 
 
 
-class Channel(ExtDictionaryMixin, Base):
+class Channel(DatesMixin, ExtDictionaryMixin, Base):
     pass
 
 
