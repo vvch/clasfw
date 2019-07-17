@@ -16,7 +16,8 @@
 	<th>Data points</th>
 </tr>
 </thead>
-{% for m in models %}
+{% for mm in models %}
+{% set m = mm.Model %}
 <tr>
 	<td>
 		<a href="{{ url_for('.model_data', model_id=m.id) }}">
@@ -30,7 +31,7 @@
 		{{ m.description }}
 	</td>
 	<td>
-		{{ m.count_ampl }}
+		{{ mm.count_ampl }}
 	</td>
 </tr>
 {% endfor %}

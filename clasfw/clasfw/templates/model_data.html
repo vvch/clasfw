@@ -21,37 +21,30 @@
 <table class="amplitudes">
 <thead>
 <tr>
+	<th>Channel</th>
 	<th>Q²</th>
 	<th>W</th>
-	<th class="split">cos θ</th>
-	<th></th>
-	<th></th>
-	<th></th>
-	<th></th>
-	<th></th>
-	<th></th>
+	<th class="rsplit">cos θ</th>
+	{% for aa in ampl_names %}
+	<th class="ampl">{{ aa }}</th>
+	{% endfor %}
+	{% for aa in strfun_names %}
+	<th{%if loop.first%} class="lsplit"{%endif%}>{{ aa }}</th>
+	{% endfor %}
 </tr>
 </thead>
 {% for a in model.amplitudes %}
 <tr>
-	<td>{{ a.q2 }}</td>
-	<td>{{ a.w }}</td>
-	<td class="split">{{ a.cos_theta }}</td>
-	{% set complex_format = "{:.2g}" %}
-	<td>{{ complex_format.format(a.t1) }}</td>
-	<td></td>
-	<td></td>
-	<td></td>
-	<td></td>
-	<td></td>
-	{#
-	<td>{{ complex_format.format(a.t1) }}</td>
-	<td>{{ complex_format.format(a.t2) }}</td>
-	<td>{{ complex_format.format(a.t3) }}</td>
-	<td>{{ complex_format.format(a.t4) }}</td>
-	<td>{{ complex_format.format(a.t5) }}</td>
-	<td>{{ complex_format.format(a.t6) }}</td>
-	#}
+	<td>{{ a.channel }}</td>
+	<td>{{ a.q2 |cpx }}</td>
+	<td>{{ a.w  |cpx }}</td>
+	<td class="rsplit">{{ a.cos_theta |cpx }}</td>
+	{% for aa in a.a %}
+	<td>{{ aa|cpx }}</td>
+	{% endfor %}
+	{% for aa in a.sigma_u, a.sigma_tt, a.sigma_tl, a.sigma_tlp %}
+	<td{%if loop.first%} class="lsplit"{%endif%}>{{ aa |cpx }}</td>
+	{% endfor %}
 </tr>
 {% endfor %}
 </table>

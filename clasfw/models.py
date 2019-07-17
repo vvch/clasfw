@@ -5,8 +5,8 @@ __all__ = [
 from database import Base, Column, \
         Integer, SmallInteger, String, DateTime, Boolean, Float, \
         Text, LargeBinary, \
-        ForeignKey, ForeignKeyConstraint, relationship, \
-        backref, deferred, func, desc
+        ForeignKey, ForeignKeyConstraint, UniqueConstraint, \
+        relationship, backref, deferred, func, desc
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -81,13 +81,19 @@ class Model(DictionaryMixin, Base):
         default='')
 
 
-
 class Channel(DatesMixin, ExtDictionaryMixin, Base):
     pass
 
 
+class Quantity(DatesMixin, ExtDictionaryMixin, Base):
+    __tablename__  = 'quantities' 
+
+
 def complex_none(r, i):
-    return complex(r, i) if r is not None and i is not None else None
+    if r is None and i is None:
+        return None
+    return complex(r, i)
+
 
 class Amplitude(Base):
     __tablename__  = 'amplitudes'
@@ -102,73 +108,215 @@ class Amplitude(Base):
     w              = Column(Float)
     cos_theta      = Column(Float)
 
-    t1r            = Column(Float)
-    t1j            = Column(Float)
-    t2r            = Column(Float)
-    t2j            = Column(Float)
-    t3r            = Column(Float)
-    t3j            = Column(Float)
-    t4r            = Column(Float)
-    t4j            = Column(Float)
-    t5r            = Column(Float)
-    t5j            = Column(Float)
-    t6r            = Column(Float)
-    t6j            = Column(Float)
+    number = 12
 
+    a0r            = Column(Float)
+    a0j            = Column(Float)
+    a1r            = Column(Float)
+    a1j            = Column(Float)
+    a2r            = Column(Float)
+    a2j            = Column(Float)
+    a3r            = Column(Float)
+    a3j            = Column(Float)
+    a4r            = Column(Float)
+    a4j            = Column(Float)
+    a5r            = Column(Float)
+    a5j            = Column(Float)
+    a6r            = Column(Float)
+    a6j            = Column(Float)
+    a7r            = Column(Float)
+    a7j            = Column(Float)
+    a8r            = Column(Float)
+    a8j            = Column(Float)
+    a8r            = Column(Float)
+    a8j            = Column(Float)
+    a9r            = Column(Float)
+    a9j            = Column(Float)
+    a10r           = Column(Float)
+    a10j           = Column(Float)
+    a11r           = Column(Float)
+    a11j           = Column(Float)
 
-    @hybrid_property
-    def t1(self):
-        return complex(self.t1r, self.t1j)
-
-    @t1.setter
-    def t1(self, value):
-        self.t1r = value.real
-        self.t1j = value.imag
-
-    @hybrid_property
-    def t2(self):
-        return complex_none(self.t2r, self.t2j)
-
-    @t2.setter
-    def t2(self, value):
-        self.t2r = value.real
-        self.t2j = value.imag
-
-    @hybrid_property
-    def t3(self):
-        return complex_none(self.t3r, self.t3j)
-
-    @t3.setter
-    def t3(self, value):
-        self.t3r = value.real
-        self.t3j = value.imag
+    sigma_u        = Column(Float)
+    sigma_tt       = Column(Float)
+    sigma_tl       = Column(Float)
+    sigma_tlp      = Column(Float)
 
     @hybrid_property
-    def t4(self):
-        return complex_none(self.t4r, self.t4j)
+    def a0(self):
+        return complex_none(self.a0r, self.a0j)
 
-    @t4.setter
-    def t4(self, value):
-        self.t4r = value.real
-        self.t4j = value.imag
-
-    @hybrid_property
-    def t5(self):
-        return complex_none(self.t5r, self.t5j)
-
-    @t5.setter
-    def t5(self, value):
-        self.t5r = value.real
-        self.t5j = value.imag
+    @a0.setter
+    def a0(self, value):
+        self.a0r = value.real
+        self.a0j = value.imag
 
     @hybrid_property
-    def t6(self):
-        return complex_none(self.t6r, self.t6j)
+    def a1(self):
+        return complex_none(self.a1r, self.a1j)
 
-    @t6.setter
-    def t6(self, value):
-        self.t6r = value.real
-        self.t6j = value.imag
+    @a1.setter
+    def a1(self, value):
+        self.a1r = value.real
+        self.a1j = value.imag
+
+    @hybrid_property
+    def a2(self):
+        return complex_none(self.a2r, self.a2j)
+
+    @a2.setter
+    def a2(self, value):
+        self.a2r = value.real
+        self.a2j = value.imag
+
+    @hybrid_property
+    def a3(self):
+        return complex_none(self.a3r, self.a3j)
+
+    @a3.setter
+    def a3(self, value):
+        self.a3r = value.real
+        self.a3j = value.imag
+
+    @hybrid_property
+    def a4(self):
+        return complex_none(self.a4r, self.a4j)
+
+    @a4.setter
+    def a4(self, value):
+        self.a4r = value.real
+        self.a4j = value.imag
+
+    @hybrid_property
+    def a5(self):
+        return complex_none(self.a5r, self.a5j)
+
+    @a5.setter
+    def a5(self, value):
+        self.a5r = value.real
+        self.a5j = value.imag
+
+    @hybrid_property
+    def a6(self):
+        return complex_none(self.a6r, self.a6j)
+
+    @a6.setter
+    def a6(self, value):
+        self.a6r = value.real
+        self.a6j = value.imag
+
+    @hybrid_property
+    def a7(self):
+        return complex_none(self.a7r, self.a7j)
+
+    @a7.setter
+    def a7(self, value):
+        self.a7r = value.real
+        self.a7j = value.imag
+
+    @hybrid_property
+    def a8(self):
+        return complex_none(self.a8r, self.a8j)
+
+    @a8.setter
+    def a8(self, value):
+        self.a8r = value.real
+        self.a8j = value.imag
+
+    @hybrid_property
+    def a9(self):
+        return complex_none(self.a9r, self.a9j)
+
+    @a9.setter
+    def a9(self, value):
+        self.a9r = value.real
+        self.a9j = value.imag
+
+    @hybrid_property
+    def a10(self):
+        return complex_none(self.a10r, self.a10j)
+
+    @a10.setter
+    def a10(self, value):
+        self.a10r = value.real
+        self.a10j = value.imag
+
+    @hybrid_property
+    def a10(self):
+        return complex_none(self.a10r, self.a10j)
+
+    @a10.setter
+    def a10(self, value):
+        self.a10r = value.real
+        self.a10j = value.imag
+
+    @hybrid_property
+    def a11(self):
+        return complex_none(self.a11r, self.a11j)
+
+    @a11.setter
+    def a11(self, value):
+        self.a11r = value.real
+        self.a11j = value.imag
+
+    @hybrid_property
+    def a(self):
+        return self.a0, self.a1, self.a2, self.a3, self.a4, self.a5, \
+               self.a6, self.a7, self.a8, self.a9, self.a10, self.a11
+
+    @a.setter
+    def a(self, value):
+        self.a0, self.a1, self.a2, self.a3, self.a4, self.a5, \
+        self.a6, self.a7, self.a8, self.a9, self.a10, self.a11 = value
+
+    _lambdas_by_index = []
+    _index_by_lambdas = {}
+    @classmethod
+    def _init_lambdas(cls):
+        i=0
+        for lambda_B in (-2, +2):
+            for lambda_g in (-1, 0, +1):
+                for lambda_p in (-2, +2):
+                    lambdas = (lambda_B, lambda_g, lambda_p)
+                    cls._lambdas_by_index.append(lambdas)
+                    cls._index_by_lambdas[lambdas] = i
+                    i += 1
+    # _init_lambdas()
+    @classmethod
+    def lambdas_int_by_aindex(cls, a_index):
+        return cls._lambdas_by_index[a_index]
+
+    @staticmethod
+    def lambda_int_to_str(l):
+        return {
+            -2: "−½",
+            +2: "+½",
+            +1: "+1",
+            -1: "−1",
+        }.get(l, str(l))
+
+    @classmethod
+    def a_index_by_lambdas_int(lb, lp, lg):
+        """
+        Returns list index in a array field
+        for 1/lambda_B, 1/lambda_p, 1/lambda_gamma specified
+        """
+        return cls._index_by_lambdas[lb, lp, lg]
+
+
+    def by_int_lambdas(self, lb, lg, lp):
+        return self.a[
+            self.a_index_by_lambdas_int(lb=lb, lg=lg, lp=lp)
+        ]
+
+    __table_args__ = ( 
+        UniqueConstraint(
+            channel_id, model_id, q2, w, cos_theta,
+            name='grid',
+        ),
+    {} )
+
+Amplitude._init_lambdas()
 
 
 if __name__ == '__main__':

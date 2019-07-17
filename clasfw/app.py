@@ -1,16 +1,23 @@
 from flask import Flask, request, render_template_string
 
-from clasfw.settings import ProdConfig
+from clasfw.settings import ProdConfig, DevConfig
 from clasfw.extensions import db, migrate, assets, debug_toolbar
 import clasfw.clasfw.blueprint
 from clasfw.clasfw.blueprint import blueprint
 
+import os
 
-def create_app(config_object=ProdConfig):
+def create_app(config_object=None):
     """An application factory, as explained here: http://flask.pocoo.org/docs/patterns/appfactories/.
 
     :param config_object: The configuration object to use.
     """
+    if config_object is None:
+        if os.environ.get('FLASK_ENV') == 'development':
+            config_object = DevConfig
+        elif os.environ.get('FLASK_ENV') == 'production':
+            config_object = ProdConfig
+
     app = Flask(__name__)
     # app.config.from_pyfile('settings.py')
     app.config.from_object(config_object)

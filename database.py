@@ -13,7 +13,8 @@ Text         = db.Text
 LargeBinary  = db.LargeBinary
 
 ForeignKey   = db.ForeignKey
-ForeignKeyConstraint   = db.ForeignKeyConstraint
+ForeignKeyConstraint = db.ForeignKeyConstraint
+UniqueConstraint     = db.UniqueConstraint
 func         = db.func
 desc         = db.desc
 
