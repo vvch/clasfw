@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title -%}
+	Phi dependence
+{%- endblock %}
+
+{% block content %}
+<h1>&phi; dependence</h1>
+
+<table class="amplitudes">
+<tr>
+	<th>Model</th>
+	<td>{{ ampl.model }}</td>
+</tr>
+<tr>
+	<th>Channel</th>
+	<td>{{ ampl.channel }}</td>
+</tr>
+<tr>
+	<th>Q2</th>
+	<td>{{ ampl.q2 }}</td>
+</tr>
+<tr>
+	<th>W</th>
+	<td>{{ ampl.w }}</td>
+</tr>
+<tr>
+	<th>cos &theta;</th>
+	<td>{{ ampl.cos_theta }}</td>
+</tr>
+{% for i in range(ampl.number) %}
+<tr>
+	<th class="ampl">{{ qu.amplitudes[i] }}</th>
+	<td>{{ ampl.a[i] |cpx}}</td>
+</tr>
+{% endfor %}
+{% for r in zip(qu.strfuns, ampl.strfuns) %}
+<tr>
+	<th>{{ r.0 }}</th>
+	<td>{{ r.1 }}</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock%}

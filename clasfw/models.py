@@ -137,7 +137,8 @@ class Amplitude(Base):
     a11r           = Column(Float)
     a11j           = Column(Float)
 
-    sigma_u        = Column(Float)
+    sigma_t        = Column(Float)
+    sigma_l        = Column(Float)
     sigma_tt       = Column(Float)
     sigma_tl       = Column(Float)
     sigma_tlp      = Column(Float)
@@ -269,15 +270,19 @@ class Amplitude(Base):
         self.a0, self.a1, self.a2, self.a3, self.a4, self.a5, \
         self.a6, self.a7, self.a8, self.a9, self.a10, self.a11 = value
 
+    @hybrid_property
+    def strfuns(self):
+        return self.sigma_t, self.sigma_l, self.sigma_tt, self.sigma_tl, self.sigma_tlp
+
     _lambdas_by_index = []
     _index_by_lambdas = {}
     @classmethod
     def _init_lambdas(cls):
         i=0
-        for lambda_B in (-2, +2):
-            for lambda_g in (-1, 0, +1):
-                for lambda_p in (-2, +2):
-                    lambdas = (lambda_B, lambda_g, lambda_p)
+        for lambda_B in -2, +2:
+            for lambda_g in -1, 0, +1:
+                for lambda_p in -2, +2:
+                    lambdas = lambda_B, lambda_g, lambda_p
                     cls._lambdas_by_index.append(lambdas)
                     cls._index_by_lambdas[lambdas] = i
                     i += 1
@@ -317,6 +322,60 @@ class Amplitude(Base):
     {} )
 
 Amplitude._init_lambdas()
+
+
+def sum_lplb(A, lg1, lg2=None):
+    if lg2 is None:
+        lg2 = lg1
+    s = 0
+    for lp in -2, +2:
+        for lb in -2, +2:
+            i1 = Amplitude.a_index_by_lambdas_int(lb, lp, lg1)
+            i2 = Amplitude.a_index_by_lambdas_int(lb, lp, lg2)
+            s += A[i1].conjugate()*A[i2]
+    return s
+
+def ampl_to_sigma_T(A):
+    M_plu2 = sum_lplb(A, 1)
+    M_min2 = sum_lplb(A, -1)
+    return M_plu2 + M_min2
+
+def ampl_to_sigma_L(A):
+    M_0_2  = sum_lplb(A, 0)
+    return M_0_2
+
+def sigma_U(sigma_T, sigma_L, eps_T):
+    return sigma_T + 2*eps_T*sigma_L
+
+def ampl_to_sigma_U(A, eps_T):
+    sigma_T = ampl_to_sigma_T(A)
+    sigma_L = ampl_to_sigma_L(A)
+    return sigma_T + 2*eps_T*sigma_L
+
+def ampl_to_sigma_TT(A, eps_T):
+    M_min_ast_M_plu = sum_lplb(A, -1, 1)
+    return -2*eps_T*M_min_ast_M_plu.real
+
+def sum_ampl_M0MpMm(a):
+    """
+    M_0^*(M_+ - M_-)
+    """
+    s = 0
+    for lp in -2, +2:
+        for lb in -2, +2:
+            i1 = Amplitude.a_index_by_lambdas_int(lb, lp, 0)
+            i2 = Amplitude.a_index_by_lambdas_int(lb, lp, 1)
+            i3 = Amplitude.a_index_by_lambdas_int(lb, lp, -1)
+            s += a[i1].conjugate() * (
+                a[i2] - a[i3].conjugate()
+            )
+    return s
+
+def ampl_to_sigma_TL_TLP(a, eps_T):
+    M0MpMm = sum_ampl_M0MpMm(a)
+    return \
+        -2*np.sqrt(eps_T*(1+epsT))*M_min_ast_M_plu.real,  \
+         2*np.sqrt(eps_T*(1-epsT))*M_min_ast_M_plu.imag
 
 
 if __name__ == '__main__':

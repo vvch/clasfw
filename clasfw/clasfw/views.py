@@ -1,7 +1,7 @@
 from .blueprint import blueprint as app
 from flask import current_app
 
-from ..models import Model, Amplitude, Channel, Quantity
+from .models import Model, Amplitude, Channel, Quantity
 
 from flask import request, Response, url_for, send_file, redirect, \
     render_template, render_template_string, Markup
@@ -71,17 +71,26 @@ def models_list():
 def model_data(model_id):
     channel = request.args.get('channel_id', None)
     model = Model.query.get(model_id)
-    ampl_names = Quantity.query.filter(
-        # fixme: should NOT use plain numeric identifiers!
-        Quantity.id.between(200, 200+Amplitude.number-1)
-    ).all()
-    strfun_names = "σ<sub>U</sub>", "σ<sub>TT</sub>", "σ<sub>TL</sub>", "σ<sub>TL&prime;</sub>"
-    strfun_names = tuple(map(Markup, strfun_names))
-    # ampl_names = 'a0', 'a1', 'a2', 'a3', 'a4', 'a5'
-    # strfun_names = "σ_U",  "σ_TT", "σ_TL", "σ_TL'"
 
     return render_template('model_data.html',
         model=model,
-        ampl_names=tuple(ampl_names),
-        strfun_names=strfun_names,
+    )
+
+
+@app.route('/phi')
+def phi_dependence():
+    model_id, channel_id, q2, w, cos_theta = (
+        request.args.get(x)
+            for x in "model_id channel_id q2 w cos_theta".split()
+    )
+    ampl = Amplitude.query.filter_by(
+        channel_id=channel_id,
+        model_id=model_id,
+        q2=q2,
+        w=w,
+        cos_theta=cos_theta,
+    ).one()
+
+    return render_template('phi_dependence.html',
+        ampl=ampl,
     )

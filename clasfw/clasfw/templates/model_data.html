@@ -25,10 +25,10 @@
 	<th>Q²</th>
 	<th>W</th>
 	<th class="rsplit">cos θ</th>
-	{% for aa in ampl_names %}
+	{% for aa in qu.amplitudes %}
 	<th class="ampl">{{ aa }}</th>
 	{% endfor %}
-	{% for aa in strfun_names %}
+	{% for aa in qu.strfuns %}
 	<th{%if loop.first%} class="lsplit"{%endif%}>{{ aa }}</th>
 	{% endfor %}
 </tr>
@@ -42,7 +42,7 @@
 	{% for aa in a.a %}
 	<td>{{ aa|cpx }}</td>
 	{% endfor %}
-	{% for aa in a.sigma_u, a.sigma_tt, a.sigma_tl, a.sigma_tlp %}
+	{% for aa in a.strfuns %}
 	<td{%if loop.first%} class="lsplit"{%endif%}>{{ aa |cpx }}</td>
 	{% endfor %}
 </tr>

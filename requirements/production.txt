@@ -1,0 +1,17 @@
+numpy
+scipy
+
+SQLAlchemy >1.0, <1.2 # incompatible API changes
+
+Flask-SqlAlchemy
+Flask-Migrate
+Flask-Assets
+Flask-Views
+
+
+##  Non-python
+
+# stylus
+#     (requires node.js, npm)
+#     installation:
+#     npm install -g stylus

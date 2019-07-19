@@ -7,8 +7,6 @@ os.environ.setdefault('FLASK_DEBUG', 'True')
 os.environ.setdefault('FLASK_ENV', 'development')
 os.environ.setdefault('FLASK_APP', 'clasfw:app.py')
 
-os.environ.setdefault('WERKZEUG_DEBUG_PIN', 'off') # no PIN for browser debugger
-
 from clasfw.app import create_app
 from clasfw.settings import DevConfig
 from clasfw.models import Base, Model, Amplitude, Channel, Quantity
@@ -16,29 +14,10 @@ from clasfw.extensions import db
 import numpy as np
 
 
-app = create_app(DevConfig)
-# db.create_all()
-
-
 def create_amplitude_qu():
     tmpl_text = "<0 {}|T|{} {}>"
     tmpl_html = "&#x27e8;0&nbsp;{}|T|{}&nbsp;{}&#x27e9;"
     tmpl_tex  = "\\langle 0 \\; {}|T| {} \\; {}\\rangle"
-
-    # i = 0
-    # qq = []
-    # # for lambda_B in ("-1/2", "+1/2"):
-    # #     for lambda_p in ("-1/2", "+1/2"):
-    # for lambda_B in ("-½", "+½"):
-    #     for lambda_p in ("-½", "+½"):
-    #         for lambda_g in ("-1", "0", "+1"):
-    #             qq += Quantity(
-    #                 id = 200 + i,
-    #                 name = tmpl_text.format(lambda_B, lambda_g, lambda_p),
-    #                 html = tmpl_html.format(lambda_B, lambda_g, lambda_p),
-    #                 tex  = tmpl_tex.format(lambda_B, lambda_g, lambda_p),
-    #             ),
-    #             i += 1
 
     qq = []
     for i in range(Amplitude.number):
@@ -54,7 +33,54 @@ def create_amplitude_qu():
     return qq
 
 
-with app.test_request_context():
+def create_structure_functions_qu():
+    qq = []
+    qq += Quantity(
+        id = 191,
+        name = "sigma_U",
+        html = "&sigma;<sub>U</sub>",
+        tex  = r"\sigma_{U}",
+        priority = 100,
+    ),
+    qq += Quantity(
+        id = 44,
+        name = "sigma_T",
+        html = "&sigma;<sub>T</sub>",
+        tex  = r"\sigma_{T}",
+        priority = 90,
+    ),
+    qq += Quantity(
+        id = 43,
+        name = "sigma_L",
+        html = "&sigma;<sub>L</sub>",
+        tex  = r"\sigma_{L}",
+        priority = 80,
+    ),
+    qq += Quantity(
+        id = 47,
+        name = "sigma_TT",
+        html = "&sigma;<sub>TT</sub>",
+        tex  = r"\sigma_{TT}",
+        priority = 70,
+    ),
+    qq += Quantity(
+        id = 48,
+        name = "sigma_TL",
+        html = "&sigma;<sub>TL</sub>",
+        tex  = r"\sigma_{TL}",
+        priority = 60,
+    ),
+    qq += Quantity(
+        id = 666,
+        name = "sigma_TL'",
+        html = "&sigma;<sub>TL&prime;</sub>",
+        tex  = r"\sigma_{TL'}",
+        priority = 50,
+    ),
+    return qq
+
+
+def generate_test_content():
     # Base.metadata.create_all()
     # db.create_all()
     m1 = Model(
@@ -117,6 +143,15 @@ with app.test_request_context():
                 m1.amplitudes.append(a1)
                 m2.amplitudes.append(a2)
                 m3.amplitudes.append(a3)
-    db.session.add_all((m1, m2, m3))
-    db.session.add_all(create_amplitude_qu())
+    db.session.add_all(
+        [m1, m2, m3] +
+        create_amplitude_qu() +
+        create_structure_functions_qu())
     db.session.commit()
+
+
+if __name__ == '__main__':
+    app = create_app()
+    # db.create_all()
+    with app.test_request_context():
+        generate_test_content()
