@@ -77,6 +77,13 @@ def create_structure_functions_qu():
         tex  = r"\sigma_{TL'}",
         priority = 50,
     ),
+    qq += Quantity(
+        id = 19,
+        name = "dsigma/dOmega",
+        html = "d&sigma;/d&Omega;",
+        tex  = r"\mathrm{d}\sigma/\mathrm{d}\Omega",
+        priority = 40,
+    ),
     return qq
 
 

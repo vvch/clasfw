@@ -1,4 +1,4 @@
-from .blueprint import blueprint as app
+from .blueprint import qu, blueprint as bp
 from flask import current_app
 
 from .models import Model, Amplitude, Channel, Quantity
@@ -11,13 +11,13 @@ import numpy as np
 import json
 
 
-@app.route('/')
+@bp.route('/')
 def index():
 
     return render_template('index.html')
 
 
-@app.route('/models')
+@bp.route('/models')
 def models_list():
 
     # from clasfw.extensions import db
@@ -67,7 +67,7 @@ def models_list():
         models=models)
 
 
-@app.route('/model_data/<int:model_id>')
+@bp.route('/model_data/<int:model_id>')
 def model_data(model_id):
     channel = request.args.get('channel_id', None)
     model = Model.query.get(model_id)
@@ -77,7 +77,7 @@ def model_data(model_id):
     )
 
 
-@app.route('/phi')
+@bp.route('/phi')
 def phi_dependence():
     model_id, channel_id, q2, w, cos_theta = (
         request.args.get(x)
@@ -91,6 +91,29 @@ def phi_dependence():
         cos_theta=cos_theta,
     ).one()
 
+    phi = np.linspace(0, 2*np.pi)
+    # test dummy data
+    sig = np.sin(phi)
+
+    plot = {
+        'layout': {
+            # 'autosize': 'true',
+            'xaxis': {
+                'title': r'$\varphi$',
+            },
+            'yaxis': {
+                'title': "${}$".format(qu.dsigma.tex),
+            },
+        },
+        'data': [{
+            'mode': 'markers',
+            'type': 'scatter',
+            'x': phi.tolist(),
+            'y': sig.tolist(),
+        }],
+    }
+
     return render_template('phi_dependence.html',
         ampl=ampl,
+        plot=plot,
     )

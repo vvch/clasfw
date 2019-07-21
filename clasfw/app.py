@@ -1,9 +1,10 @@
 from flask import Flask, request, render_template_string
 
-from clasfw.settings import ProdConfig, DevConfig
-from clasfw.extensions import db, migrate, assets, debug_toolbar
-import clasfw.clasfw.blueprint
-from clasfw.clasfw.blueprint import blueprint
+from .settings import ProdConfig, DevConfig
+from .extensions import db, migrate, assets, debug_toolbar
+from .shell_context import get_shell_context
+from .clasfw.blueprint import blueprint
+from .clasfw import views
 
 import os
 
@@ -24,15 +25,22 @@ def create_app(config_object=None):
     app.config.from_pyfile('settings_local.py', silent=True)
     # app.config.from_pyfile('settings_local.py')
 
+    app.jinja_env.line_statement_prefix = '%'
+    app.jinja_env.line_comment_prefix = '##'
+    app.jinja_env.lstrip_blocks = True
+    app.jinja_env.trim_blocks = True
+
     register_extensions(app)
     register_blueprints(app)
     # register_errorhandlers(app)
+
+    app.shell_context_processor(get_shell_context)
     return app
 
 
 def register_blueprints(app):
     """Register Flask blueprints."""
-    app.register_blueprint(clasfw.clasfw.blueprint.blueprint)
+    app.register_blueprint(blueprint)
     return None
 
 
@@ -80,7 +88,3 @@ def register_extensions(app):
 #         </body>
 #         </html>
 #         """, path=request.path), 404
-
-# from clasfw.settings import DevConfig
-import clasfw.clasfw.views
-# app = create_app(DevConfig)  ##  temporary workaround

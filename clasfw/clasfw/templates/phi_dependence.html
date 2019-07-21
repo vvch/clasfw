@@ -4,6 +4,11 @@
 	Phi dependence
 {%- endblock %}
 
+{% block extrahead %}
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+{% endblock %}
+
 {% block content %}
 <h1>&phi; dependence</h1>
 
@@ -41,4 +46,16 @@
 </tr>
 {% endfor %}
 </table>
+
+<div id="plot"></div>
+
+<script>
+var plot_json = {{ plot|safe }};
+Plotly.newPlot('plot', plot_json.data, plot_json.layout, {'displaylogo': false
+{%- if not config.DEBUG -%}
+, 'modeBarButtonsToRemove': ['sendDataToCloud','resetCameraLastSave3d']
+{%- endif -%}
+});
+</script>
+
 {% endblock%}

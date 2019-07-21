@@ -1,5 +1,5 @@
 __all__ = [
-    'Amplitude', 'Model', 'Channel',
+    'Amplitude', 'Model', 'Channel', 'Quantity'
 ]
 
 from database import Base, Column, \
@@ -321,6 +321,7 @@ class Amplitude(Base):
         ),
     {} )
 
+
 Amplitude._init_lambdas()
 
 
@@ -335,47 +336,67 @@ def sum_lplb(A, lg1, lg2=None):
             s += A[i1].conjugate()*A[i2]
     return s
 
+
 def ampl_to_sigma_T(A):
-    M_plu2 = sum_lplb(A, 1)
+    M_plu2 = sum_lplb(A, +1)
     M_min2 = sum_lplb(A, -1)
     return M_plu2 + M_min2
 
+
 def ampl_to_sigma_L(A):
-    M_0_2  = sum_lplb(A, 0)
+    M_0_2 = sum_lplb(A, 0)
     return M_0_2
 
-def sigma_U(sigma_T, sigma_L, eps_T):
-    return sigma_T + 2*eps_T*sigma_L
-
-def ampl_to_sigma_U(A, eps_T):
-    sigma_T = ampl_to_sigma_T(A)
-    sigma_L = ampl_to_sigma_L(A)
-    return sigma_T + 2*eps_T*sigma_L
 
 def ampl_to_sigma_TT(A, eps_T):
-    M_min_ast_M_plu = sum_lplb(A, -1, 1)
-    return -2*eps_T*M_min_ast_M_plu.real
+    M_min_conj_M_plu = sum_lplb(A, -1, +1)
+    return -2*eps_T*M_min_conj_M_plu.real
 
-def sum_ampl_M0MpMm(a):
+
+def sum_ampl_M0MpMm(A):
     """
-    M_0^*(M_+ - M_-)
+    $$ M_0^* ( M_{+} - M_{-} ) $$
     """
     s = 0
+    # fixme: avoid "magic" constants +2/-2
     for lp in -2, +2:
         for lb in -2, +2:
-            i1 = Amplitude.a_index_by_lambdas_int(lb, lp, 0)
-            i2 = Amplitude.a_index_by_lambdas_int(lb, lp, 1)
-            i3 = Amplitude.a_index_by_lambdas_int(lb, lp, -1)
-            s += a[i1].conjugate() * (
-                a[i2] - a[i3].conjugate()
-            )
+            i1, i2, i3 = (
+                Amplitude.a_index_by_lambdas_int(lb, lp, lg)
+                    for lg in (0, +1, -1))
+            s += A[i1].conjugate() * (
+                A[i2] - A[i3].conjugate())
     return s
+
 
 def ampl_to_sigma_TL_TLP(a, eps_T):
     M0MpMm = sum_ampl_M0MpMm(a)
     return \
-        -2*np.sqrt(eps_T*(1+epsT))*M_min_ast_M_plu.real,  \
-         2*np.sqrt(eps_T*(1-epsT))*M_min_ast_M_plu.imag
+        -2*np.sqrt(eps_T*(1+eps_T))*M0MpMm.real,  \
+         2*np.sqrt(eps_T*(1-eps_T))*M0MpMm.imag
+
+
+def strfuns_to_dsigma(W, Q2, Eb, phi, st, sl, stt, stl, stlp):
+    alpha = 1/137
+    M_p = 0.938 ## GeV
+    # fixme: use correct mass for pi^0 instead of pi^+- for pi0p reaction
+    m_m = 0.13957018 ## GeV ; 0.1349766 for pi^0
+    M_N = M_p
+    M_B = M_N ## fixme: ???
+    K_L = (W*W - M_N*M_N) / (2*M_N)
+    E_m = (W*W + m_m*m_m - M_B*M_B)
+    p_m = np.sqrt(E_m*E_m - m_m*m_m)
+    h = +1 ## -1 ???
+    eps_T = eps_T(W, Q2, Eb) ## ???
+
+    sin_theta = np.sin(theta) ## ???
+
+    ds = st + 2*eps_T*sl +  \
+         eps_T*np.cos(2*phi)*stt +  \
+         np.sqrt(eps_T*(1+eps_T))*np.cos(phi)*stl +  \
+         np.sqrt(eps_T*(1-eps_T))*np.sin(phi)*stlp*h
+    ds *= alpha*p_m / (32 * np.pi * K_L * M_N * W) * sin_theta
+    return ds
 
 
 if __name__ == '__main__':

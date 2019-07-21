@@ -1,8 +1,10 @@
 numpy
 scipy
 
+python-dotenv
 SQLAlchemy >1.0, <1.2 # incompatible API changes
 
+Flask >= 1.0
 Flask-SqlAlchemy
 Flask-Migrate
 Flask-Assets
