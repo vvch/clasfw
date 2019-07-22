@@ -6,6 +6,10 @@ from .models import Model, Amplitude, Channel, Quantity
 from flask import request, Response, url_for, send_file, redirect, \
     render_template, render_template_string, Markup
 
+import hep
+import hep.hep
+import hep.amplitudes
+
 from sqlalchemy import func
 import numpy as np
 import json
@@ -83,6 +87,7 @@ def phi_dependence():
         request.args.get(x)
             for x in "model_id channel_id q2 w cos_theta".split()
     )
+    q2, w, cos_theta = [float(x) for x in (q2, w, cos_theta)]
     ampl = Amplitude.query.filter_by(
         channel_id=channel_id,
         model_id=model_id,
@@ -93,16 +98,21 @@ def phi_dependence():
 
     phi = np.linspace(0, 2*np.pi)
     # test dummy data
-    sig = np.sin(phi)
+    # sig = np.sin(phi)
+    eps_T = hep.hep.ε_T(w, q2, 10.6)  # Eb = 10.6 GeV
+    sig = hep.amplitudes.strfuns_to_dsigma(w, q2, cos_theta, eps_T, phi, *(ampl.strfuns))
+
+    def tex(q):
+        return "${}$".format(q.tex)
 
     plot = {
         'layout': {
             # 'autosize': 'true',
             'xaxis': {
-                'title': r'$\varphi$',
+                'title': tex(qu.phi),
             },
             'yaxis': {
-                'title': "${}$".format(qu.dsigma.tex),
+                'title': tex(qu.dsigma),
             },
         },
         'data': [{
@@ -115,5 +125,79 @@ def phi_dependence():
 
     return render_template('phi_dependence.html',
         ampl=ampl,
+        plot=plot,
+    )
+
+
+@bp.route('/dsigma')
+def dsigma():
+    model_id, channel_id, q2, w = (
+        request.args.get(x)
+            for x in "model_id channel_id q2 w".split()
+    )
+    q2, w = [float(x) for x in (q2, w)]
+    ampls = Amplitude.query.filter_by(
+        channel_id=channel_id,
+        model_id=model_id,
+        q2=q2,
+        w=w,
+    ).all()
+
+    phi = np.linspace(0, 2*np.pi)
+    # test dummy data
+    # sig = np.sin(phi)
+    eps_T = hep.hep.ε_T(w, q2, 10.6)  # Eb = 10.6 GeV
+    sig_M = np.zeros(shape=(len(ampls), len(phi)))
+    cos_theta_v = np.zeros(shape=(len(ampls),))
+    # for a in ampls:
+    for i in range(len(ampls)):
+        ampl = ampls[i]
+        cos_theta = ampl.cos_theta
+        cos_theta_v[i] = ampl.cos_theta
+        sig = hep.amplitudes.strfuns_to_dsigma(w, q2, cos_theta, eps_T, phi, *(ampl.strfuns))
+        sig_M[i] = sig
+
+    # i = np.arange(len(ampls))
+    # sig_M[i] = hep.amplitudes.strfuns_to_dsigma(w, q2, cos_theta, eps_T, phi, *(ampl[i].strfuns))
+
+    def plotly_3dlabel(q):
+        try:
+            return q.unicode
+        except AttributeError:
+            try:
+                return q.name
+            except AttributeError:
+                pass
+        return q.name
+
+    plot = {
+        'layout': {
+            'scene': {
+                # 'autosize': 'true',
+                'xaxis': {
+                    'title': "ϕ",
+                },
+                'yaxis': {
+                    # 'title': plotly_3dlabel(qu.cos_theta),
+                    'title': "cos θ",
+                },
+                'zaxis': {
+                    # 'title': plotly_3dlabel(qu.dsigma),
+                    'title': "dσ/dΩ",
+                    'rangemode': 'tozero',
+                },
+            },
+        },
+        'data': [{
+            # 'mode': 'markers',
+            'type': 'surface',
+            'x': phi.tolist(),
+            'y': cos_theta_v.tolist(),
+            'z': sig_M.tolist(),
+        }],
+    }
+
+    return render_template('phi_dependence.html',
+        kinem=ampl, # temporary
         plot=plot,
     )

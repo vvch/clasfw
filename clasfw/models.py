@@ -85,8 +85,14 @@ class Channel(DatesMixin, ExtDictionaryMixin, Base):
     pass
 
 
+class Unit(DatesMixin, ExtDictionaryMixin, Base):
+    __tablename__  = 'units' 
+
+
 class Quantity(DatesMixin, ExtDictionaryMixin, Base):
-    __tablename__  = 'quantities' 
+    __tablename__  = 'quantities'
+    unit_id        = Column(Integer, ForeignKey(Unit.id))
+    unit           = relationship(Unit)
 
 
 def complex_none(r, i):
@@ -274,45 +280,9 @@ class Amplitude(Base):
     def strfuns(self):
         return self.sigma_t, self.sigma_l, self.sigma_tt, self.sigma_tl, self.sigma_tlp
 
-    _lambdas_by_index = []
-    _index_by_lambdas = {}
-    @classmethod
-    def _init_lambdas(cls):
-        i=0
-        for lambda_B in -2, +2:
-            for lambda_g in -1, 0, +1:
-                for lambda_p in -2, +2:
-                    lambdas = lambda_B, lambda_g, lambda_p
-                    cls._lambdas_by_index.append(lambdas)
-                    cls._index_by_lambdas[lambdas] = i
-                    i += 1
-    # _init_lambdas()
-    @classmethod
-    def lambdas_int_by_aindex(cls, a_index):
-        return cls._lambdas_by_index[a_index]
-
-    @staticmethod
-    def lambda_int_to_str(l):
-        return {
-            -2: "−½",
-            +2: "+½",
-            +1: "+1",
-            -1: "−1",
-        }.get(l, str(l))
-
-    @classmethod
-    def a_index_by_lambdas_int(lb, lp, lg):
-        """
-        Returns list index in a array field
-        for 1/lambda_B, 1/lambda_p, 1/lambda_gamma specified
-        """
-        return cls._index_by_lambdas[lb, lp, lg]
-
-
-    def by_int_lambdas(self, lb, lg, lp):
-        return self.a[
-            self.a_index_by_lambdas_int(lb=lb, lg=lg, lp=lp)
-        ]
+    @strfuns.setter
+    def strfuns(self, strfuns):
+        self.sigma_t, self.sigma_l, self.sigma_tt, self.sigma_tl, self.sigma_tlp = strfuns
 
     __table_args__ = ( 
         UniqueConstraint(
@@ -320,83 +290,6 @@ class Amplitude(Base):
             name='grid',
         ),
     {} )
-
-
-Amplitude._init_lambdas()
-
-
-def sum_lplb(A, lg1, lg2=None):
-    if lg2 is None:
-        lg2 = lg1
-    s = 0
-    for lp in -2, +2:
-        for lb in -2, +2:
-            i1 = Amplitude.a_index_by_lambdas_int(lb, lp, lg1)
-            i2 = Amplitude.a_index_by_lambdas_int(lb, lp, lg2)
-            s += A[i1].conjugate()*A[i2]
-    return s
-
-
-def ampl_to_sigma_T(A):
-    M_plu2 = sum_lplb(A, +1)
-    M_min2 = sum_lplb(A, -1)
-    return M_plu2 + M_min2
-
-
-def ampl_to_sigma_L(A):
-    M_0_2 = sum_lplb(A, 0)
-    return M_0_2
-
-
-def ampl_to_sigma_TT(A, eps_T):
-    M_min_conj_M_plu = sum_lplb(A, -1, +1)
-    return -2*eps_T*M_min_conj_M_plu.real
-
-
-def sum_ampl_M0MpMm(A):
-    """
-    $$ M_0^* ( M_{+} - M_{-} ) $$
-    """
-    s = 0
-    # fixme: avoid "magic" constants +2/-2
-    for lp in -2, +2:
-        for lb in -2, +2:
-            i1, i2, i3 = (
-                Amplitude.a_index_by_lambdas_int(lb, lp, lg)
-                    for lg in (0, +1, -1))
-            s += A[i1].conjugate() * (
-                A[i2] - A[i3].conjugate())
-    return s
-
-
-def ampl_to_sigma_TL_TLP(a, eps_T):
-    M0MpMm = sum_ampl_M0MpMm(a)
-    return \
-        -2*np.sqrt(eps_T*(1+eps_T))*M0MpMm.real,  \
-         2*np.sqrt(eps_T*(1-eps_T))*M0MpMm.imag
-
-
-def strfuns_to_dsigma(W, Q2, Eb, phi, st, sl, stt, stl, stlp):
-    alpha = 1/137
-    M_p = 0.938 ## GeV
-    # fixme: use correct mass for pi^0 instead of pi^+- for pi0p reaction
-    m_m = 0.13957018 ## GeV ; 0.1349766 for pi^0
-    M_N = M_p
-    M_B = M_N ## fixme: ???
-    K_L = (W*W - M_N*M_N) / (2*M_N)
-    E_m = (W*W + m_m*m_m - M_B*M_B)
-    p_m = np.sqrt(E_m*E_m - m_m*m_m)
-    h = +1 ## -1 ???
-    eps_T = eps_T(W, Q2, Eb) ## ???
-
-    sin_theta = np.sin(theta) ## ???
-
-    ds = st + 2*eps_T*sl +  \
-         eps_T*np.cos(2*phi)*stt +  \
-         np.sqrt(eps_T*(1+eps_T))*np.cos(phi)*stl +  \
-         np.sqrt(eps_T*(1-eps_T))*np.sin(phi)*stlp*h
-    ds *= alpha*p_m / (32 * np.pi * K_L * M_N * W) * sin_theta
-    return ds
 
 
 if __name__ == '__main__':

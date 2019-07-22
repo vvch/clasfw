@@ -48,7 +48,7 @@ def register_extensions(app):
     """Register Flask extensions."""
 
     db.init_app(app)
-    migrate.init_app(app, db)
+    migrate.init_app(app, db, render_as_batch=True)
     debug_toolbar.init_app(app)
 
     assets.init_app(app)

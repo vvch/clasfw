@@ -22,9 +22,9 @@
 <thead>
 <tr>
 	<th>Channel</th>
-	<th>Q²</th>
-	<th>W</th>
-	<th class="rsplit">cos θ</th>
+	<th>{{ qu.Q2 }}</th>
+	<th>{{ qu.W }}</th>
+	<th class="rsplit">{{ qu.cos_theta }}</th>
 	{% for aa in qu.amplitudes %}
 	<th class="ampl">{{ aa }}</th>
 	{% endfor %}
@@ -33,6 +33,7 @@
 	{% endfor %}
 </tr>
 </thead>
+<tbody>
 {% for a in model.amplitudes %}
 <tr>
 	<td>{{ a.channel }}</td>
@@ -47,6 +48,7 @@
 	{% endfor %}
 </tr>
 {% endfor %}
+</tbody>
 </table>
 </div>
 {% endblock%}

@@ -1,16 +1,6 @@
-import os
-
-# shoul be set in environment!
-# may not behave as expected if set in code
-os.environ.setdefault('DEBUG', 'True')
-os.environ.setdefault('FLASK_DEBUG', 'True')
-os.environ.setdefault('FLASK_ENV', 'development')
-os.environ.setdefault('FLASK_APP', 'clasfw:app.py')
-
-from clasfw.app import create_app
-from clasfw.settings import DevConfig
-from clasfw.models import Base, Model, Amplitude, Channel, Quantity
+from clasfw.models import Model, Amplitude, Channel, Quantity, Unit
 from clasfw.extensions import db
+import hep.amplitudes
 import numpy as np
 
 
@@ -22,8 +12,8 @@ def create_amplitude_qu():
     qq = []
     for i in range(Amplitude.number):
         lambdas_str = tuple(
-                Amplitude.lambda_int_to_str(l)
-                    for l in Amplitude.lambdas_int_by_aindex(i))
+                hep.amplitudes.rlambda_to_str(l)
+                    for l in hep.amplitudes.rlambdas_by_aindex(i))
         qq += Quantity(
             id = 200 + i,
             name = tmpl_text.format(*lambdas_str),
@@ -35,12 +25,48 @@ def create_amplitude_qu():
 
 def create_structure_functions_qu():
     qq = []
+    dimensionless = Unit(
+        id = 1,
+        name = "dimensionless",
+        html = "dimensionless",
+        tex  = r"dimensionless",
+        priority = 0,
+    )
+    GeV = Unit(
+        id = 2,
+        name = "GeV",
+        html = "GeV",
+        tex  = r"GeV",
+        priority = 10,
+    )
+    GeV2 = Unit(
+        id = 3,
+        name = "GeV^2",
+        html = "GeV²",
+        tex  = r"GeV^2",
+        priority = 20,
+    )
+    mcb = Unit(
+        id = 4,
+        name = "mcb",
+        html = "μb",
+        tex  = r"\mu b",
+        priority = 30,
+    )
+    rad = Unit(
+        id = 4,
+        name = "rad",
+        html = "rad",
+        tex  = r"rad",
+        priority = 40,
+    )
     qq += Quantity(
         id = 191,
         name = "sigma_U",
         html = "&sigma;<sub>U</sub>",
         tex  = r"\sigma_{U}",
         priority = 100,
+        unit=dimensionless,
     ),
     qq += Quantity(
         id = 44,
@@ -48,6 +74,7 @@ def create_structure_functions_qu():
         html = "&sigma;<sub>T</sub>",
         tex  = r"\sigma_{T}",
         priority = 90,
+        unit=dimensionless,
     ),
     qq += Quantity(
         id = 43,
@@ -55,6 +82,7 @@ def create_structure_functions_qu():
         html = "&sigma;<sub>L</sub>",
         tex  = r"\sigma_{L}",
         priority = 80,
+        unit=dimensionless,
     ),
     qq += Quantity(
         id = 47,
@@ -62,6 +90,7 @@ def create_structure_functions_qu():
         html = "&sigma;<sub>TT</sub>",
         tex  = r"\sigma_{TT}",
         priority = 70,
+        unit=dimensionless,
     ),
     qq += Quantity(
         id = 48,
@@ -69,6 +98,7 @@ def create_structure_functions_qu():
         html = "&sigma;<sub>TL</sub>",
         tex  = r"\sigma_{TL}",
         priority = 60,
+        unit=dimensionless,
     ),
     qq += Quantity(
         id = 666,
@@ -76,6 +106,7 @@ def create_structure_functions_qu():
         html = "&sigma;<sub>TL&prime;</sub>",
         tex  = r"\sigma_{TL'}",
         priority = 50,
+        unit=dimensionless,
     ),
     qq += Quantity(
         id = 19,
@@ -84,12 +115,42 @@ def create_structure_functions_qu():
         tex  = r"\mathrm{d}\sigma/\mathrm{d}\Omega",
         priority = 40,
     ),
+    qq += Quantity(
+        id = 1017,
+        name = "cos(theta)",
+        html = "cos(&theta;)",
+        tex  = r"\cos(\theta)",
+        priority = 30,
+        unit=dimensionless,
+    ),
+    qq += Quantity(
+        id = 1014,
+        name = "Q^2",
+        html = "Q<sup>2</sup>",
+        tex  = r"Q^2",
+        priority = 20,
+        unit=GeV2,
+    ),
+    qq += Quantity(
+        id = 1015,
+        name = "W",
+        html = "W",
+        tex  = r"W",
+        priority = 10,
+        unit=GeV,
+    ),
+    qq += Quantity(
+        id = 1016,
+        name = "phi",
+        html = "&phi;",
+        tex  = r"\varphi",
+        priority = 0,
+        unit=rad,
+    ),
     return qq
 
 
 def generate_test_content():
-    # Base.metadata.create_all()
-    # db.create_all()
     m1 = Model(
         name="test_1",
         description="test model with dummy amplitude values equal to 1",
@@ -158,6 +219,17 @@ def generate_test_content():
 
 
 if __name__ == '__main__':
+    from clasfw.app import create_app
+
+    import os
+
+    # shoul be set in environment!
+    # may not behave as expected if set in code
+    os.environ.setdefault('DEBUG', 'True')
+    os.environ.setdefault('FLASK_DEBUG', 'True')
+    os.environ.setdefault('FLASK_ENV', 'development')
+    os.environ.setdefault('FLASK_APP', 'clasfw:app.py')
+
     app = create_app()
     # db.create_all()
     with app.test_request_context():
