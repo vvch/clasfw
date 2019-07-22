@@ -6,6 +6,8 @@ from .extensions import db
 import hep.amplitudes
 import flask_migrate
 
+from .generate_content import create_dictionaries, generate_test_content, generate_all
+
 
 def register(app):
     @app.cli.group()
@@ -16,17 +18,17 @@ def register(app):
     @gen.command()
     def all():
         """Generate all DB content."""
-        pass
+        generate_all()
 
     @gen.command()
     def dict():
         """Generate dictionary tables content."""
-        pass
+        create_dictionaries()
 
     @gen.command()
     def models():
         """Generate dummy models data."""
-        pass
+        generate_test_content()
 
     @gen.command()
     def create():

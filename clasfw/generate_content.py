@@ -1,10 +1,10 @@
-from clasfw.models import Model, Amplitude, Channel, Quantity, Unit
-from clasfw.extensions import db
+from .models import Model, Amplitude, Channel, Quantity, Unit
+from .extensions import db
 import hep.amplitudes
 import numpy as np
 
 
-def create_amplitude_qu():
+def create_amplitude_qu(qu):
     tmpl_text = "<0 {}|T|{} {}>"
     tmpl_html = "&#x27e8;0&nbsp;{}|T|{}&nbsp;{}&#x27e9;"
     tmpl_tex  = "\\langle 0 \\; {}|T| {} \\; {}\\rangle"
@@ -19,11 +19,13 @@ def create_amplitude_qu():
             name = tmpl_text.format(*lambdas_str),
             html = tmpl_html.format(*lambdas_str),
             tex  = tmpl_tex.format(*lambdas_str),
+            unit = qu.dimensionless,
         ),
-    return qq
+    db.session.add_all(qq)
+    return qu
 
 
-def create_structure_functions_qu():
+def create_quantities_functions_qu(qu):
     qq = []
     dimensionless = Unit(
         id = 1,
@@ -32,6 +34,7 @@ def create_structure_functions_qu():
         tex  = r"dimensionless",
         priority = 0,
     )
+    qu.dimensionless = dimensionless
     GeV = Unit(
         id = 2,
         name = "GeV",
@@ -147,7 +150,16 @@ def create_structure_functions_qu():
         priority = 0,
         unit=rad,
     ),
-    return qq
+    db.session.add_all(qq)
+    return qu
+
+
+def create_dictionaries():
+    class qu:
+        pass
+    create_quantities_functions_qu(qu)
+    create_amplitude_qu(qu)
+    db.session.commit()
 
 
 def generate_test_content():
@@ -211,11 +223,13 @@ def generate_test_content():
                 m1.amplitudes.append(a1)
                 m2.amplitudes.append(a2)
                 m3.amplitudes.append(a3)
-    db.session.add_all(
-        [m1, m2, m3] +
-        create_amplitude_qu() +
-        create_structure_functions_qu())
+    db.session.add_all([m1, m2, m3])
     db.session.commit()
+
+
+def generate_all():
+    create_dictionaries()
+    generate_test_content()
 
 
 if __name__ == '__main__':
@@ -223,14 +237,7 @@ if __name__ == '__main__':
 
     import os
 
-    # shoul be set in environment!
-    # may not behave as expected if set in code
-    os.environ.setdefault('DEBUG', 'True')
-    os.environ.setdefault('FLASK_DEBUG', 'True')
-    os.environ.setdefault('FLASK_ENV', 'development')
-    os.environ.setdefault('FLASK_APP', 'clasfw:app.py')
-
     app = create_app()
     # db.create_all()
     with app.test_request_context():
-        generate_test_content()
+        generate_all()
