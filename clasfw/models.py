@@ -157,8 +157,6 @@ class Amplitude(Base):
     a7j            = Column(Float)
     a8r            = Column(Float)
     a8j            = Column(Float)
-    a8r            = Column(Float)
-    a8j            = Column(Float)
     a9r            = Column(Float)
     a9j            = Column(Float)
     a10r           = Column(Float)

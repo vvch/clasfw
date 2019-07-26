@@ -126,9 +126,9 @@ def strfuns_to_dsigma(W, Q2, cos_theta, eps_T, phi, st, sl, stt, stl, stlp):
 
     sin_theta = np.sqrt(1-cos_theta**2)
 
-    ds = st + 2*eps_T*sl +  \
-         eps_T*np.cos(2*phi)*stt +  \
-         np.sqrt(eps_T*(1+eps_T))*np.cos(phi)*stl +  \
-         np.sqrt(eps_T*(1-eps_T))*np.sin(phi)*stlp*h
+    ds = st + 2*eps_T*sl  \
+       + eps_T*np.cos(2*phi)*stt  \
+       + np.sqrt(eps_T*(1+eps_T))*np.cos(phi)*stl  \
+       + np.sqrt(eps_T*(1-eps_T))*np.sin(phi)*stlp*h
     ds *= alpha*p_m / (4*4*4 * np.pi * K_L * M_N * W) * sin_theta
     return ds * mcb_per_GeVm2

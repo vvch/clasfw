@@ -3,6 +3,8 @@ import numpy as np
 alpha   = 1.0 / 137.035999139     #  Fine-structure constant
 M_p     = 0.9382720813            #  [GeV]
 M_p2    = M_p**2                  #  [GeV**2]
+m_pi    = 0.13957018              #  [GeV]
+m_pi0   = 0.1349766               #  [GeV]
 GeVm2_per_mcb = 2.57E-3           #  [Gev**2/mcbn], conversion factor from mcbn to GeV
 mcb_per_GeVm2 = 1/GeVm2_per_mcb
 

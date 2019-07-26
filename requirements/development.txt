@@ -1,4 +1,4 @@
--r prod.txt
+-r production.txt
 
 flask-shell-ipython
 flask-debugtoolbar >= 0.10.1

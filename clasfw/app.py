@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template_string
+from flask import Flask, request, render_template, render_template_string
 
 from .settings import ProdConfig, DevConfig
 from .extensions import db, migrate, assets, debug_toolbar
@@ -31,7 +31,7 @@ def create_app(config_object=None):
 
     register_extensions(app)
     register_blueprints(app)
-    # register_errorhandlers(app)
+    register_errorhandlers(app)
     return app
 
 
@@ -76,16 +76,16 @@ def register_extensions(app):
     return None
 
 
-# @app.errorhandler(404)
-# def error_page_not_found(e):
-#     return render_template_string(
-#         """
-#         <html>
-#         <head>
-#         </head>
-#         <body>
-#             <h1>Page not found</h1>
-#             <div>{{ path }}</div>
-#         </body>
-#         </html>
-#         """, path=request.path), 404
+def register_errorhandlers(app):
+    """Register error handlers."""
+
+    def render_error(error):
+        """Render error template."""
+        # If a HTTPException, pull the `code` attribute; default to 500
+        error_code = getattr(error, "code", 500)
+        return render_template("{0}.html".format(error_code)), error_code
+
+    for errcode in [404, 500]:
+    # for errcode in [401, 404, 500]:
+        app.errorhandler(errcode)(render_error)
+    return None

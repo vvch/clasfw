@@ -1,2 +1,2 @@
-FLASK_APP=clasfw.app
+FLASK_APP=manage
 FLASK_ENV=development

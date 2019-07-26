@@ -29,23 +29,9 @@ class Config:
     ADMINS = ['chesn@depni.sinp.msu.ru']
     
     # STYLUS_BIN = '/usr/local/bin/stylus'
-    
-    
-    USER_APP_NAME                   = "CLAS Analysis Framework"    # Used by email templates
-    USER_ENABLE_EMAIL               = True
-    USER_ENABLE_USERNAME            = True
-    USER_ENABLE_CHANGE_USERNAME     = False
-    
-    USER_ENABLE_INVITATION          = True
-    USER_REQUIRE_INVITATION         = True
-    USER_ENABLE_INVITE_USER         = True
-    
-    USER_LOGIN_URL                  = '/user/login'
-    USER_LOGOUT_URL                 = '/user/logout'
-    
-    USER_AFTER_LOGIN_ENDPOINT = 'index'
-    # USER_AFTER_LOGIN_ENDPOINT = 'user.profile'
-    # USER_AFTER_LOGOUT_ENDPOINT = 'index'
+
+    # to suppress 'overhead' warning
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 class ProdConfig(Config):

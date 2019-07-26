@@ -3,13 +3,13 @@
 {%- endmacro -%}
 
 <div class="top-menu">
-    <a href="{{ url_for('.index') }}"
+    <a href="{{ url_for('clasfw.index') }}"
         accesskey="S"
         title="">Start</a>
 
     {{delim()}}
 
-    <a href="{{ url_for('.models_list') }}"
+    <a href="{{ url_for('clasfw.models_list') }}"
         accesskey="L"
         title="List of all available models">Models</a>
     {{delim()}}
