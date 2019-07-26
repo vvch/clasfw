@@ -8,13 +8,26 @@ TABLE.models, TABLE.amplitudes
 	TD, TH
 		border: solid 1px
 		padding: 0.3em 0.5em
+		A
+			text-decoration: none
+			&:hover
+				text-decoration: underline
 	TD.rsplit, TH.rsplit
 		border-right: solid 5px
 	TD.lsplit, TH.lsplit
 		border-left: solid 5px
 	TH.ampl
 		font-weight: normal
-		font-size: small
+		font-size: x-small
+
+TABLE.amplitudes
+	TH.hidden-link, TD.hidden-link
+		display: none
+	TBODY>TR
+		cursor: pointer
+		&:hover
+			background-color: lightcyan
+
 
 DIV.model-data
 	DL

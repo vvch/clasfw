@@ -4,6 +4,12 @@
 	Model data
 {%- endblock %}
 
+{% block extrahead %}
+{% assets "js_modellist" -%}
+<script src="{{ ASSET_URL }}"></script>
+{% endassets -%}
+{% endblock %}
+
 {% block content %}
 <div class="model-data">
 
@@ -21,6 +27,7 @@
 <table class="amplitudes">
 <thead>
 <tr>
+	<th class="hidden-link">{{ qu.phi }}-dependence</th>
 	<th>Channel</th>
 	<th>{{ qu.Q2 }}</th>
 	<th>{{ qu.W }}</th>
@@ -36,6 +43,9 @@
 <tbody>
 {% for a in model.amplitudes %}
 <tr>
+	<td class="hidden-link"><a href="{{
+		url_for('.phi_dependence', channel_id=a.channel_id, model_id=a.model_id, q2=a.q2, w=a.w, cos_theta=a.cos_theta)
+	}}">{{ qu.dsigma }}</a></td>
 	<td>{{ a.channel }}</td>
 	<td>{{ a.q2 |cpx }}</td>
 	<td>{{ a.w  |cpx }}</td>

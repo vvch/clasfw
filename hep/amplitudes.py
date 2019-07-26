@@ -1,4 +1,5 @@
 import numpy as np
+from .hep import mcb_per_GeVm2, alpha, M_p
 
 
 _lambdas_by_index = []
@@ -112,8 +113,6 @@ def ampl_to_strfuns(A):
 
 
 def strfuns_to_dsigma(W, Q2, cos_theta, eps_T, phi, st, sl, stt, stl, stlp):
-    alpha = 1/137
-    M_p = 0.938 ## GeV
     # fixme: use correct mass for pi^0 instead of pi^+- for pi0p reaction
     m_m = 0.13957018 ## GeV ; 0.1349766 for pi^0
     M_N = M_p
@@ -132,6 +131,4 @@ def strfuns_to_dsigma(W, Q2, cos_theta, eps_T, phi, st, sl, stt, stl, stlp):
          np.sqrt(eps_T*(1+eps_T))*np.cos(phi)*stl +  \
          np.sqrt(eps_T*(1-eps_T))*np.sin(phi)*stlp*h
     ds *= alpha*p_m / (4*4*4 * np.pi * K_L * M_N * W) * sin_theta
-    # fixme: convert GeV to mcb
-    ds *= 389.5  #  mcb/GeV^-2
-    return ds
+    return ds * mcb_per_GeVm2

@@ -2,7 +2,6 @@ from flask import Flask, request, render_template_string
 
 from .settings import ProdConfig, DevConfig
 from .extensions import db, migrate, assets, debug_toolbar
-from .shell_context import get_shell_context
 from .clasfw.blueprint import blueprint
 from .clasfw import views
 
@@ -33,8 +32,6 @@ def create_app(config_object=None):
     register_extensions(app)
     register_blueprints(app)
     # register_errorhandlers(app)
-
-    app.shell_context_processor(get_shell_context)
     return app
 
 
@@ -66,6 +63,10 @@ def register_extensions(app):
         'base.styl', 'views.styl',
         filters='stylus',
         output='gen/screen.css')
+
+    assets.register('js_modellist',
+        'model_list.js',
+        output='gen/model_list.js')
 
     # if 0: #app.debug:
     #     from flask_debugtoolbar import DebugToolbarExtension

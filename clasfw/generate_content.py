@@ -10,7 +10,7 @@ def create_amplitude_qu(qu):
     tmpl_tex  = "\\langle 0 \\; {}|T| {} \\; {}\\rangle"
 
     qq = []
-    for i in range(Amplitude.number):
+    for i in range(hep.amplitudes.ampl_num):
         lambdas_str = tuple(
                 hep.amplitudes.rlambda_to_str(l)
                     for l in hep.amplitudes.rlambdas_by_aindex(i))
@@ -217,9 +217,10 @@ def generate_test_content():
                     q2=q2,
                     cos_theta=cos_theta,
                 )
-                a1.a = [1 ]*Amplitude.number
-                a2.a = [1j]*Amplitude.number
+                a1.a = [1 ]*hep.amplitudes.ampl_num
+                a2.a = [1j]*hep.amplitudes.ampl_num
                 a3.a0 = 3+5j
+                a3.a1 = 1+2j
                 m1.amplitudes.append(a1)
                 m2.amplitudes.append(a2)
                 m3.amplitudes.append(a3)

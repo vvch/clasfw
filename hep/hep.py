@@ -3,7 +3,9 @@ import numpy as np
 alpha   = 1.0 / 137.035999139     #  Fine-structure constant
 M_p     = 0.9382720813            #  [GeV]
 M_p2    = M_p**2                  #  [GeV**2]
-GeVm2_per_mcbn = 2.57E-3          #  [Gev^2/mcbn], conversion factor from mcbn to GeV
+GeVm2_per_mcb = 2.57E-3           #  [Gev**2/mcbn], conversion factor from mcbn to GeV
+mcb_per_GeVm2 = 1/GeVm2_per_mcb
+
 
 α4π2 = 4*np.pi*np.pi*alpha
 
@@ -49,7 +51,7 @@ def ε_T(W, Q2, E, ν=None):
 
 
 def σ_to_F1F2(σ, Q2, E, R, W=None, v=None):
-    σ *= GeVm2_per_mcbn
+    σ *= GeVm2_per_mcb
     if ν is None:
         ν = W2nu(W, Q2)
     ν2 = ν*ν
@@ -79,7 +81,7 @@ def SigTL_from_Q2nuEF1F2(Q2, nu, E, F1, F2):
     sigmaT = F1 / k1
     sigmaL = F2 / k2 - sigmaT
 
-    return (sigmaT / GeVm2_per_mcbn, sigmaL / GeVm2_per_mcbn)
+    return (sigmaT * mcb_per_GeVm2, sigmaL * mcb_per_GeVm2)
 
 
 def SigTot_from_Q2nuESigTL(Q2, nu, E, sigmaT, sigmaL):

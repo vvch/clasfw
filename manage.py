@@ -15,7 +15,7 @@ def make_shell_context():
     return {
         'np': np,
         'db': db,
-        'qu': qu,  #  fixme: not working
+        'qu': qu,  #  fixme: not initialized 
         'Amplitude': Amplitude,
         'Quantity': Quantity,
         'Channel': Channel,

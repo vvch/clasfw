@@ -9,6 +9,7 @@ from database import Base, Column, \
         relationship, backref, deferred, func, desc
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
+from flask import Markup
 
 import re
 
@@ -74,13 +75,6 @@ class ExtDictionaryMixin(DictionaryMixin):
         return self.html
 
 
-class Model(DictionaryMixin, Base):
-    author         = Column(String, nullable=False,
-        default='')
-    comment        = Column(Text, nullable=False,
-        default='')
-
-
 class Channel(DatesMixin, ExtDictionaryMixin, Base):
     pass
 
@@ -92,7 +86,36 @@ class Unit(DatesMixin, ExtDictionaryMixin, Base):
 class Quantity(DatesMixin, ExtDictionaryMixin, Base):
     __tablename__  = 'quantities'
     unit_id        = Column(Integer, ForeignKey(Unit.id))
-    unit           = relationship(Unit)
+    # fixme: lazy loading of units causes DetachedInstanceError
+    #   <Quantity> is not bound to a Session; lazy load operation of attribute 'unit' cannot proceed
+    # after long application uptime
+    # for preliminary loaded quantities in before_first_request likq 'qu' object
+    unit           = relationship(Unit, lazy='immediate')
+
+    def with_unit(self, type='html'):
+        # fixme: do not use plain unit ID for comparison!!
+        q = getattr(self, type)
+        if self.unit_id != 1:  #  not dimensionless
+            u = getattr(self.unit, type)
+            fmt = "{}, {}"
+            q = fmt.format(q, u)
+        if type == 'html':
+            q = Markup(q)
+        return q
+
+    @property
+    def wu(self):
+        return self.with_unit()
+    @property
+    def wu_tex(self):
+        return self.with_unit('tex')
+
+
+class Model(DictionaryMixin, Base):
+    author         = Column(String, nullable=False,
+        default='')
+    comment        = Column(Text, nullable=False,
+        default='')
 
 
 def complex_none(r, i):

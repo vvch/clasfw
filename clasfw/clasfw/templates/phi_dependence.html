@@ -12,27 +12,29 @@
 {% block content %}
 <h1>&phi; dependence</h1>
 
-<table class="amplitudes">
+<table class="models">
 {% if ampl %}
 <tr>
 	<th>Model</th>
-	<td>{{ ampl.model }}</td>
+	<td><a href="{{
+		url_for('.model_data', model_id=ampl.model_id)
+	}}">{{ ampl.model }}</a></td>
 </tr>
 <tr>
 	<th>Channel</th>
 	<td>{{ ampl.channel }}</td>
 </tr>
 <tr>
-	<th>{{ qu.Q2 }}</th>
+	<th>{{ qu.Q2.wu }}</th>
 	<td>{{ ampl.q2 }}</td>
 </tr>
 <tr>
-	<th>{{ qu.W }}</th>
+	<th>{{ qu.W.wu }}</th>
 	<td>{{ ampl.w }}</td>
 </tr>
 <tr>
-	<th>{{ qu.cos_theta }}</th>
-	<td>{{ ampl.cos_theta }}</td>
+	<th>{{ qu.cos_theta.wu }}</th>
+	<td>{{ ampl.cos_theta |cpx}}</td>
 </tr>
 {% for i in range(ampl.number) %}
 <tr>
@@ -42,7 +44,7 @@
 {% endfor %}
 {% for r in zip(qu.strfuns, ampl.strfuns) %}
 <tr>
-	<th>{{ r.0 }}</th>
+	<th>{{ r.0.wu }}</th>
 	<td>{{ r.1 }}</td>
 </tr>
 {% endfor %}
@@ -54,9 +56,9 @@
 	<td>{{ kinem.model }}</td>
 </tr>
 <tr>
-	<th>{{ qu.Q2 }}</th>
+	<th>{{ qu.Q2.wu }}</th>
 	<td>{{ kinem.q2 }}</td>
-	<th>{{ qu.W }}</th>
+	<th>{{ qu.W.wu }}</th>
 	<td>{{ kinem.w }}</td>
 </tr>
 {% endif %}
