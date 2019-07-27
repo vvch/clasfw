@@ -15,42 +15,60 @@
 {% block content %}
 <h1>&phi; dependence</h1>
 
-<table class="models">
+<table>
 {% if ampl %}
 <tr>
-	<th>Model</th>
-	<td><a href="{{
-		url_for('.model_data', model_id=ampl.model_id)
-	}}">{{ ampl.model }}</a></td>
+	<td>
+	<table class="properties">
+	<thead>
+	<tr>	
+			<th>Model</th>
+			<th>Channel</th>
+			<th>{{ qu.Q2.wu }}</th>
+			<th>{{ qu.W.wu }}</th>
+			<th class="rsplit">{{ qu.cos_theta.wu }}</th>
+			{% for r in qu.strfuns %}
+			<th>{{ r.wu }}</th>
+			{% endfor %}
+	</tr>
+	</thead>
+	<tbody>
+	<tr>
+			<td><a href="{{
+				url_for('.model_data', model_id=ampl.model_id)
+			}}">{{ ampl.model }}</a></td>
+			<td>{{ ampl.channel }}</td>
+			<td>{{ ampl.q2 }}</td>
+			<td>{{ ampl.w }}</td>
+			<td class="rsplit">{{ ampl.cos_theta |cpx}}</td>
+			{% for r in ampl.strfuns %}
+			<th>{{ r }}</th>
+			{% endfor %}
+	</tr>
+	</tbody>
+	</table>
+	</td>
 </tr>
 <tr>
-	<th>Channel</th>
-	<td>{{ ampl.channel }}</td>
+	<td>
+		<table class="properties">
+		<thead>
+		<tr>
+			{% for i in range(ampl.number) %}
+			<th class="ampl">{{ qu.amplitudes[i] }}</th>
+			{% endfor %}
+		</tr>
+		</thead>
+		<tbody>
+		<tr>
+			{% for i in range(ampl.number) %}
+			<td>{{ ampl.a[i] |cpx}}</td>
+			{% endfor %}
+		</tr>
+		</tbody>
+		</table>
+	</td>
 </tr>
-<tr>
-	<th>{{ qu.Q2.wu }}</th>
-	<td>{{ ampl.q2 }}</td>
-</tr>
-<tr>
-	<th>{{ qu.W.wu }}</th>
-	<td>{{ ampl.w }}</td>
-</tr>
-<tr>
-	<th>{{ qu.cos_theta.wu }}</th>
-	<td>{{ ampl.cos_theta |cpx}}</td>
-</tr>
-{% for i in range(ampl.number) %}
-<tr>
-	<th class="ampl">{{ qu.amplitudes[i] }}</th>
-	<td>{{ ampl.a[i] |cpx}}</td>
-</tr>
-{% endfor %}
-{% for r in zip(qu.strfuns, ampl.strfuns) %}
-<tr>
-	<th>{{ r.0.wu }}</th>
-	<td>{{ r.1 }}</td>
-</tr>
-{% endfor %}
 {% else %}{# not ampl #}
 <tr>
 	<th>Channel</th>

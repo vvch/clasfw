@@ -95,9 +95,11 @@ class Quantity(DatesMixin, ExtDictionaryMixin, Base):
     def with_unit(self, type='html'):
         # fixme: do not use plain unit ID for comparison!!
         q = getattr(self, type)
-        if self.unit_id != 1:  #  not dimensionless
+        if self.unit_id not in (0, 1, None):  #  not dimensionless or unknown
             u = getattr(self.unit, type)
-            fmt = "{}, {}"
+            fmt = {
+                'tex': r"{0}, \mathrm{{{1}}}",
+            }.get(type, "{0}, {1}")
             q = fmt.format(q, u)
         if type == 'html':
             q = Markup(q)

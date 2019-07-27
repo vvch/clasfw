@@ -103,7 +103,7 @@ def phi_dependence():
     sig = hep.amplitudes.strfuns_to_dsigma(w, q2, cos_theta, eps_T, phi, *(ampl.strfuns))
 
     def tex(q):
-        return "${}$".format(q.tex)
+        return "${}$".format(q.wu_tex)
 
     plot = {
         'layout': {
@@ -113,6 +113,12 @@ def phi_dependence():
             },
             'yaxis': {
                 'title': tex(qu.dsigma),
+            },
+            'margin': {
+                 't': 32,
+                 # 'b': 65,
+                 # 'l': 65,
+                 # 'r': 50,
             },
         },
         'data': [{

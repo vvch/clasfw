@@ -32,36 +32,50 @@ def create_quantities_functions_qu(qu):
         name = "dimensionless",
         html = "dimensionless",
         tex  = r"dimensionless",
-        priority = 0,
+        priority = -10,
     )
     qu.dimensionless = dimensionless
-    GeV = Unit(
-        id = 2,
-        name = "GeV",
-        html = "GeV",
-        tex  = r"GeV",
-        priority = 10,
-    )
-    GeV2 = Unit(
-        id = 3,
-        name = "GeV^2",
-        html = "GeV²",
-        tex  = r"GeV^2",
-        priority = 20,
-    )
-    mcb = Unit(
-        id = 4,
-        name = "mcb",
-        html = "μb",
-        tex  = r"\mu b",
-        priority = 30,
-    )
     rad = Unit(
-        id = 4,
+        id = 2,
         name = "rad",
         html = "rad",
         tex  = r"rad",
-        priority = 40,
+        priority = -20,
+    )
+    deg = Unit(
+        id = 3,
+        name = "deg",
+        html = "deg",
+        tex  = r"deg",
+        priority = -30,
+    )
+    GeV = Unit(
+        id = 4,
+        name = "GeV",
+        html = "GeV",
+        tex  = r"GeV",
+        priority = -40,
+    )
+    GeV2 = Unit(
+        id = 5,
+        name = "GeV^2",
+        html = "GeV²",
+        tex  = r"GeV^2",
+        priority = -50,
+    )
+    mcb = Unit(
+        id = 6,
+        name = "mcb",
+        html = "μb",
+        tex  = r"\mu b",
+        priority = -60,
+    )
+    mcb_sr = Unit(
+        id = 7,
+        name = "mcb/sr",
+        html = "μb/sr",
+        tex  = r"\mu b /sr",
+        priority = -70,
     )
     qq += Quantity(
         id = 191,
@@ -117,6 +131,7 @@ def create_quantities_functions_qu(qu):
         html = "d&sigma;/d&Omega;",
         tex  = r"\mathrm{d}\sigma/\mathrm{d}\Omega",
         priority = 40,
+        unit=mcb_sr,
     ),
     qq += Quantity(
         id = 1017,
