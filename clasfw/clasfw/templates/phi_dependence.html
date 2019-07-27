@@ -5,8 +5,11 @@
 {%- endblock %}
 
 {% block extrahead %}
-<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG"></script>
+{#
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+#}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.49.0/plotly.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_SVG"></script>
 {% endblock %}
 
 {% block content %}
@@ -65,7 +68,6 @@
 </table>
 
 <div id="plot"></div>
-
 <script>
 var plot_json = {{ plot|safe }};
 Plotly.newPlot('plot', plot_json.data, plot_json.layout, {'displaylogo': false
@@ -74,5 +76,4 @@ Plotly.newPlot('plot', plot_json.data, plot_json.layout, {'displaylogo': false
 {%- endif -%}
 });
 </script>
-
 {% endblock%}
