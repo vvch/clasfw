@@ -1,5 +1,5 @@
 import numpy as np
-from .hep import mcb_per_GeVm2, alpha, M_p
+from .hep import mcb_per_GeVm2, alpha, M_p, m_pi, m_pi0
 
 
 _lambdas_by_index = []
@@ -93,7 +93,7 @@ def sum_ampl_M0MpMm(A):
                 aindex_by_rlambdas(lb, lp, lg)
                     for lg in (0, +1, -1))
             s += A[i1].conjugate() * (
-                A[i2] - A[i3].conjugate())
+                A[i2] - A[i3])
     return s
 
 
@@ -113,12 +113,16 @@ def ampl_to_strfuns(A):
 
 
 def strfuns_to_dsigma(W, Q2, cos_theta, eps_T, phi, st, sl, stt, stl, stlp):
+    """
+    Calculate differential cross-section from structure functions
+    for specified kinematics
+    """
     # fixme: use correct mass for pi^0 instead of pi^+- for pi0p reaction
-    m_m = 0.13957018 ## GeV ; 0.1349766 for pi^0
+    m_m = m_pi  ## or m_pi0 for pi0p final state
     M_N = M_p
     M_B = M_N ## fixme: ???
     K_L = (W*W - M_N*M_N) / (2*M_N)
-    E_m = (W*W + m_m*m_m - M_B*M_B)
+    E_m = (W*W + m_m*m_m - M_B*M_B) / (2*W)
     p_m = np.sqrt(E_m*E_m - m_m*m_m)
     
     # fixme: should depend on reaction?
