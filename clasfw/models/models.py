@@ -1,5 +1,5 @@
 __all__ = [
-    'Amplitude', 'Model', 'Channel', 'Quantity'
+    'Amplitude', 'Model', 'Channel', 'Quantity', 'Unit'
 ]
 
 from database import Base, Column, \
