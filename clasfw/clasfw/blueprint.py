@@ -25,9 +25,9 @@ def setup_quantities():
     for s in qu.strfun_names:
         q = Quantity.query.filter_by(name=s).one()
         qu.strfuns.append(q)
-    qu.Q2, qu.W, qu.cos_theta, qu.phi, qu.dsigma = (
+    qu.Q2, qu.W, qu.cos_theta, qu.phi, qu.dsigma, qu.Eb = (
         Quantity.query.filter_by(name=s).one()
-            for s in "Q^2 W cos(theta) phi dsigma/dOmega".split() )
+            for s in "Q^2 W cos(theta) phi dsigma/dOmega E_b".split() )
     qu.amplitudes = Quantity.query.filter(
         # fixme: should NOT use plain numeric identifiers!
         Quantity.id.between(200, 200+Amplitude.number-1)

@@ -28,15 +28,15 @@
 <thead>
 <tr>
 	<th class="hidden-link">{{ qu.phi }}-dependence</th>
-	<th>Channel</th>
-	<th>{{ qu.Q2 }}</th>
-	<th>{{ qu.W }}</th>
-	<th class="rsplit">{{ qu.cos_theta }}</th>
+	<th class="channel">Channel</th>
+	<th>{{ qu.Q2.wu }}</th>
+	<th>{{ qu.W.wu }}</th>
+	<th class="rsplit">{{ qu.cos_theta.wu }}</th>
 	{% for aa in qu.amplitudes %}
 	<th class="ampl">{{ aa }}</th>
 	{% endfor %}
-	{% for aa in qu.strfuns %}
-	<th{%if loop.first%} class="lsplit"{%endif%}>{{ aa }}</th>
+	{% for sf in qu.strfuns %}
+	<th{%if loop.first%} class="lsplit"{%endif%}>{{ sf.wu }}</th>
 	{% endfor %}
 </tr>
 </thead>
@@ -46,7 +46,7 @@
 	<td class="hidden-link"><a href="{{
 		url_for('.phi_dependence', channel_id=a.channel_id, model_id=a.model_id, q2=a.q2, w=a.w, cos_theta=a.cos_theta)
 	}}">{{ qu.dsigma }}</a></td>
-	<td>{{ a.channel }}</td>
+	<td class="channel">{{ a.channel }}</td>
 	<td>{{ a.q2 |cpx }}</td>
 	<td>{{ a.w  |cpx }}</td>
 	<td class="rsplit">{{ a.cos_theta |cpx }}</td>

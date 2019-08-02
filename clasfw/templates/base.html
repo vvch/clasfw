@@ -11,15 +11,14 @@
     CLAS Analysis Framework
 {%- endblock -%}
 </title>
+{% assets "css_screen" -%}
+<link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+{% endassets -%}
 {#
 <script type="text/javascript"
     src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 -#}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-{% assets "css_screen" -%}
-<link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
-{% endassets -%}
-
 {% block extrahead %}{% endblock -%}
 
 </head>

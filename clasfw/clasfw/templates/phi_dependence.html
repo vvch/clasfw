@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title -%}
-	Phi dependence
+	Differential cross-section
 {%- endblock %}
 
 {% block extrahead %}
@@ -13,37 +13,39 @@
 {% endblock %}
 
 {% block content %}
-<h1>&phi; dependence</h1>
+<h1>Differential cross-section</h1>
 
-<table>
-{% if ampl %}
+<table class="void">
+{% if not plot3D %}
 <tr>
 	<td>
 	<table class="properties">
 	<thead>
 	<tr>	
-			<th>Model</th>
-			<th>Channel</th>
-			<th>{{ qu.Q2.wu }}</th>
-			<th>{{ qu.W.wu }}</th>
-			<th class="rsplit">{{ qu.cos_theta.wu }}</th>
-			{% for r in qu.strfuns %}
-			<th>{{ r.wu }}</th>
-			{% endfor %}
+		<th>Model</th>
+		<th class="channel">Channel</th>
+		<th>{{ qu.Q2.wu }}</th>
+		<th>{{ qu.W.wu }}</th>
+		<th>{{ qu.cos_theta.wu }}</th>
+		<th class="rsplit">{{ qu.Eb.wu }}</th>
+		{% for r in qu.strfuns %}
+		<th>{{ r.wu }}</th>
+		{% endfor %}
 	</tr>
 	</thead>
 	<tbody>
 	<tr>
-			<td><a href="{{
-				url_for('.model_data', model_id=ampl.model_id)
-			}}">{{ ampl.model }}</a></td>
-			<td>{{ ampl.channel }}</td>
-			<td>{{ ampl.q2 }}</td>
-			<td>{{ ampl.w }}</td>
-			<td class="rsplit">{{ ampl.cos_theta |cpx}}</td>
-			{% for r in ampl.strfuns %}
-			<th>{{ r }}</th>
-			{% endfor %}
+		<td><a href="{{
+			url_for('.model_data', model_id=ampl.model_id)
+		}}">{{ ampl.model }}</a></td>
+		<td class="channel">{{ ampl.channel }}</td>
+		<td>{{ ampl.q2 }}</td>
+		<td>{{ ampl.w }}</td>
+		<td>{{ ampl.cos_theta |cpx}}</td>
+		<td class="rsplit">{{ Eb }}</td>
+		{% for r in ampl.strfuns %}
+		<td>{{ r }}</td>
+		{% endfor %}
 	</tr>
 	</tbody>
 	</table>
@@ -69,18 +71,26 @@
 		</table>
 	</td>
 </tr>
-{% else %}{# not ampl #}
+{% else %}{# 3D plot #}
 <tr>
-	<th>Channel</th>
-	<td>{{ kinem.channel }}</td>
-	<th>Model</th>
-	<td>{{ kinem.model }}</td>
-</tr>
-<tr>
-	<th>{{ qu.Q2.wu }}</th>
-	<td>{{ kinem.q2 }}</td>
-	<th>{{ qu.W.wu }}</th>
-	<td>{{ kinem.w }}</td>
+	<td>
+		<table class="properties">
+		<tr>
+			<th>Channel</th>
+			<td>{{ ampl.channel }}</td>
+			<th>Model</th>
+			<td><a href="{{
+				url_for('.model_data', model_id=ampl.model_id)
+			}}">{{ ampl.model }}</a></td>
+			<th>{{ qu.Q2.wu }}</th>
+			<td>{{ ampl.q2 }}</td>
+			<th>{{ qu.W.wu }}</th>
+			<td>{{ ampl.w }}</td>
+			<th>{{ qu.Eb.wu }}</th>
+			<td>{{ Eb }}</td>
+		</tr>
+		</table>
+	</td>
 </tr>
 {% endif %}
 </table>

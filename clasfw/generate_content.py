@@ -20,6 +20,7 @@ def create_amplitude_qu(qu):
             html = tmpl_html.format(*lambdas_str),
             tex  = tmpl_tex.format(*lambdas_str),
             unit = qu.dimensionless,
+            priority=200+i,
         ),
     db.session.add_all(qq)
     return qu
@@ -74,7 +75,7 @@ def create_quantities_functions_qu(qu):
         id = 7,
         name = "mcb/sr",
         html = "μb/sr",
-        tex  = r"\mu b /sr",
+        tex  = r"\mu b/sr",
         priority = -70,
     )
     qq += Quantity(
@@ -136,8 +137,8 @@ def create_quantities_functions_qu(qu):
     qq += Quantity(
         id = 1017,
         name = "cos(theta)",
-        html = "cos(&theta;)",
-        tex  = r"\cos(\theta)",
+        html = '<span class="op">cos</span>&theta;',
+        tex  = r"\cos\theta",
         priority = 30,
         unit=dimensionless,
     ),
@@ -165,11 +166,22 @@ def create_quantities_functions_qu(qu):
         priority = 0,
         unit=rad,
     ),
+    qq += Quantity(
+        id = 1666,
+        name = "E_b",
+        html = "E<sub>b</sub>",
+        tex  = r"E_{b}",
+        priority = -10,
+        unit=GeV,
+        description="Beam energy",
+    ),
     db.session.add_all(qq)
     return qu
 
 
-def create_dictionaries():
+def create_dictionaries(verbose=0):
+    if verbose >=0:
+        print("Generating dictionaries...")
     class qu:
         pass
     create_quantities_functions_qu(qu)
@@ -177,7 +189,9 @@ def create_dictionaries():
     db.session.commit()
 
 
-def generate_test_content():
+def generate_test_content(verbose=0):
+    if verbose >=0:
+        print("Generating test content...")
     m1 = Model(
         name="test_1",
         description="test model with dummy amplitude values equal to 1",
@@ -206,28 +220,31 @@ def generate_test_content():
             start=start, stop=stop, num=num+1,
             endpoint=endpoint, dtype=dtype)[1:]
 
-    w_all = np_linspace_left(0, 4, 8)
-    q2_all = np_linspace_left(0, 5, 10)
+    w_all = np.linspace(2, 4, 5)  #  should start from 1.7 GeV
+    q2_all = np_linspace_left(0, 8, 16)
     cos_theta_all = np.linspace(0, 1, 10, endpoint=False)
 
-    for q2 in q2_all:
+    for ch in c1, c2:
+      for q2 in q2_all:
         for w in w_all:
-            print ("W, Q2 = ", w, q2)
+            if verbose>0:
+                # TODO: use logger instead of print
+                print ("W, Q2 = ", w, q2)
             for cos_theta in cos_theta_all:
                 a1 = Amplitude(
-                    channel=c1,
+                    channel=ch,
                     w=w,
                     q2=q2,
                     cos_theta=cos_theta,
                 )
                 a2 = Amplitude(
-                    channel=c1,
+                    channel=ch,
                     w=w,
                     q2=q2,
                     cos_theta=cos_theta,
                 )
                 a3 = Amplitude(
-                    channel=c2,
+                    channel=ch,
                     w=w,
                     q2=q2,
                     cos_theta=cos_theta,
@@ -240,12 +257,14 @@ def generate_test_content():
                 m2.amplitudes.append(a2)
                 m3.amplitudes.append(a3)
     db.session.add_all([m1, m2, m3])
+    if verbose >=0:
+        print("Committing results to the database...")
     db.session.commit()
 
 
-def generate_all():
+def generate_all(verbose):
     create_dictionaries()
-    generate_test_content()
+    generate_test_content(verbose)
 
 
 if __name__ == '__main__':

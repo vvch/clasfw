@@ -16,9 +16,10 @@ def register(app):
         pass
 
     @gen.command()
-    def all():
+    @click.option('-v', '--verbose', count=True)
+    def all(verbose):
         """Generate all DB content."""
-        generate_all()
+        generate_all(verbose)
 
     @gen.command()
     def dict():
@@ -26,7 +27,8 @@ def register(app):
         create_dictionaries()
 
     @gen.command()
-    def models():
+    @click.option('-v', '--verbose', count=True)
+    def models(verbose):
         """Generate dummy models data."""
         generate_test_content()
 
@@ -38,13 +40,26 @@ def register(app):
 
 
     @gen.command()
-    def strfuns():
+    @click.option('-v', '--verbose', count=True)
+    def strfuns(verbose):
         """Calculate structure functions."""
+        # TODO: parameter 'models'
+        if verbose >=0:
+            print("Calculating structure functions...")
         for a in Amplitude.query.filter(
                 # fixme: temporary!!!
-                Amplitude.model_id.in_((1,2))
+                Amplitude.model_id.in_((1,2)),
+                # Amplitude.id.in_((1,2,3,4))
             ).all():
-            print(a.a)
+            if verbose>0:
+                print(a.a)
             a.strfuns = hep.amplitudes.ampl_to_strfuns(a.a)
             db.session.add(a)
+        if verbose >0:
+            print("Committing to the database...")
+            print("DEBUG: BEFORE COMMIT")
         db.session.commit()
+        if verbose >0:
+            print("DEBUG: AFTER COMMIT")
+        if verbose >=0:
+            print("DONE.")

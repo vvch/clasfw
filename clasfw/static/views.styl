@@ -1,3 +1,14 @@
+.math
+	font-family: serif
+	font-style: italic
+.unit
+	font-family: serif
+	font-style: normal
+.math .op  //  operator in math formula like cos
+	font-style: normal
+	margin-right: 0.2em
+
+
 TABLE.models, TABLE.amplitudes
 	font-family: sans-serif
 	border: solid 1px
@@ -19,8 +30,13 @@ TABLE.models, TABLE.amplitudes
 	TH.ampl
 		font-weight: normal
 		font-size: x-small
+	TD.channel
+		@extend .math
+
 
 TABLE.amplitudes
+	TH.channel
+		font-size: 70%
 	TH.hidden-link, TD.hidden-link
 		display: none
 	TBODY>TR
@@ -29,13 +45,20 @@ TABLE.amplitudes
 			background-color: lightcyan
 
 
-TABLE
+TABLE.void
+	border: none
+	padding: 0
+	margin: 0
+	TD, TH
+		border: none
+		padding: 0
+		margin: 0	
 	TABLE.properties
 		@extend TABLE.models
 		margin-bottom: 0.5em
 		width: 100%
-		// TH.ampl
-		// 	font-size: small
+		TH.ampl
+			font-size: small
 
 
 DIV.model-data

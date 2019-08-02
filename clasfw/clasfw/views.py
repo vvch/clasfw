@@ -81,129 +81,118 @@ def model_data(model_id):
     )
 
 
-@bp.route('/phi')
-def phi_dependence():
-    model_id, channel_id, q2, w, cos_theta = (
-        request.args.get(x)
-            for x in "model_id channel_id q2 w cos_theta".split()
-    )
-    q2, w, cos_theta = [float(x) for x in (q2, w, cos_theta)]
-    ampl = Amplitude.query.filter_by(
-        channel_id=channel_id,
-        model_id=model_id,
-        q2=q2,
-        w=w,
-        cos_theta=cos_theta,
-    ).one()
+def plotly_3dlabel(q):
+    try:
+        return q.unicode
+    except AttributeError:
+        try:
+            return q.name
+        except AttributeError:
+            pass
+    return q.name
 
-    phi = np.linspace(0, 2*np.pi)
-    # test dummy data
-    # sig = np.sin(phi)
-    eps_T = hep.hep.ε_T(w, q2, 10.6)  # Eb = 10.6 GeV
-    sig = hep.amplitudes.strfuns_to_dsigma(w, q2, cos_theta, eps_T, phi, *(ampl.strfuns))
-
-    def tex(q):
-        return "${}$".format(q.wu_tex)
-
-    plot = {
-        'layout': {
-            # 'autosize': 'true',
-            'xaxis': {
-                'title': tex(qu.phi),
-            },
-            'yaxis': {
-                'title': tex(qu.dsigma),
-            },
-            'margin': {
-                 't': 32,
-                 # 'b': 65,
-                 # 'l': 65,
-                 # 'r': 50,
-            },
-        },
-        'data': [{
-            'mode': 'markers',
-            'type': 'scatter',
-            'x': phi.tolist(),
-            'y': sig.tolist(),
-        }],
-    }
-
-    return render_template('phi_dependence.html',
-        ampl=ampl,
-        plot=plot,
-    )
+def tex(q):
+    return "${}$".format(q.wu_tex)
 
 
 @bp.route('/dsigma')
-def dsigma():
-    model_id, channel_id, q2, w = (
-        request.args.get(x)
-            for x in "model_id channel_id q2 w".split()
-    )
-    q2, w = [float(x) for x in (q2, w)]
-    ampls = Amplitude.query.filter_by(
+def phi_dependence():
+    channel_id= request.args.get('channel_id', type=int)
+    model_id  = request.args.get('model_id', type=int)
+    Q2        = request.args.get('q2', type=float)
+    Q2        = request.args.get('q2', type=float)
+    W         = request.args.get('w', type=float)
+    cos_theta = request.args.get('cos_theta', type=float, default=None)
+    Eb        = request.args.get('Eb', type=float, default=10.6)
+
+    ampl = Amplitude.query.filter_by(
         channel_id=channel_id,
         model_id=model_id,
-        q2=q2,
-        w=w,
-    ).all()
+        q2=Q2,
+        w=W,
+    )
+
+    plot3D = cos_theta is None
 
     phi = np.linspace(0, 2*np.pi)
-    # test dummy data
-    # sig = np.sin(phi)
-    eps_T = hep.hep.ε_T(w, q2, 10.6)  # Eb = 10.6 GeV
-    sig_M = np.zeros(shape=(len(ampls), len(phi)))
-    cos_theta_v = np.zeros(shape=(len(ampls),))
-    # for a in ampls:
-    for i in range(len(ampls)):
-        ampl = ampls[i]
-        cos_theta = ampl.cos_theta
-        cos_theta_v[i] = ampl.cos_theta
-        sig = hep.amplitudes.strfuns_to_dsigma(w, q2, cos_theta, eps_T, phi, *(ampl.strfuns))
-        sig_M[i] = sig
+    eps_T = hep.hep.ε_T(W, Q2, Eb)
 
-    # i = np.arange(len(ampls))
-    # sig_M[i] = hep.amplitudes.strfuns_to_dsigma(w, q2, cos_theta, eps_T, phi, *(ampl[i].strfuns))
 
-    def plotly_3dlabel(q):
-        try:
-            return q.unicode
-        except AttributeError:
-            try:
-                return q.name
-            except AttributeError:
-                pass
-        return q.name
+    if not plot3D:
+        ampl = ampl.filter_by(
+            cos_theta=cos_theta,
+        ).one()
+        sig = hep.amplitudes.strfuns_to_dsigma(W, Q2, cos_theta, eps_T, phi, *(ampl.strfuns))
 
-    plot = {
-        'layout': {
-            'scene': {
+        plot = {
+            'layout': {
                 # 'autosize': 'true',
                 'xaxis': {
-                    'title': "ϕ",
+                    'title': tex(qu.phi),
                 },
                 'yaxis': {
-                    # 'title': plotly_3dlabel(qu.cos_theta),
-                    'title': "cos θ",
+                    'title': tex(qu.dsigma),
                 },
-                'zaxis': {
-                    # 'title': plotly_3dlabel(qu.dsigma),
-                    'title': "dσ/dΩ",
-                    'rangemode': 'tozero',
+                'margin': {
+                     't': 32,
+                     # 'b': 65,
+                     # 'l': 65,
+                     # 'r': 50,
                 },
             },
-        },
-        'data': [{
-            # 'mode': 'markers',
-            'type': 'surface',
-            'x': phi.tolist(),
-            'y': cos_theta_v.tolist(),
-            'z': sig_M.tolist(),
-        }],
-    }
+            'data': [{
+                'mode': 'markers',
+                'type': 'scatter',
+                'x': phi.tolist(),
+                'y': sig.tolist(),
+            }],
+        }
+    else:  #  3D-plot
+        ampls=ampl.all()
+        sig_M = np.zeros(shape=(len(ampls), len(phi)))
+        cos_theta_v = np.zeros(shape=(len(ampls),))
+
+        for i in range(len(ampls)):
+            ampl = ampls[i]
+            cos_theta = ampl.cos_theta
+            cos_theta_v[i] = ampl.cos_theta
+            sig = hep.amplitudes.strfuns_to_dsigma(W, Q2, cos_theta, eps_T, phi, *(ampl.strfuns))
+            sig_M[i] = sig
+
+        # i = np.arange(len(ampls))
+        # sig_M[i] = hep.amplitudes.strfuns_to_dsigma(W, Q2, cos_theta, eps_T, phi, *(ampl[i].strfuns))
+
+        plot = {
+            'layout': {
+                'scene': {
+                    # 'autosize': 'true',
+                    'xaxis': {
+                        'title': "φ, rad",  # fixme!
+                    },
+                    'yaxis': {
+                        # 'title': plotly_3dlabel(qu.cos_theta),
+                        'title': "cos θ",  # fixme!
+                    },
+                    'zaxis': {
+                        # 'title': plotly_3dlabel(qu.dsigma),
+                        'title': "dσ/dΩ, μb/sr",  # fixme!
+                        'rangemode': 'tozero',
+                    },
+                },
+            },
+            'data': [{
+                # 'mode': 'markers',
+                'type': 'surface',
+                'x': phi.tolist(),
+                'y': cos_theta_v.tolist(),
+                'z': sig_M.tolist(),
+            }],
+        }
+        ampl=ampls[-1]  # temporary, for template args
 
     return render_template('phi_dependence.html',
-        kinem=ampl, # temporary
         plot=plot,
+        Eb=Eb,
+        ampl=ampl,
+        plot3D=plot3D,
     )

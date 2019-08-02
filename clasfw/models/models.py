@@ -98,10 +98,12 @@ class Quantity(DatesMixin, ExtDictionaryMixin, Base):
         if self.unit_id not in (0, 1, None):  #  not dimensionless or unknown
             u = getattr(self.unit, type)
             fmt = {
-                'tex': r"{0}, \mathrm{{{1}}}",
+                'html': r'{0}, <span class="unit">{1}</span>',
+                'tex':  r"{0}, \mathrm{{{1}}}",
             }.get(type, "{0}, {1}")
             q = fmt.format(q, u)
         if type == 'html':
+            q = '<span class="math">{}</span>'.format(q)
             q = Markup(q)
         return q
 
