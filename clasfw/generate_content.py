@@ -1,29 +1,39 @@
 from .models import Model, Amplitude, Channel, Quantity, Unit
 from .extensions import db
-import hep.amplitudes
 import numpy as np
 
 
 def create_amplitude_qu(qu):
-    tmpl_text = "<0 {}|T|{} {}>"
-    tmpl_html = "&#x27e8;0&nbsp;{}|T|{}&nbsp;{}&#x27e9;"
-    tmpl_tex  = "\\langle 0 \\; {}|T| {} \\; {}\\rangle"
+    tmpl_text = "H_{}"
+    tmpl_html = "H<sub>{}</sub>"
+    tmpl_tex  = "H_{{{}}}"
+    start_id = 200
 
-    qq = []
-    for i in range(hep.amplitudes.ampl_num):
-        lambdas_str = tuple(
-                hep.amplitudes.rlambda_to_str(l)
-                    for l in hep.amplitudes.rlambdas_by_aindex(i))
-        qq += Quantity(
-            id = 200 + i,
-            name = tmpl_text.format(*lambdas_str),
-            html = tmpl_html.format(*lambdas_str),
-            tex  = tmpl_tex.format(*lambdas_str),
+    for i in range(1, Amplitude.number+1):
+        db.session.add(Quantity(
+            id = start_id + i,
+            name = tmpl_text.format(i),
+            html = tmpl_html.format(i),
+            tex  = tmpl_tex.format(i),
             unit = qu.dimensionless,
-            priority=200+i,
-        ),
-    db.session.add_all(qq)
-    return qu
+            priority=-(start_id+i),
+        ))
+
+    tmpl_text = "R_{}_00"
+    tmpl_html = "R<span class='supsub'><sup>00</sup><sub>{}</sub></span>"
+    tmpl_tex  = "R_{{{}}}^{{00}}"
+    start_id = 300
+
+    for ii, i in enumerate("T  L  TT  TL  TL'".split()):
+        hi = i.replace("'", "&prime;")
+        db.session.add(Quantity(
+            id = start_id + ii,
+            name = tmpl_text.format(i),
+            html = tmpl_html.format(hi),
+            tex  = tmpl_tex.format(i),
+            unit = qu.dimensionless,
+            priority=-(start_id+ii),
+        ))
 
 
 def create_quantities_functions_qu(qu):
@@ -220,7 +230,7 @@ def generate_test_content(verbose=0):
             start=start, stop=stop, num=num+1,
             endpoint=endpoint, dtype=dtype)[1:]
 
-    w_all = np.linspace(2, 4, 5)  #  should start from 1.7 GeV
+    w_all = np.arange(1.7, 4.1, 0.1)
     q2_all = np_linspace_left(0, 8, 16)
     cos_theta_all = np.linspace(0, 1, 10, endpoint=False)
 
@@ -249,10 +259,10 @@ def generate_test_content(verbose=0):
                     q2=q2,
                     cos_theta=cos_theta,
                 )
-                a1.a = [1 ]*hep.amplitudes.ampl_num
-                a2.a = [1j]*hep.amplitudes.ampl_num
-                a3.a0 = 3+5j
-                a3.a1 = 1+2j
+                a1.H = [None] + [1 ]*Amplitude.number
+                a2.H = [None] + [1j]*Amplitude.number
+                a3.H1 = 3+5j
+                a3.H2 = 1+2j
                 m1.amplitudes.append(a1)
                 m2.amplitudes.append(a2)
                 m3.amplitudes.append(a3)

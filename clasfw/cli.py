@@ -52,8 +52,8 @@ def register(app):
                 # Amplitude.id.in_((1,2,3,4))
             ).all():
             if verbose>0:
-                print(a.a)
-            a.strfuns = hep.amplitudes.ampl_to_strfuns(a.a)
+                print(a.H)
+            a.strfuns = hep.amplitudes.ampl_to_strfuns(a.H)
             db.session.add(a)
         if verbose >0:
             print("Committing to the database...")

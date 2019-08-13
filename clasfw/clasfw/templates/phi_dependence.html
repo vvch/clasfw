@@ -56,15 +56,15 @@
 		<table class="properties">
 		<thead>
 		<tr>
-			{% for i in range(ampl.number) %}
-			<th class="ampl">{{ qu.amplitudes[i] }}</th>
+			{% for aa in qu.amplitudes %}
+			<th>{{ aa.wu }}</th>
 			{% endfor %}
 		</tr>
 		</thead>
 		<tbody>
 		<tr>
-			{% for i in range(ampl.number) %}
-			<td>{{ ampl.a[i] |cpx}}</td>
+			{% for aa in ampl.H[1:] %}
+			<td>{{ aa |cpx}}</td>
 			{% endfor %}
 		</tr>
 		</tbody>

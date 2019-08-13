@@ -1,8 +1,8 @@
 """initial
 
-Revision ID: 15bd48ee87a6
+Revision ID: 05fcb1058ab0
 Revises: 
-Create Date: 2019-07-23 00:03:31.986884
+Create Date: 2019-08-14 04:26:51.705958
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '15bd48ee87a6'
+revision = '05fcb1058ab0'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -35,6 +35,8 @@ def upgrade():
     op.create_table('models',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('status', sa.Integer(), nullable=True),
+    sa.Column('mdate', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+    sa.Column('cdate', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.Column('priority', sa.Integer(), autoincrement=True, nullable=True),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('description', sa.Text(), server_default='', nullable=False),
@@ -64,35 +66,23 @@ def upgrade():
     sa.Column('q2', sa.Float(), nullable=True),
     sa.Column('w', sa.Float(), nullable=True),
     sa.Column('cos_theta', sa.Float(), nullable=True),
-    sa.Column('a0r', sa.Float(), nullable=True),
-    sa.Column('a0j', sa.Float(), nullable=True),
-    sa.Column('a1r', sa.Float(), nullable=True),
-    sa.Column('a1j', sa.Float(), nullable=True),
-    sa.Column('a2r', sa.Float(), nullable=True),
-    sa.Column('a2j', sa.Float(), nullable=True),
-    sa.Column('a3r', sa.Float(), nullable=True),
-    sa.Column('a3j', sa.Float(), nullable=True),
-    sa.Column('a4r', sa.Float(), nullable=True),
-    sa.Column('a4j', sa.Float(), nullable=True),
-    sa.Column('a5r', sa.Float(), nullable=True),
-    sa.Column('a5j', sa.Float(), nullable=True),
-    sa.Column('a6r', sa.Float(), nullable=True),
-    sa.Column('a6j', sa.Float(), nullable=True),
-    sa.Column('a7r', sa.Float(), nullable=True),
-    sa.Column('a7j', sa.Float(), nullable=True),
-    sa.Column('a8r', sa.Float(), nullable=True),
-    sa.Column('a8j', sa.Float(), nullable=True),
-    sa.Column('a9r', sa.Float(), nullable=True),
-    sa.Column('a9j', sa.Float(), nullable=True),
-    sa.Column('a10r', sa.Float(), nullable=True),
-    sa.Column('a10j', sa.Float(), nullable=True),
-    sa.Column('a11r', sa.Float(), nullable=True),
-    sa.Column('a11j', sa.Float(), nullable=True),
-    sa.Column('sigma_t', sa.Float(), nullable=True),
-    sa.Column('sigma_l', sa.Float(), nullable=True),
-    sa.Column('sigma_tt', sa.Float(), nullable=True),
-    sa.Column('sigma_tl', sa.Float(), nullable=True),
-    sa.Column('sigma_tlp', sa.Float(), nullable=True),
+    sa.Column('H1r', sa.Float(), nullable=True),
+    sa.Column('H1j', sa.Float(), nullable=True),
+    sa.Column('H2r', sa.Float(), nullable=True),
+    sa.Column('H2j', sa.Float(), nullable=True),
+    sa.Column('H3r', sa.Float(), nullable=True),
+    sa.Column('H3j', sa.Float(), nullable=True),
+    sa.Column('H4r', sa.Float(), nullable=True),
+    sa.Column('H4j', sa.Float(), nullable=True),
+    sa.Column('H5r', sa.Float(), nullable=True),
+    sa.Column('H5j', sa.Float(), nullable=True),
+    sa.Column('H6r', sa.Float(), nullable=True),
+    sa.Column('H6j', sa.Float(), nullable=True),
+    sa.Column('R_T', sa.Float(), nullable=True),
+    sa.Column('R_L', sa.Float(), nullable=True),
+    sa.Column('R_TT', sa.Float(), nullable=True),
+    sa.Column('R_TL', sa.Float(), nullable=True),
+    sa.Column('R_TLp', sa.Float(), nullable=True),
     sa.ForeignKeyConstraint(['channel_id'], ['channels.id'], name=op.f('fk_amplitudes_channel_id_channels')),
     sa.ForeignKeyConstraint(['model_id'], ['models.id'], name=op.f('fk_amplitudes_model_id_models')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_amplitudes')),

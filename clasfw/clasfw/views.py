@@ -17,7 +17,6 @@ import json
 
 @bp.route('/')
 def index():
-
     return render_template('index.html')
 
 
@@ -117,12 +116,12 @@ def phi_dependence():
     phi = np.linspace(0, 2*np.pi)
     eps_T = hep.hep.ε_T(W, Q2, Eb)
 
-
+    h=1
     if not plot3D:
         ampl = ampl.filter_by(
             cos_theta=cos_theta,
         ).one()
-        sig = hep.amplitudes.strfuns_to_dsigma(W, Q2, cos_theta, eps_T, phi, *(ampl.strfuns))
+        sig = hep.amplitudes.strfuns_to_dsigma(W, Q2, cos_theta, eps_T, phi, h, ampl.strfuns)
 
         plot = {
             'layout': {
@@ -156,7 +155,7 @@ def phi_dependence():
             ampl = ampls[i]
             cos_theta = ampl.cos_theta
             cos_theta_v[i] = ampl.cos_theta
-            sig = hep.amplitudes.strfuns_to_dsigma(W, Q2, cos_theta, eps_T, phi, *(ampl.strfuns))
+            sig = hep.amplitudes.strfuns_to_dsigma(W, Q2, cos_theta, eps_T, phi, h, ampl.strfuns)
             sig_M[i] = sig
 
         # i = np.arange(len(ampls))

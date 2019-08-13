@@ -33,7 +33,7 @@
 	<th>{{ qu.W.wu }}</th>
 	<th class="rsplit">{{ qu.cos_theta.wu }}</th>
 	{% for aa in qu.amplitudes %}
-	<th class="ampl">{{ aa }}</th>
+	<th>{{ aa.wu }}</th>
 	{% endfor %}
 	{% for sf in qu.strfuns %}
 	<th{%if loop.first%} class="lsplit"{%endif%}>{{ sf.wu }}</th>
@@ -50,7 +50,7 @@
 	<td>{{ a.q2 |cpx }}</td>
 	<td>{{ a.w  |cpx }}</td>
 	<td class="rsplit">{{ a.cos_theta |cpx }}</td>
-	{% for aa in a.a %}
+	{% for aa in a.H[1:] %}
 	<td>{{ aa|cpx }}</td>
 	{% endfor %}
 	{% for aa in a.strfuns %}

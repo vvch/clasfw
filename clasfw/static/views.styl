@@ -1,12 +1,22 @@
 .math
 	font-family: serif
 	font-style: italic
+	white-space: nowrap
 .unit
 	font-family: serif
 	font-style: normal
 .math .op  //  operator in math formula like cos
 	font-style: normal
 	margin-right: 0.2em
+.supsub
+	display: inline-block
+	SUP, SUB
+		display: block
+		position: relative
+		font-size: .5em
+		line-height: 1.2
+	SUB
+		top: .3em
 
 
 TABLE.models, TABLE.amplitudes
@@ -27,9 +37,6 @@ TABLE.models, TABLE.amplitudes
 		border-right: solid 5px
 	TD.lsplit, TH.lsplit
 		border-left: solid 5px
-	TH.ampl
-		font-weight: normal
-		font-size: x-small
 	TD.channel
 		@extend .math
 
@@ -57,8 +64,6 @@ TABLE.void
 		@extend TABLE.models
 		margin-bottom: 0.5em
 		width: 100%
-		TH.ampl
-			font-size: small
 
 
 DIV.model-data
