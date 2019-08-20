@@ -1,7 +1,9 @@
 import os
 import click
 
-from .models import Amplitude
+from sqlalchemy import or_
+
+from .models import Amplitude, Model
 from .extensions import db
 import hep.amplitudes
 import flask_migrate
@@ -41,21 +43,37 @@ def register(app):
 
     @gen.command()
     @click.option('-v', '--verbose', count=True)
-    def strfuns(verbose):
+    @click.option('-m', '--models', multiple=True, type=str)
+    @click.option('-i', '--ids', multiple=True, type=int)
+    def strfuns(verbose, models, ids):
         """Calculate structure functions."""
-        # TODO: parameter 'models'
+
         if verbose >=0:
             print("Calculating structure functions...")
-        for a in Amplitude.query.filter(
-                # fixme: temporary!!!
-                Amplitude.model_id.in_((1,2)),
-                # Amplitude.id.in_((1,2,3,4))
-            ).all():
-            if verbose>0:
+            print("    for models ", models)
+
+        cond = []
+        for mmm in models:
+            for m in mmm.split(','):
+                try:
+                    c = Amplitude.model_id == int(m)
+                except ValueError:
+                    c = Model.name == str(m)
+                cond.append(c)
+        for i in ids:
+            c = Amplitude.id == i
+            cond.append(c)
+
+        counter = 0
+        # print(cond)
+        for a in Amplitude.query.join(Model).filter(or_(*cond)):
+            if verbose >=1:
                 print(a.H)
             a.strfuns = hep.amplitudes.ampl_to_strfuns(a.H)
             db.session.add(a)
+            counter +=1
         if verbose >0:
+            print("Calculated strfuns for {} amplitudes data points".format(counter))
             print("Committing to the database...")
             print("DEBUG: BEFORE COMMIT")
         db.session.commit()

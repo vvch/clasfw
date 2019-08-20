@@ -230,9 +230,9 @@ def generate_test_content(verbose=0):
             start=start, stop=stop, num=num+1,
             endpoint=endpoint, dtype=dtype)[1:]
 
-    w_all = np.arange(1.7, 4.1, 0.1)
+    w_all = np.arange(1.1, 4.1, 0.1)
     q2_all = np_linspace_left(0, 8, 16)
-    cos_theta_all = np.linspace(0, 1, 10, endpoint=False)
+    cos_theta_all = np.linspace(-1, 1, 21)
 
     for ch in c1, c2:
       for q2 in q2_all:
