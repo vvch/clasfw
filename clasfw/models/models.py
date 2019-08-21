@@ -49,6 +49,7 @@ class Quantity(DatesMixin, ExtDictionaryMixin, Base):
     @property
     def wu(self):
         return self.with_unit()
+
     @property
     def wu_tex(self):
         return self.with_unit('tex')
@@ -58,7 +59,7 @@ class Quantity(DatesMixin, ExtDictionaryMixin, Base):
 
 
 class Model(DatesMixin, DictionaryMixin, Base):
-    author         = Column(String, nullable=False,
+    author         = Column(String(255), nullable=False,
         default='')
     comment        = Column(Text, nullable=False,
         default='')
@@ -82,7 +83,6 @@ class Amplitude(Base):
     q2             = Column(Float)
     w              = Column(Float)
     cos_theta      = Column(Float)
-
 
     number = 6
 

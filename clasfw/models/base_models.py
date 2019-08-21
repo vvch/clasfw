@@ -29,9 +29,8 @@ class DictionaryMixin(StatusMixin):
         return cls.__name__.lower() + 's'
 
     priority       = Column(Integer, autoincrement=True)
-    name           = Column(String, nullable=False, unique=True)
-    description    = Column(Text, nullable=False,
-        server_default='')
+    name           = Column(String(255), nullable=False, unique=True)
+    description    = Column(Text)
 
     # __mapper_args__ = {
     #     'order_by': 'priority desc'
@@ -57,9 +56,9 @@ def default_html_value(context):
 
 
 class ExtDictionaryMixin(DictionaryMixin):
-    html           = Column(String, default=default_html_value)
-    html_plain     = Column(String, default=default_html_value)
-    tex            = Column(String)
+    html           = Column(String(255), default=default_html_value)
+    html_plain     = Column(String(255), default=default_html_value)
+    tex            = Column(String(255))
 
     def _repr_html_(self):  # for display_html() function in IPython
         return str(self.html)
