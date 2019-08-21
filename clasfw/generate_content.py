@@ -1,5 +1,6 @@
 from .models import Model, Amplitude, Channel, Quantity, Unit
 from .extensions import db
+from .utils import np_linspace_left
 import numpy as np
 
 
@@ -225,21 +226,19 @@ def generate_test_content(verbose=0):
         html=r"&pi;<sup>0</sup>p",
         tex=r"$\pi^0p$")
 
-    def np_linspace_left(start, stop, num=50, endpoint=True, dtype=None):
-        return np.linspace(
-            start=start, stop=stop, num=num+1,
-            endpoint=endpoint, dtype=dtype)[1:]
-
     w_all = np.arange(1.1, 4.1, 0.1)
     q2_all = np_linspace_left(0, 8, 16)
     cos_theta_all = np.linspace(-1, 1, 21)
 
     for ch in c1, c2:
       for q2 in q2_all:
+        if verbose>0:
+            # TODO: use logger instead of print
+            print ("Q2 = ", q2)
         for w in w_all:
-            if verbose>0:
+            if verbose>1:
                 # TODO: use logger instead of print
-                print ("W, Q2 = ", w, q2)
+                print ("\tW = ", w)
             for cos_theta in cos_theta_all:
                 a1 = Amplitude(
                     channel=ch,
@@ -261,8 +260,12 @@ def generate_test_content(verbose=0):
                 )
                 a1.H = [None] + [1 ]*Amplitude.number
                 a2.H = [None] + [1j]*Amplitude.number
-                a3.H1 = 3+5j
-                a3.H2 = 1+2j
+                a3.H1 =  1+0j
+                a3.H2 = -1+0j
+                a3.H3 = -1+0j
+                a3.H4 =  1+0j
+                a3.H5 = -1+0j
+                a3.H6 =  1+0j
                 m1.amplitudes.append(a1)
                 m2.amplitudes.append(a2)
                 m3.amplitudes.append(a3)

@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def complex_format(c, real_f="{:f}", imag_f=None):
     if c is not None:
         if imag_f is not None:
@@ -5,3 +8,9 @@ def complex_format(c, real_f="{:f}", imag_f=None):
         else:
             c = real_f.format(c)
     return "{}".format(c)
+
+
+def np_linspace_left(start, stop, num=50, endpoint=True, dtype=None):
+    return np.linspace(
+        start=start, stop=stop, num=num+1,
+        endpoint=endpoint, dtype=dtype)[1:]

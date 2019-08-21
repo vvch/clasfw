@@ -35,7 +35,8 @@ def register(app):
         generate_test_content()
 
     @gen.command()
-    def create():
+    @click.option('-v', '--verbose', count=True)
+    def create(verbose):
         """Create all database tables."""
         db.create_all()
         flask_migrate.stamp()
@@ -48,21 +49,24 @@ def register(app):
     def strfuns(verbose, models, ids):
         """Calculate structure functions."""
 
-        if verbose >=0:
-            print("Calculating structure functions...")
-            print("    for models ", models)
-
         cond = []
+        m_list = []
         for mmm in models:
             for m in mmm.split(','):
                 try:
                     c = Amplitude.model_id == int(m)
+                    m_list.append(int(m))
                 except ValueError:
                     c = Model.name == str(m)
+                    m_list.append(str(m))
                 cond.append(c)
         for i in ids:
             c = Amplitude.id == i
             cond.append(c)
+
+        if verbose >=0:
+            print("Calculating structure functions...")
+            print("    for models ", m_list)
 
         counter = 0
         # print(cond)
