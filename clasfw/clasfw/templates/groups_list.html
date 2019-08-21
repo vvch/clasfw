@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title -%}
+	Data groups
+{%- endblock %}
+
+{% block extrahead %}
+{% assets "js_modellist" -%}
+<script src="{{ ASSET_URL }}"></script>
+{% endassets -%}
+{% endblock %}
+
+
+{% block content %}
+<h1>Data groups</h1>
+
+<table class="clickable models">
+<thead>
+<tr>
+	<th class="hidden-link">Link</th>
+	<th>Model</th>
+	<th>Channel</th>
+	<th>{{ qu.Q2.wu }}</th>
+	<th>Data points</th>
+</tr>
+</thead>
+{% for mm in models %}
+{% set a = mm.Amplitude %}
+<tr>
+	<td class="hidden-link">
+		<a href="{{
+			url_for('.model_data', model_id=a.model_id, channel_id=a.channel_id, q2=a.q2)
+		}}">group</a>
+	</td>
+	<td>
+		{# <a href="{{ url_for('.model_data', model_id=a.model_id) }}"> #}
+			{{ a.model.name }}
+		{# </a> #}
+	</td>
+	<td>{{ a.channel }}</td>
+	<td>{{ a.q2 }}</td>
+	<td>
+		{{ mm.count_ampl }}
+	</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock%}

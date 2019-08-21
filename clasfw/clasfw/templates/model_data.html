@@ -22,9 +22,17 @@
 	<dd class="description">
 		{{ model.description }}
 	</dd>
+	{% if channel %}
+	<dt>Channel</dt>
+	<dd>{{ channel }}</dd>
+	{% endif %}
+	{% if q2 is not none %}
+	<dt>{{ qu.Q2 }}</dt>
+	<dd>{{ q2 }}&nbsp;{{ qu.Q2.unit }}</dd>
+	{% endif %}
 </dl>
 
-<table class="amplitudes">
+<table class="clickable amplitudes">
 <thead>
 <tr>
 	<th class="hidden-link">{{ qu.phi }}-dependence</th>
@@ -41,7 +49,7 @@
 </tr>
 </thead>
 <tbody>
-{% for a in model.amplitudes %}
+{% for a in amplitudes %}
 <tr>
 	<td class="hidden-link"><a href="{{
 		url_for('.phi_dependence', channel_id=a.channel_id, model_id=a.model_id, q2=a.q2, w=a.w, cos_theta=a.cos_theta)

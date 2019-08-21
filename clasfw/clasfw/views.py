@@ -74,10 +74,26 @@ def models_list():
 @bp.route('/model_data/<int:model_id>')
 def model_data(model_id):
     channel = request.args.get('channel_id', None)
+    q2 = request.args.get('q2', default=None, type=float)
     model = Model.query.get(model_id)
+    if channel:
+        channel = Channel.query.get(channel)
+
+    if channel or q2:
+        amplitudes = Amplitude.query.filter_by(model_id=model.id)
+        if channel:
+            amplitudes = amplitudes.filter_by(channel_id=channel.id)
+        if q2:
+            amplitudes = amplitudes.filter(equal_eps(Amplitude.q2, q2))
+        amplitudes = amplitudes.all()
+    else:
+        amplitudes = model.amplitudes
 
     return render_template('model_data.html',
         model=model,
+        channel=channel,
+        q2=q2,
+        amplitudes=amplitudes,
     )
 
 
@@ -200,3 +216,24 @@ def phi_dependence():
         ampl=ampl,
         plot3D=plot3D,
     )
+
+
+@bp.route('/groups')
+def groups_list():
+    models = Amplitude.query.join(
+        Model, Channel
+    ).group_by(
+        Model.id, Channel.id, Amplitude.q2
+    ).add_columns(
+        # func.count().label('count_ampl'),
+        func.count(Amplitude.id).label('count_ampl'),
+    ).order_by(
+        # Model.priority.desc(),
+        Model.id, # fixme: temporary, use priority
+        # Channel.priority.desc(),
+        Channel.id, # fixme: temporary
+        Amplitude.q2,
+    ).all()
+
+    return render_template('groups_list.html',
+        models=models)

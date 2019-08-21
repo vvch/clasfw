@@ -53,6 +53,9 @@ class Quantity(DatesMixin, ExtDictionaryMixin, Base):
     def wu_tex(self):
         return self.with_unit('tex')
 
+    def __html__(self):
+        return '<span class="math">{}</span>'.format(self.html)
+
 
 class Model(DatesMixin, DictionaryMixin, Base):
     author         = Column(String, nullable=False,
