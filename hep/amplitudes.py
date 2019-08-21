@@ -6,7 +6,7 @@ from .hep import mcb_per_GeVm2, alpha, M_p, m_pi, m_pi0
 """
 Formalism source:
 arXiv:nucl-th/9506029
-DOI:10.1007/BF01289506 
+DOI:10.1007/BF01289506
     G. Knöchlein, D. Drechsel, L. Tiator
     Photo- and Electroproduction of Eta Mesons
     Z.Phys.A352:327-343,1995
@@ -79,10 +79,10 @@ def strfuns_to_dsigma(W, Q2, cos_theta, eps_T, phi, h, strfuns):
     # K_L = (W*W - M_N*M_N) / (2*M_N)
     E_m = (W*W + m_m*m_m - M_B*M_B) / (2*W)
     p_m = sqrt(E_m*E_m - m_m*m_m)
-    
+
     R_T, R_L, R_TT, R_TL, R_TLp = strfuns
 
-    E_γ_cm = (W*W - Q2 - M_N) / (2*W)
+    E_γ_cm = (W*W - Q2 - M_N*M_N) / (2*W)
     K_γ_cm = sqrt(Q2 + E_γ_cm**2)
     sinθ   = sqrt(1-cos_theta**2)
 
@@ -93,9 +93,7 @@ def strfuns_to_dsigma(W, Q2, cos_theta, eps_T, phi, h, strfuns):
        + R_L   * εL                                 \
        + R_TL  * sqrt(2*εL*(1+ε)) * cos(phi)        \
        + R_TT  * ε                * cos(2*phi)      \
-       + R_TLp * sqrt(2*εL*(1-ε)) * sin(phi)   *h   \
-    # equation end
+       + R_TLp * sqrt(2*εL*(1-ε)) * sin(phi)   * h
 
-    ds *= p_m / K_γ_cm / (4*4*np.pi) * sinθ
-    # ds *= alpha*p_m / (4*4*4 * np.pi * K_L * M_N * W)
+    ds *= p_m / K_γ_cm
     return ds * mcb_per_GeVm2
