@@ -2,6 +2,7 @@ from .blueprint import qu, blueprint as bp
 from flask import current_app
 
 from .models import Model, Amplitude, Channel, Quantity
+from ..utils import equal_eps
 
 from flask import request, Response, url_for, send_file, redirect, \
     render_template, render_template_string, Markup
@@ -90,6 +91,7 @@ def plotly_3dlabel(q):
             pass
     return q.name
 
+
 def tex(q):
     return "${}$".format(q.wu_tex)
 
@@ -99,7 +101,6 @@ def phi_dependence():
     channel_id= request.args.get('channel_id', type=int)
     model_id  = request.args.get('model_id', type=int)
     Q2        = request.args.get('q2', type=float)
-    Q2        = request.args.get('q2', type=float)
     W         = request.args.get('w', type=float)
     cos_theta = request.args.get('cos_theta', type=float, default=None)
     Eb        = request.args.get('Eb', type=float, default=10.6)
@@ -107,8 +108,9 @@ def phi_dependence():
     ampl = Amplitude.query.filter_by(
         channel_id=channel_id,
         model_id=model_id,
-        q2=Q2,
-        w=W,
+    ).filter(
+        equal_eps(Amplitude.q2, Q2),
+        equal_eps(Amplitude.w, W),
     )
 
     plot3D = cos_theta is None
@@ -118,10 +120,11 @@ def phi_dependence():
 
     h=1
     if not plot3D:
-        ampl = ampl.filter_by(
-            cos_theta=cos_theta,
+        ampl = ampl.filter(
+            equal_eps(Amplitude.cos_theta, cos_theta),
         ).one()
-        sig = hep.amplitudes.strfuns_to_dsigma(W, Q2, cos_theta, eps_T, phi, h, ampl.strfuns)
+        sig = hep.amplitudes.strfuns_to_dsigma(
+            W, Q2, cos_theta, eps_T, phi, h, ampl.strfuns)
 
         plot = {
             'layout': {
@@ -155,11 +158,13 @@ def phi_dependence():
             ampl = ampls[i]
             cos_theta = ampl.cos_theta
             cos_theta_v[i] = ampl.cos_theta
-            sig = hep.amplitudes.strfuns_to_dsigma(W, Q2, cos_theta, eps_T, phi, h, ampl.strfuns)
+            sig = hep.amplitudes.strfuns_to_dsigma(
+                W, Q2, cos_theta, eps_T, phi, h, ampl.strfuns)
             sig_M[i] = sig
 
         # i = np.arange(len(ampls))
-        # sig_M[i] = hep.amplitudes.strfuns_to_dsigma(W, Q2, cos_theta, eps_T, phi, *(ampl[i].strfuns))
+        # sig_M[i] = hep.amplitudes.strfuns_to_dsigma(
+            # W, Q2, cos_theta, eps_T, phi, *(ampl[i].strfuns))
 
         plot = {
             'layout': {
