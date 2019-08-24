@@ -73,7 +73,7 @@ def models_list():
 
 @bp.route('/model_data/<int:model_id>')
 def model_data(model_id):
-    channel = request.args.get('channel_id', None)
+    channel = request.args.get('channel', None)
     q2 = request.args.get('q2', default=None, type=float)
     model = Model.query.get(model_id)
     if channel:
@@ -114,8 +114,8 @@ def tex(q):
 
 @bp.route('/dsigma')
 def phi_dependence():
-    channel_id= request.args.get('channel_id', type=int)
-    model_id  = request.args.get('model_id', type=int)
+    channel_id= request.args.get('channel', type=int)
+    model_id  = request.args.get('model', type=int)
     Q2        = request.args.get('q2', type=float)
     W         = request.args.get('w', type=float)
     cos_theta = request.args.get('cos_theta', type=float, default=None)

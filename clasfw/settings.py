@@ -16,12 +16,9 @@ class Config:
     TEMPLATES_AUTO_RELOAD = True
     
     CSRF_ENABLED = True
-    WTF_CSRF_ENABLED=True
-     
-    RECAPTCHA_PUBLIC_KEY  = '6LcZA2cUAAAAAGgvNfUDkVZ9DtAI9d_x1xKk31Fq'
-    RECAPTCHA_PRIVATE_KEY = '6LcZA2cUAAAAAIFqH2tGhcjOfhdBGjMwmiVjhLGw'
-    
-    
+    WTF_CSRF_ENABLED = True
+
+
     # SERVER_NAME = 'clas.sinp.msu.ru'
     MAIL_SERVER = 'depni-mx.sinp.msu.ru'
     # MAIL_DEFAULT_SENDER = ('CLAS DB Support Team', 'clasdb@depni.sinp.msu.ru')

@@ -74,20 +74,17 @@ def strfuns_to_dsigma(W, Q2, cos_theta, eps_T, phi, h, strfuns):
     """
     # fixme: use correct mass for pi^0 instead of pi^+- for pi0p reaction
     m_m = m_pi  ## or m_pi0 for pi0p final state
-    M_N = M_p
-    M_B = M_N ## fixme: ???
-    # K_L = (W*W - M_N*M_N) / (2*M_N)
+    M_B = M_p
     E_m = (W*W + m_m*m_m - M_B*M_B) / (2*W)
     p_m = sqrt(E_m*E_m - m_m*m_m)
 
-    R_T, R_L, R_TT, R_TL, R_TLp = strfuns
-
-    E_γ_cm = (W*W - Q2 - M_N*M_N) / (2*W)
+    E_γ_cm = (W*W - Q2 - M_B*M_B) / (2*W)
     K_γ_cm = sqrt(Q2 + E_γ_cm**2)
-    sinθ   = sqrt(1-cos_theta**2)
 
     ε = eps_T
     εL = ε
+
+    R_T, R_L, R_TT, R_TL, R_TLp = strfuns
 
     ds = R_T                                        \
        + R_L   * εL                                 \

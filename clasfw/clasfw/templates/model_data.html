@@ -52,7 +52,7 @@
 {% for a in amplitudes %}
 <tr>
 	<td class="hidden-link"><a href="{{
-		url_for('.phi_dependence', channel_id=a.channel_id, model_id=a.model_id, q2=a.q2, w=a.w, cos_theta=a.cos_theta)
+		url_for('.phi_dependence', channel=a.channel_id, model=a.model_id, q2=a.q2, w=a.w, cos_theta=a.cos_theta)
 	}}">{{ qu.dsigma }}</a></td>
 	<td class="channel">{{ a.channel }}</td>
 	<td>{{ a.q2 |cpx }}</td>

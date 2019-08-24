@@ -21,24 +21,28 @@ class qu:
     strfuns = []
     amplitudes = []
 
+    @classmethod
+    def load(cls):
+        cls.Q2, cls.W, cls.cos_theta, cls.phi, cls.dsigma, cls.Eb = (
+            Quantity.query.filter_by(name=s).one()
+                for s in "Q^2 W cos(theta) phi dsigma/dOmega E_b".split() )
+
+        for s in cls.strfun_names:
+            q = Quantity.query.filter_by(name=s).one()
+            cls.strfuns.append(q)
+
+        amplitudes_first_id = 200
+        cls.amplitudes = Quantity.query.filter(
+            # fixme: should NOT use plain numeric identifiers!
+            Quantity.id.between(
+                amplitudes_first_id,
+                amplitudes_first_id+Amplitude.number)
+        ).order_by(Quantity.id).all()
+
 
 @blueprint.before_app_first_request
 def setup_quantities():
-    qu.Q2, qu.W, qu.cos_theta, qu.phi, qu.dsigma, qu.Eb = (
-        Quantity.query.filter_by(name=s).one()
-            for s in "Q^2 W cos(theta) phi dsigma/dOmega E_b".split() )
-
-    for s in qu.strfun_names:
-        q = Quantity.query.filter_by(name=s).one()
-        qu.strfuns.append(q)
-
-    amplitudes_first_id = 200
-    qu.amplitudes = Quantity.query.filter(
-        # fixme: should NOT use plain numeric identifiers!
-        Quantity.id.between(
-            amplitudes_first_id,
-            amplitudes_first_id+Amplitude.number)
-    ).order_by(Quantity.id).all()
+    qu.load()
 
 
 @blueprint.context_processor

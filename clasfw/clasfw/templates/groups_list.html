@@ -29,11 +29,11 @@
 <tr>
 	<td class="hidden-link">
 		<a href="{{
-			url_for('.model_data', model_id=a.model_id, channel_id=a.channel_id, q2=a.q2)
+			url_for('.model_data', model_id=a.model_id, channel=a.channel_id, q2=a.q2)
 		}}">group</a>
 	</td>
 	<td>
-		{# <a href="{{ url_for('.model_data', model_id=a.model_id) }}"> #}
+		{# <a href="{{ url_for('.model_data', model=a.model_id) }}"> #}
 			{{ a.model.name }}
 		{# </a> #}
 	</td>
