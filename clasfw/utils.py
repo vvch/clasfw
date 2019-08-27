@@ -1,5 +1,6 @@
 import numpy as np
 from sqlalchemy import func
+import re
 
 
 def complex_format(c, real_f="{:f}", imag_f=None):
@@ -19,3 +20,11 @@ def np_linspace_left(start, stop, num=50, endpoint=True, dtype=None):
 
 def equal_eps(left, right, epsilon=0.000001):
     return func.abs(left - right) < epsilon
+
+
+def arxiv_url(arxiv):
+    m = re.search(r"arXiv:((?:\w+\-?\w+/)?\d+\.?\d+)", arxiv, re.I)
+    if m:
+        a = m.group(1)
+        return "https://arxiv.org/abs/" + a
+    raise ValueError('Not an arXiv link')

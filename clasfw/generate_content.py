@@ -16,7 +16,7 @@ def create_amplitude_qu(qu):
             name = tmpl_text.format(i),
             html = tmpl_html.format(i),
             tex  = tmpl_tex.format(i),
-            unit = qu.dimensionless,
+            unit = qu.GeVm1,
             priority=-(start_id+i),
         ))
 
@@ -32,70 +32,84 @@ def create_amplitude_qu(qu):
             name = tmpl_text.format(i),
             html = tmpl_html.format(hi),
             tex  = tmpl_tex.format(i),
-            unit = qu.dimensionless,
+            unit = qu.GeVm2,
             priority=-(start_id+ii),
         ))
 
 
 def create_quantities_functions_qu(qu):
     qq = []
-    dimensionless = Unit(
+    qu.dimensionless = Unit(
         id = 1,
         name = "dimensionless",
         html = "dimensionless",
         tex  = r"dimensionless",
         priority = -10,
     )
-    qu.dimensionless = dimensionless
-    rad = Unit(
+    qu.rad = Unit(
         id = 2,
         name = "rad",
         html = "rad",
         tex  = r"rad",
         priority = -20,
     )
-    deg = Unit(
+    qu.deg = Unit(
         id = 3,
         name = "deg",
         html = "deg",
         tex  = r"deg",
         priority = -30,
     )
-    GeV = Unit(
+    qu.GeV = Unit(
         id = 4,
         name = "GeV",
         html = "GeV",
         tex  = r"GeV",
         priority = -40,
     )
-    GeV2 = Unit(
+    qu.GeV2 = Unit(
         id = 5,
         name = "GeV^2",
         html = "GeV²",
         tex  = r"GeV^2",
         priority = -50,
     )
-    mcb = Unit(
+    qu.mcb = Unit(
         id = 6,
         name = "mcb",
         html = "μb",
         tex  = r"\mu b",
         priority = -60,
     )
-    mcb_sr = Unit(
+    qu.mcb_sr = Unit(
         id = 7,
         name = "mcb/sr",
         html = "μb/sr",
         tex  = r"\mu b/sr",
         priority = -70,
     )
+    qu.GeVm1 = Unit(
+        id = 8,
+        name = "GeV^-1",
+        html = "GeV<sup>&minus;1</sup>",
+        tex  = r"GeV^{-1}",
+        priority = -80,
+    )
+    qu.GeVm2 = Unit(
+        id = 9,
+        name = "GeV^-2",
+        html = "GeV<sup>&minus;2</sup>",
+        tex  = r"GeV^{-2}",
+        priority = -90,
+    )
+
     qq += Quantity(
         id = 191,
         name = "sigma_U",
         html = "&sigma;<sub>U</sub>",
         tex  = r"\sigma_{U}",
         priority = 100,
-        unit=dimensionless,
+        unit=qu.mcb_sr,
     ),
     qq += Quantity(
         id = 44,
@@ -103,7 +117,7 @@ def create_quantities_functions_qu(qu):
         html = "&sigma;<sub>T</sub>",
         tex  = r"\sigma_{T}",
         priority = 90,
-        unit=dimensionless,
+        unit=qu.mcb_sr,
     ),
     qq += Quantity(
         id = 43,
@@ -111,7 +125,7 @@ def create_quantities_functions_qu(qu):
         html = "&sigma;<sub>L</sub>",
         tex  = r"\sigma_{L}",
         priority = 80,
-        unit=dimensionless,
+        unit=qu.mcb_sr,
     ),
     qq += Quantity(
         id = 47,
@@ -119,7 +133,7 @@ def create_quantities_functions_qu(qu):
         html = "&sigma;<sub>TT</sub>",
         tex  = r"\sigma_{TT}",
         priority = 70,
-        unit=dimensionless,
+        unit=qu.mcb_sr,
     ),
     qq += Quantity(
         id = 48,
@@ -127,7 +141,7 @@ def create_quantities_functions_qu(qu):
         html = "&sigma;<sub>TL</sub>",
         tex  = r"\sigma_{TL}",
         priority = 60,
-        unit=dimensionless,
+        unit=qu.mcb_sr,
     ),
     qq += Quantity(
         id = 666,
@@ -135,7 +149,7 @@ def create_quantities_functions_qu(qu):
         html = "&sigma;<sub>TL&prime;</sub>",
         tex  = r"\sigma_{TL'}",
         priority = 50,
-        unit=dimensionless,
+        unit=qu.mcb_sr,
     ),
     qq += Quantity(
         id = 19,
@@ -143,7 +157,7 @@ def create_quantities_functions_qu(qu):
         html = "d&sigma;/d&Omega;",
         tex  = r"\mathrm{d}\sigma/\mathrm{d}\Omega",
         priority = 40,
-        unit=mcb_sr,
+        unit=qu.mcb_sr,
     ),
     qq += Quantity(
         id = 1017,
@@ -151,7 +165,7 @@ def create_quantities_functions_qu(qu):
         html = '<span class="op">cos</span>&theta;',
         tex  = r"\cos\theta",
         priority = 30,
-        unit=dimensionless,
+        unit=qu.dimensionless,
     ),
     qq += Quantity(
         id = 1014,
@@ -159,7 +173,7 @@ def create_quantities_functions_qu(qu):
         html = "Q<sup>2</sup>",
         tex  = r"Q^2",
         priority = 20,
-        unit=GeV2,
+        unit=qu.GeV2,
     ),
     qq += Quantity(
         id = 1015,
@@ -167,7 +181,7 @@ def create_quantities_functions_qu(qu):
         html = "W",
         tex  = r"W",
         priority = 10,
-        unit=GeV,
+        unit=qu.GeV,
     ),
     qq += Quantity(
         id = 1016,
@@ -175,7 +189,7 @@ def create_quantities_functions_qu(qu):
         html = "&phi;",
         tex  = r"\varphi",
         priority = 0,
-        unit=rad,
+        unit=qu.rad,
     ),
     qq += Quantity(
         id = 1666,
@@ -183,7 +197,7 @@ def create_quantities_functions_qu(qu):
         html = "E<sub>b</sub>",
         tex  = r"E_{b}",
         priority = -10,
-        unit=GeV,
+        unit=qu.GeV,
         description="Beam energy",
     ),
     db.session.add_all(qq)

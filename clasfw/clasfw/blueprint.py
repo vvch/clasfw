@@ -1,5 +1,6 @@
 from flask import Blueprint, current_app
 from .models import Quantity, Amplitude
+from ..utils import arxiv_url
 
 blueprint = Blueprint("clasfw", __name__,
     template_folder='templates',
@@ -49,4 +50,6 @@ def setup_quantities():
 def inject_qu():
     return dict(
         qu=qu,
-        zip=zip)
+        zip=zip,
+        arxiv_url=arxiv_url,
+    )

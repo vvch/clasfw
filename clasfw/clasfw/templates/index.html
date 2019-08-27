@@ -1,11 +1,91 @@
 {% extends "base.html" %}
 
 {% block extrahead %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_SVG"></script>
 {% endblock %}
 
 {% block content %}
 <h1>CLAS Analysis Framework</h1>
 
-<a href="{{ url_for('clasfw.models_list') }}">Models list</a>
+<ul>
+    <li>
+        <a href="{{ url_for('clasfw.models_list') }}">Available models list</a>
+    </li>
+    <li>
+        <a href="{{ url_for('clasfw.groups_list') }}">Data grouped by model, channel, Q²</a>
+    </li>
+</ul>
 
+<div>
+<h2>Formalism used</h2>
+<p>
+$$
+	R_T     = \frac{1}{2}(|H_1|^2 + |H_2|^2 + |H_3|^2 + |H_4|^2)
+$$
+</p>
+<p>
+$$
+	R_L     = |H_5|^2 + |H_6|^2
+$$
+</p>
+<p>
+$$
+	R_{TL}  = \frac{1}{\sqrt{2}}(H_5^*H_1 - H_5^*H_4 + H_6^*H_2 + H_6^*H_3)
+$$
+</p>
+<p>
+$$
+	R_{TT}  = - H_1^*H_4 + H_2^*H_3
+$$
+</p>
+<p>
+$$
+	R_{TL'} = \frac{1}{\sqrt{2}}(-H_5^*H_1 + H_5^*H_4 - H_6^*H_2 - H_6^*H_3)
+$$
+</p>
+<p>
+    <br>
+</p>
+<p>
+$$
+    \frac{d\sigma}{d\Omega} =
+        \frac{p_m}{k_{\gamma}^{ef}}
+        \left(
+                                            R_{T}^{00}                +
+        \varepsilon                         R_{L}^{00}                +
+        \sqrt{2\varepsilon(1+\varepsilon)}  R_{TL}^{00}  \cos\varphi  +
+        \varepsilon                         R_{TT}^{00}  \cos2\varphi +
+        h\sqrt{2\varepsilon(1-\varepsilon)} R_{TL'}^{00} \sin\varphi
+        \right)
+$$
+
+$$
+    k_{\gamma}^{ef} = \frac{W^2 - M_B^2}{2W}
+$$
+$$
+	p_m = \sqrt{E_m^2 - m_m^2}
+$$
+$$
+	E_m = \frac{W^2 + m_m^2 - M_B^2}{2W}
+$$
+</p>
+</div>
+<div>
+<h2>References</h2>
+<ol class="references">
+    <li>
+        <span class="authors">
+            G. Knöchlein, D. Drechsel, L. Tiator
+        </span>
+        <span class="title">
+            <a href="{{ arxiv_url('arXiv:nucl-th/9506029') }}">
+                Photo- and Electroproduction of η-Mesons
+            </a>
+        </span>
+        <span class="ref">
+            Z.Phys.A352 p.327-343, 1995
+        </span>
+    </li>
+</ol>
+</div>
 {% endblock%}

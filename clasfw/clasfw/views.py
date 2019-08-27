@@ -79,15 +79,18 @@ def model_data(model_id):
     if channel:
         channel = Channel.query.get(channel)
 
+    amplitudes = Amplitude.query.filter_by(model_id=model.id)
     if channel or q2:
-        amplitudes = Amplitude.query.filter_by(model_id=model.id)
         if channel:
             amplitudes = amplitudes.filter_by(channel_id=channel.id)
         if q2:
             amplitudes = amplitudes.filter(equal_eps(Amplitude.q2, q2))
-        amplitudes = amplitudes.all()
-    else:
-        amplitudes = model.amplitudes
+    amplitudes = amplitudes.order_by(
+        Amplitude.channel_id,  ##  fixme: use channel.priority
+        Amplitude.q2,
+        Amplitude.w,
+        Amplitude.cos_theta,
+    ).all()
 
     return render_template('model_data.html',
         model=model,
@@ -140,7 +143,7 @@ def phi_dependence():
             equal_eps(Amplitude.cos_theta, cos_theta),
         ).one()
         sig = hep.amplitudes.strfuns_to_dsigma(
-            W, Q2, cos_theta, eps_T, phi, h, ampl.strfuns)
+            Q2, W, eps_T, phi, h, ampl.strfuns)
 
         plot = {
             'layout': {
@@ -175,12 +178,12 @@ def phi_dependence():
             cos_theta = ampl.cos_theta
             cos_theta_v[i] = ampl.cos_theta
             sig = hep.amplitudes.strfuns_to_dsigma(
-                W, Q2, cos_theta, eps_T, phi, h, ampl.strfuns)
+                Q2, W, eps_T, phi, h, ampl.strfuns)
             sig_M[i] = sig
 
         # i = np.arange(len(ampls))
         # sig_M[i] = hep.amplitudes.strfuns_to_dsigma(
-            # W, Q2, cos_theta, eps_T, phi, *(ampl[i].strfuns))
+            # Q2, W, eps_T, phi, *(ampl[i].strfuns))
 
         plot = {
             'layout': {
