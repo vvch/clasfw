@@ -6,6 +6,7 @@ import hep
 import hep.amplitudes
 
 import numpy as np
+from flask import current_app
 
 
 app = create_app()
@@ -19,10 +20,10 @@ def make_shell_context():
         'db': db,
         'qu': qu,  #  fixme: not initialized 
         'hep': hep,
-        'hep.amplitudes': hep.amplitudes,
         'Amplitude': Amplitude,
         'Quantity': Quantity,
         'Channel': Channel,
         'Model': Model,
         'Unit': Unit,
+        'current_app': current_app,
     }

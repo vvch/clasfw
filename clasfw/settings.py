@@ -10,11 +10,7 @@ class Config:
     
     DEBUG = False
     DEBUG_TB_INTERCEPT_REDIRECTS = False
-    
-    # Workaround for bug
-    # https://github.com/pallets/flask/issues/1907
-    TEMPLATES_AUTO_RELOAD = True
-    
+
     CSRF_ENABLED = True
     WTF_CSRF_ENABLED = True
 
@@ -41,7 +37,7 @@ class ProdConfig(Config):
     DB_PATH = os.path.join(Config.PROJECT_ROOT, DB_NAME)
     SQLALCHEMY_DATABASE_URI = 'sqlite:///{0}'.format(DB_PATH)
 
-    DEBUG_TB_ENABLED = False  # Disable Debug toolbar
+    DEBUG_TB_ENABLED = False
 
 
 class DevConfig(Config):
@@ -51,7 +47,6 @@ class DevConfig(Config):
     DEBUG = True
 
     DB_NAME = 'clasfw_development.sqlite'
-    # Put the db file in project root
     DB_PATH = os.path.join(Config.PROJECT_ROOT, DB_NAME)
     SQLALCHEMY_DATABASE_URI = 'sqlite:///{0}'.format(DB_PATH)
 
@@ -60,12 +55,19 @@ class DevConfig(Config):
     ASSETS_DEBUG = True  # Don't bundle/minify static assets
     CACHE_TYPE = 'simple'  # Can be "memcached", "redis", etc.
 
+    # Workaround for bug
+    # https://github.com/pallets/flask/issues/1907
+    TEMPLATES_AUTO_RELOAD = True
+
 
 class TestConfig(Config):
     """Test configuration."""
 
     TESTING = True
+    ENV = "development"
     DEBUG = True
+
+    DEBUG_TB_ENABLED = False
     SQLALCHEMY_DATABASE_URI = 'sqlite://'
     BCRYPT_LOG_ROUNDS = 4  # For faster tests; needs at least 4 to avoid "ValueError: Invalid rounds"
     WTF_CSRF_ENABLED = False  # Allows form testing

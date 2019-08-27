@@ -8,21 +8,21 @@ from .clasfw import views
 import os
 
 def create_app(config_object=None):
-    """An application factory, as explained here: http://flask.pocoo.org/docs/patterns/appfactories/.
-
-    :param config_object: The configuration object to use.
-    """
+    """An application factory"""
+    load_local_flag = False
     if config_object is None:
+        load_local_flag = True
         if os.environ.get('FLASK_ENV') == 'development':
             config_object = DevConfig
-        elif os.environ.get('FLASK_ENV') == 'production':
+        # elif os.environ.get('FLASK_ENV') == 'production':
+        else:
             config_object = ProdConfig
 
     app = Flask(__name__)
     # app.config.from_pyfile('settings.py')
     app.config.from_object(config_object)
-    app.config.from_pyfile('settings_local.py', silent=True)
-    # app.config.from_pyfile('settings_local.py')
+    if os.environ.get('FLASK_ENV') in ('development', 'production'):
+        app.config.from_pyfile('settings_local.py', silent=True)
 
     app.jinja_env.line_statement_prefix = '%'
     app.jinja_env.line_comment_prefix = '##'

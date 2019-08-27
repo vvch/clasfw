@@ -8,10 +8,17 @@ Flask >= 1.0
 Flask-SqlAlchemy >= 2.3  #  due to bugs in __tablename__ generation
 Flask-Migrate
 Flask-Assets
-Flask-Views
+
+# Development
+
+flask-debugtoolbar >= 0.10.1
+
+# Testing
+
+pytest
 
 
-##  Non-python
+##  NON-PYTHON
 
 # stylus
 #     (requires node.js, npm)
