@@ -1,6 +1,7 @@
 from flask import Blueprint, current_app
-from .models import Quantity, Amplitude
+from .models import Quantity, Amplitude, Unit
 from ..utils import arxiv_url
+
 
 blueprint = Blueprint("clasfw", __name__,
     template_folder='templates',
@@ -16,10 +17,11 @@ def cpx(value):
 
 
 class qu:
-    strfun_names = """
-        R_T_00  R_L_00  R_TT_00  R_TL_00  R_TL'_00
-    """.strip().split()
+    strfun_indexes = "T  L  TT  TL  TL'".split()
+    strfun_names = ["R_{}_00".format(i) for i in strfun_indexes]
+    dsigma_names = ["dsigma_{}/dOmega".format(i) for i in strfun_indexes]
     strfuns = []
+    dsigmas = []
     amplitudes = []
 
     @classmethod
@@ -27,6 +29,9 @@ class qu:
         cls.Q2, cls.W, cls.cos_theta, cls.phi, cls.dsigma, cls.Eb = (
             Quantity.query.filter_by(name=s).one()
                 for s in "Q^2 W cos(theta) phi dsigma/dOmega E_b".split() )
+        cls.mcb_sr, = (
+            Unit.query.filter_by(name=s).one()
+                for s in "mcb/sr".split() )
 
         for s in cls.strfun_names:
             q = Quantity.query.filter_by(name=s).one()

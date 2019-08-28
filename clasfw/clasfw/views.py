@@ -218,6 +218,10 @@ def phi_dependence():
         Eb=Eb,
         ampl=ampl,
         plot3D=plot3D,
+        hep=hep,
+
+        rfuncs_mcb_sr=np.array(ampl.strfuns)*hep.mcb_per_GeVm2,
+        dsigmas=np.array(ampl.strfuns)*hep.amplitudes.R_to_dsigma_factor(ampl.q2, ampl.w)*hep.mcb_per_GeVm2,
     )
 
 

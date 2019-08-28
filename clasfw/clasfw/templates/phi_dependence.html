@@ -27,10 +27,7 @@
 		<th>{{ qu.Q2.wu }}</th>
 		<th>{{ qu.W.wu }}</th>
 		<th>{{ qu.cos_theta.wu }}</th>
-		<th class="rsplit">{{ qu.Eb.wu }}</th>
-		{% for r in qu.strfuns %}
-		<th>{{ r.wu }}</th>
-		{% endfor %}
+		<th>{{ qu.Eb.wu }}</th>
 	</tr>
 	</thead>
 	<tbody>
@@ -42,15 +39,76 @@
 		<td>{{ ampl.q2 }}</td>
 		<td>{{ ampl.w }}</td>
 		<td>{{ ampl.cos_theta |cpx}}</td>
-		<td class="rsplit">{{ Eb }}</td>
-		{% for r in ampl.strfuns %}
-		<td>{{ r }}</td>
+		<td>{{ Eb }}</td>
+	</tr>
+	</tbody>
+	</table>
+	</td>
+</tr>
+
+<tr>
+	<td>
+	<table class="properties">
+	<thead>
+	<tr>
+		{% for R in qu.strfuns %}
+		<th>{{ R.wu }}</th>
+		{% endfor %}
+	</tr>
+	</thead>
+	<tbody>
+	<tr>
+		{% for R in ampl.strfuns %}
+		<td>{{ R }}</td>
 		{% endfor %}
 	</tr>
 	</tbody>
 	</table>
 	</td>
 </tr>
+
+<tr>
+	<td>
+	<table class="properties">
+	<thead>
+	<tr>
+		{% for R in qu.strfuns %}
+		<th>{{ R }}, {{ qu.mcb_sr }}</th>
+		{% endfor %}
+	</tr>
+	</thead>
+	<tbody>
+	<tr>
+		{% for R in rfuncs_mcb_sr %}
+		<td>{{ R }}</td>
+		{% endfor %}
+	</tr>
+	</tbody>
+	</table>
+	</td>
+</tr>
+
+<tr>
+	<td>
+	<table class="properties">
+	<thead>
+	<tr>
+		{% for i in qu.strfun_indexes %}
+		<th>\( \frac{d\sigma_{ {{i}} }}{d\Omega} \) , {{ qu.mcb_sr }}</th>
+		{% endfor %}
+	</tr>
+	</thead>
+	<tbody>
+	<tr>
+		{% for ds_dO in dsigmas %}
+		<td>{{ ds_dO }}</td>
+		{% endfor %}
+	</tr>
+	</tbody>
+	</table>
+	</td>
+</tr>
+
 <tr>
 	<td>
 		<table class="properties">
