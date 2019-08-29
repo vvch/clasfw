@@ -1,6 +1,6 @@
 import numpy as np
 from numpy import sqrt, sin, cos
-from .hep import mcb_per_GeVm2, alpha, M_p, m_pi, m_pi0, W2nu
+from .hep import mcb_per_GeVm2, alpha, M_p, m_pi, m_pi0
 
 
 """
@@ -66,9 +66,9 @@ def ampl_to_strfuns(H):
     ])
 
 
-def R_to_dsigma_factor(Q2, W):
+def R_to_dsigma_factors(Q2, W):
     """
-    dsigma_i = R_i * R_to_dsigma_factor(W, Q2)
+    dsigma_v, mcb/sr = R_v * response_funcs_to_dsigmas(Q2, W)
     """
     # fixme: use correct mass for pi^0 instead of pi^+- for pi0p reaction
     m_m = m_pi  ## or m_pi0 for pi0p final state
@@ -76,29 +76,41 @@ def R_to_dsigma_factor(Q2, W):
     E_m = (W*W + m_m*m_m - M_B*M_B) / (2*W)
     p_m = sqrt(E_m*E_m - m_m*m_m)
 
-    # E_γ_cm = (W*W - Q2 - M_B*M_B) / (2*W)
-    # K_γ_cm = sqrt(Q2 + E_γ_cm**2)
-    K_γ_eff = (W**2 - M_B**2) / (2*W)
-    return p_m / K_γ_eff
+    k_γ_cm = (W**2 - M_B**2) / (2*W)
+
+    # ω_γ is photon energy in the CM-frame
+    ω_γ = (W**2 - Q2 - M_B**2) / (2*W)
+
+    sqrt_tmp = sqrt(Q2) / np.abs(ω_γ)
+
+    return np.array([  #  factors to multiply when ε is used instead of ε_T and ε_L
+        1,              ##  T
+        Q2 / ω_γ**2,    ##  L
+        1,              ##  TT
+        sqrt_tmp,       ##  TL
+        sqrt_tmp,       ##  TL'
+    ]) * ( p_m / k_γ_cm * mcb_per_GeVm2 )
 
 
-def strfuns_to_dsigma(Q2, W, eps_T, phi, h, strfuns):
+def strfuns_to_dsigma(Q2, W, eps_T, phi, h, response_funcs):
     """
     Calculate differential cross-section
-    from structure functions
+    from response functions
     for specified kinematics
     """
+
+    dσ_T, dσ_L, dσ_TT, dσ_TL, dσ_TLp = response_funcs * R_to_dsigma_factors(Q2, W)
+
+    ## ε is virtual photon polarization parameter
     ε = eps_T
     εL = ε
-    # εL = ε * Q2 / W2nu(W, Q2)**2
+    # not using ε_L on the contrary to Drechsel's article
+    # the difference is considered in R_to_dsigma_factors instead
 
-    R_T, R_L, R_TT, R_TL, R_TLp = strfuns
+    ds = dσ_T                                        \
+       + dσ_L   * εL                                 \
+       + dσ_TL  * sqrt(2*εL*(1+ε)) * cos(phi)        \
+       + dσ_TT  * ε                * cos(2*phi)      \
+       + dσ_TLp * sqrt(2*εL*(1-ε)) * sin(phi)   * h
 
-    ds = R_T                                        \
-       + R_L   * εL                                 \
-       + R_TL  * sqrt(2*εL*(1+ε)) * cos(phi)        \
-       + R_TT  * ε                * cos(2*phi)      \
-       + R_TLp * sqrt(2*εL*(1-ε)) * sin(phi)   * h
-
-    ds *= R_to_dsigma_factor(Q2, W)
-    return ds * mcb_per_GeVm2
+    return ds

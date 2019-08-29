@@ -46,6 +46,8 @@
 	</td>
 </tr>
 
+
+{#
 <tr>
 	<td>
 	<table class="properties">
@@ -66,6 +68,8 @@
 	</table>
 	</td>
 </tr>
+#}
+
 
 <tr>
 	<td>
@@ -93,8 +97,9 @@
 	<table class="properties">
 	<thead>
 	<tr>
-		{% for i in qu.strfun_indexes %}
-		<th>\( \frac{d\sigma_{ {{i}} }}{d\Omega} \) , {{ qu.mcb_sr }}</th>
+		{% for ds in qu.dsigmas %}
+		{# <th>{{ ds.wu }}</th> #}
+		<th>\({{ ds.tex }}\), {{ds.unit}}</th>
 		{% endfor %}
 	</tr>
 	</thead>

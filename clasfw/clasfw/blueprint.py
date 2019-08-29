@@ -37,12 +37,15 @@ class qu:
             q = Quantity.query.filter_by(name=s).one()
             cls.strfuns.append(q)
 
-        amplitudes_first_id = 200
+        for s in cls.dsigma_names:
+            q = Quantity.query.filter_by(name=s).one()
+            cls.dsigmas.append(q)
+
         cls.amplitudes = Quantity.query.filter(
-            # fixme: should NOT use plain numeric identifiers!
-            Quantity.id.between(
-                amplitudes_first_id,
-                amplitudes_first_id+Amplitude.number)
+            Quantity.name.in_(
+                'H_{}'.format(i)
+                    for i in range(1, Amplitude.number+1)
+            )
         ).order_by(Quantity.id).all()
 
 

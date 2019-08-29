@@ -20,20 +20,38 @@ def create_amplitude_qu(qu):
             priority=-(start_id+i),
         ))
 
-    tmpl_text = "R_{}_00"
-    tmpl_html = "R<span class='supsub'><sup>00</sup><sub>{}</sub></span>"
-    tmpl_tex  = "R_{{{}}}^{{00}}"
-    start_id = 300
+    R_tmpl_text = "R_{}_00"
+    R_tmpl_html = "R<span class='supsub'><sup>00</sup><sub>{}</sub></span>"
+    R_tmpl_tex  = "R_{{{}}}^{{00}}"
 
-    for ii, i in enumerate("T  L  TT  TL  TL'".split()):
+    s_tmpl_text = "dsigma_{}/dOmega"
+    s_tmpl_html = "d&sigma;<sub>{}</sub>/d&Omega;"
+    s_tmpl_tex  = "\\frac{{d\\sigma_{{{0}}}}}{{d\\Omega}}"
+
+    R_start_id = 300
+    s_start_id = 400
+
+    strfun_indexes = "T  L  TT  TL  TL'".split()
+
+    for ii, i in enumerate(strfun_indexes):
         hi = i.replace("'", "&prime;")
         db.session.add(Quantity(
-            id = start_id + ii,
-            name = tmpl_text.format(i),
-            html = tmpl_html.format(hi),
-            tex  = tmpl_tex.format(i),
+            id   = R_start_id + ii,
+            name = R_tmpl_text.format(i),
+            html = R_tmpl_html.format(hi),
+            tex  = R_tmpl_tex.format(i),
             unit = qu.GeVm2,
-            priority=-(start_id+ii),
+            priority    = -(R_start_id+ii),
+            description = "Response function",
+        ))
+        db.session.add(Quantity(
+            id   = s_start_id + ii,
+            name = s_tmpl_text.format(i),
+            html = s_tmpl_html.format(hi),
+            tex  = s_tmpl_tex.format(i),
+            unit = qu.mcb_sr,
+            priority    = -(s_start_id+ii),
+            description = "Interference term",
         ))
 
 
@@ -103,54 +121,6 @@ def create_quantities_functions_qu(qu):
         priority = -90,
     )
 
-    qq += Quantity(
-        id = 191,
-        name = "sigma_U",
-        html = "&sigma;<sub>U</sub>",
-        tex  = r"\sigma_{U}",
-        priority = 100,
-        unit=qu.mcb_sr,
-    ),
-    qq += Quantity(
-        id = 44,
-        name = "sigma_T",
-        html = "&sigma;<sub>T</sub>",
-        tex  = r"\sigma_{T}",
-        priority = 90,
-        unit=qu.mcb_sr,
-    ),
-    qq += Quantity(
-        id = 43,
-        name = "sigma_L",
-        html = "&sigma;<sub>L</sub>",
-        tex  = r"\sigma_{L}",
-        priority = 80,
-        unit=qu.mcb_sr,
-    ),
-    qq += Quantity(
-        id = 47,
-        name = "sigma_TT",
-        html = "&sigma;<sub>TT</sub>",
-        tex  = r"\sigma_{TT}",
-        priority = 70,
-        unit=qu.mcb_sr,
-    ),
-    qq += Quantity(
-        id = 48,
-        name = "sigma_TL",
-        html = "&sigma;<sub>TL</sub>",
-        tex  = r"\sigma_{TL}",
-        priority = 60,
-        unit=qu.mcb_sr,
-    ),
-    qq += Quantity(
-        id = 666,
-        name = "sigma_TL'",
-        html = "&sigma;<sub>TL&prime;</sub>",
-        tex  = r"\sigma_{TL'}",
-        priority = 50,
-        unit=qu.mcb_sr,
-    ),
     qq += Quantity(
         id = 19,
         name = "dsigma/dOmega",
@@ -225,10 +195,10 @@ def generate_test_content(verbose=0):
         name="test_i",
         description="test model with dummy amplitude values equal to i",
         author="V. Mokeev")
-    m3 = Model(
-        name="dummy",
-        description="test model with dummy values",
-        author="V. Chesnokov")
+    # m3 = Model(
+    #     name="dummy",
+    #     description="test model with dummy values",
+    #     author="V. Chesnokov")
     c1 = Channel(
         id=1,
         name="pi+ n",
@@ -266,24 +236,19 @@ def generate_test_content(verbose=0):
                     q2=q2,
                     cos_theta=cos_theta,
                 )
-                a3 = Amplitude(
-                    channel=ch,
-                    w=w,
-                    q2=q2,
-                    cos_theta=cos_theta,
-                )
+                # a3 = Amplitude(
+                #     channel=ch,
+                #     w=w,
+                #     q2=q2,
+                #     cos_theta=cos_theta,
+                # )
                 a1.H = [None] + [1 ]*Amplitude.number
                 a2.H = [None] + [1j]*Amplitude.number
-                a3.H1 =  1+0j
-                a3.H2 = -1+0j
-                a3.H3 = -1+0j
-                a3.H4 =  1+0j
-                a3.H5 = -1+0j
-                a3.H6 =  1+0j
+                # a3.H1 = [None, 1, -1, -1, 1, -1, 1]
                 m1.amplitudes.append(a1)
                 m2.amplitudes.append(a2)
-                m3.amplitudes.append(a3)
-    db.session.add_all([m1, m2, m3])
+                # m3.amplitudes.append(a3)
+    db.session.add_all([m1, m2])
     if verbose >=0:
         print("Committing results to the database...")
     db.session.commit()
