@@ -1,90 +1,124 @@
 {% extends "base.html" %}
 
 {% block extrahead %}
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        {% if not config.DEBUG %}
+        showMathMenu: false,
+        {% endif %}
+    });
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_SVG"></script>
 {% endblock %}
 
 {% block content %}
 <h1>CLAS Analysis Framework</h1>
-
 <ul>
     <li>
-        <a href="{{ url_for('clasfw.models_list') }}">Available models list</a>
+        <a href="{{ url_for('clasfw.models_list') }}">
+            Available models list
+        </a>
     </li>
     <li>
-        <a href="{{ url_for('clasfw.groups_list') }}">Data grouped by model, channel, Q²</a>
+        <a href="{{ url_for('clasfw.groups_list') }}">
+            Data grouped by model, channel, <span class="math">Q²</span>
+        </a>
     </li>
 </ul>
 
-<div>
+<div style="width: 800px">
 <h2>Formalism used</h2>
 <p>
-$$
-	R_T     = \frac{1}{2}(|H_1|^2 + |H_2|^2 + |H_3|^2 + |H_4|^2)
-$$
+\begin{align}
+	R^{00}_{T  }   & = \frac{1}{2}(|H_1|^2 + |H_2|^2 + |H_3|^2 + |H_4|^2)
+\\
+	R^{00}_{L  }   & = |H_5|^2 + |H_6|^2
+\\
+	R^{00}_{TL }   & = \frac{1}{\sqrt{2}}(H_5^*H_1 - H_5^*H_4 + H_6^*H_2 + H_6^*H_3)
+\\
+	R^{00}_{TT }   & = - H_1^*H_4 + H_2^*H_3
+\\
+	R^{00}_{TL'}   & = \frac{1}{\sqrt{2}}(-H_5^*H_1 + H_5^*H_4 - H_6^*H_2 - H_6^*H_3)
+\end{align}
+</p>
+<p>
+    \( H_i \; (i = T, L, TT, TL, TL&prime;) \) stand for helicity amplitudes;
+    \( R^{00}_i \) are response functions.
+    Differential cross-section is
 </p>
 <p>
 $$
-	R_L     = |H_5|^2 + |H_6|^2
+\frac{d\sigma}{d\Omega} =
+                                        \frac{d\sigma_{T  }}{d\Omega}               +
+    \varepsilon                         \frac{d\sigma_{L  }}{d\Omega}               +
+    \sqrt{2\varepsilon(1+\varepsilon)}  \frac{d\sigma_{TL }}{d\Omega}  \cos \varphi +
+    \varepsilon                         \frac{d\sigma_{TT }}{d\Omega}  \cos2\varphi +
+    h\sqrt{2\varepsilon(1-\varepsilon)} \frac{d\sigma_{TL'}}{d\Omega}  \sin \varphi
 $$
 </p>
 <p>
-$$
-	R_{TL}  = \frac{1}{\sqrt{2}}(H_5^*H_1 - H_5^*H_4 + H_6^*H_2 + H_6^*H_3)
-$$
+\( \varepsilon \) stands for virtual photon polarization parameter
+    (please, note: here we do NOT use the longitudinal polarization \( \varepsilon_L \) so the longitudinal cross-sections differ from those in <a href="#ref-1">[1]</a>),
+\( h \) describes the longitudinal polarization of the incident electron:
+\( h = +1(-1) \) if electrons are polarized parallel (anti-parallel) to the beam direction,
+\( \varphi \) stands for meson emission angle,
+\( \frac{d\sigma_{i}}{d\Omega} \) are interference terms,
+related to corresponding response functions \( R^{00}_{i} \) as follows:
 </p>
-<p>
-$$
-	R_{TT}  = - H_1^*H_4 + H_2^*H_3
-$$
-</p>
-<p>
-$$
-	R_{TL'} = \frac{1}{\sqrt{2}}(-H_5^*H_1 + H_5^*H_4 - H_6^*H_2 - H_6^*H_3)
-$$
-</p>
-<p>
-    <br>
-</p>
-<p>
-$$
-    \frac{d\sigma}{d\Omega} =
-        \frac{p_m}{k_{\gamma}^{ef}}
-        \left(
-                                            R_{T}^{00}                +
-        \varepsilon                         R_{L}^{00}                +
-        \sqrt{2\varepsilon(1+\varepsilon)}  R_{TL}^{00}  \cos\varphi  +
-        \varepsilon                         R_{TT}^{00}  \cos2\varphi +
-        h\sqrt{2\varepsilon(1-\varepsilon)} R_{TL'}^{00} \sin\varphi
-        \right)
-$$
 
-$$
-    k_{\gamma}^{ef} = \frac{W^2 - M_B^2}{2W}
-$$
-$$
-	p_m = \sqrt{E_m^2 - m_m^2}
-$$
-$$
-	E_m = \frac{W^2 + m_m^2 - M_B^2}{2W}
-$$
+\begin{align}
+\frac{d\sigma_{T  }}{d\Omega} & = R^{00}_{T  } \frac{p_m}{k_{\gamma}^{cm}}
+\\
+\frac{d\sigma_{L  }}{d\Omega} & = R^{00}_{L  } \frac{p_m}{k_{\gamma}^{cm}}
+    \frac{Q^2}{\omega_{\gamma}^2}
+\\
+\frac{d\sigma_{TL }}{d\Omega} & = R^{00}_{TL } \frac{p_m}{k_{\gamma}^{cm}}
+    \frac{\sqrt{Q^2}}{|\omega_{\gamma}|}
+\\
+\frac{d\sigma_{TT }}{d\Omega} & = R^{00}_{TT } \frac{p_m}{k_{\gamma}^{cm}}
+\\
+\frac{d\sigma_{TL'}}{d\Omega} & = R^{00}_{TL'} \frac{p_m}{k_{\gamma}^{cm}}
+    \frac{\sqrt{Q^2}}{|\omega_{\gamma}|}
+\end{align}
+
+<p>
+\( p_m \) is absolute value of meson three-momentum,
+\( \omega_{\gamma} \) stands for photon energy in the CM-frame:
+</p>
+<p>
+\begin{align}
+    \omega_{\gamma} & = \frac{W^2 - Q^2 - M_B^2}{2W}
+\\
+    k_{\gamma}^{cm} & = \frac{W^2 - M_B^2}{2W}
+\\
+    p_m & = \sqrt{E_m^2 - m_m^2}
+\\
+    E_m & = \frac{W^2 + m_m^2 - M_B^2}{2W}
+\end{align}
+</p>
+<p>
+    \( E_m \) stands for meson energy in c. m.,
+    \( m_m \) and \( M_B \) stand for meson and baryon masses,
+    \( Q^2 \) is photon virtuality,
+    \( W   \) is invariant mass of the final hadronic system.
 </p>
 </div>
 <div>
 <h2>References</h2>
 <ol class="references">
-    <li>
+    <li id="ref-1">
         <span class="authors">
             G. Knöchlein, D. Drechsel, L. Tiator
         </span>
         <span class="title">
-            <a href="{{ arxiv_url('arXiv:nucl-th/9506029') }}">
-                Photo- and Electroproduction of η-Mesons
-            </a>
+            Photo- and Electroproduction of η-Mesons
         </span>
         <span class="ref">
             Z.Phys.A352 p.327-343, 1995
         </span>
+        <a href="{{ arxiv_url('arXiv:nucl-th/9506029') }}">
+            arXiv:nucl-th/9506029
+        </a>
     </li>
 </ol>
 </div>

@@ -36,14 +36,11 @@ def create_app(config_object=None):
 
 
 def register_blueprints(app):
-    """Register Flask blueprints."""
     app.register_blueprint(blueprint)
     return None
 
 
 def register_extensions(app):
-    """Register Flask extensions."""
-
     db.init_app(app)
     migrate.init_app(app, db, render_as_batch=True)
     debug_toolbar.init_app(app)
@@ -77,7 +74,6 @@ def register_extensions(app):
 
 
 def register_errorhandlers(app):
-    """Register error handlers."""
 
     def render_error(error):
         """Render error template."""
