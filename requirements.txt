@@ -2,7 +2,7 @@ numpy
 scipy
 
 python-dotenv
-SQLAlchemy >1.0, <1.2 # incompatible API changes
+SQLAlchemy > 1.2
 
 Flask >= 1.0
 Flask-SqlAlchemy >= 2.3  #  due to bugs in __tablename__ generation

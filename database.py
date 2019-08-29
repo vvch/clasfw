@@ -7,6 +7,7 @@ Boolean      = db.Boolean
 Integer      = db.Integer
 SmallInteger = db.SmallInteger
 DateTime     = db.DateTime
+TIMESTAMP    = db.TIMESTAMP
 Float        = db.Float
 String       = db.String
 Text         = db.Text

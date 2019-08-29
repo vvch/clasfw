@@ -1,5 +1,6 @@
 settings_local.py
 .htaccess
+.env
 
 *.sqlite
 *.sqlite3

@@ -1,8 +1,8 @@
 """initial
 
-Revision ID: 05fcb1058ab0
+Revision ID: ce6f5e95b530
 Revises: 
-Create Date: 2019-08-14 04:26:51.705958
+Create Date: 2019-09-04 20:59:20.376323
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '05fcb1058ab0'
+revision = 'ce6f5e95b530'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,26 +21,26 @@ def upgrade():
     op.create_table('channels',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('status', sa.Integer(), nullable=True),
-    sa.Column('mdate', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
-    sa.Column('cdate', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+    sa.Column('mdate', sa.TIMESTAMP(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+    sa.Column('cdate', sa.TIMESTAMP(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.Column('priority', sa.Integer(), autoincrement=True, nullable=True),
-    sa.Column('name', sa.String(), nullable=False),
-    sa.Column('description', sa.Text(), server_default='', nullable=False),
-    sa.Column('html', sa.String(), nullable=True),
-    sa.Column('html_plain', sa.String(), nullable=True),
-    sa.Column('tex', sa.String(), nullable=True),
+    sa.Column('name', sa.String(length=255), nullable=False),
+    sa.Column('description', sa.Text(), nullable=True),
+    sa.Column('html', sa.String(length=255), nullable=True),
+    sa.Column('html_plain', sa.String(length=255), nullable=True),
+    sa.Column('tex', sa.String(length=255), nullable=True),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_channels')),
     sa.UniqueConstraint('name', name=op.f('uq_channels_name'))
     )
     op.create_table('models',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('status', sa.Integer(), nullable=True),
-    sa.Column('mdate', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
-    sa.Column('cdate', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+    sa.Column('mdate', sa.TIMESTAMP(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+    sa.Column('cdate', sa.TIMESTAMP(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.Column('priority', sa.Integer(), autoincrement=True, nullable=True),
-    sa.Column('name', sa.String(), nullable=False),
-    sa.Column('description', sa.Text(), server_default='', nullable=False),
-    sa.Column('author', sa.String(), nullable=False),
+    sa.Column('name', sa.String(length=255), nullable=False),
+    sa.Column('description', sa.Text(), nullable=True),
+    sa.Column('author', sa.String(length=255), nullable=False),
     sa.Column('comment', sa.Text(), nullable=False),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_models')),
     sa.UniqueConstraint('name', name=op.f('uq_models_name'))
@@ -48,14 +48,14 @@ def upgrade():
     op.create_table('units',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('status', sa.Integer(), nullable=True),
-    sa.Column('mdate', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
-    sa.Column('cdate', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+    sa.Column('mdate', sa.TIMESTAMP(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+    sa.Column('cdate', sa.TIMESTAMP(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.Column('priority', sa.Integer(), autoincrement=True, nullable=True),
-    sa.Column('name', sa.String(), nullable=False),
-    sa.Column('description', sa.Text(), server_default='', nullable=False),
-    sa.Column('html', sa.String(), nullable=True),
-    sa.Column('html_plain', sa.String(), nullable=True),
-    sa.Column('tex', sa.String(), nullable=True),
+    sa.Column('name', sa.String(length=255), nullable=False),
+    sa.Column('description', sa.Text(), nullable=True),
+    sa.Column('html', sa.String(length=255), nullable=True),
+    sa.Column('html_plain', sa.String(length=255), nullable=True),
+    sa.Column('tex', sa.String(length=255), nullable=True),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_units')),
     sa.UniqueConstraint('name', name=op.f('uq_units_name'))
     )
@@ -91,14 +91,14 @@ def upgrade():
     op.create_table('quantities',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('status', sa.Integer(), nullable=True),
-    sa.Column('mdate', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
-    sa.Column('cdate', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+    sa.Column('mdate', sa.TIMESTAMP(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+    sa.Column('cdate', sa.TIMESTAMP(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.Column('priority', sa.Integer(), autoincrement=True, nullable=True),
-    sa.Column('name', sa.String(), nullable=False),
-    sa.Column('description', sa.Text(), server_default='', nullable=False),
-    sa.Column('html', sa.String(), nullable=True),
-    sa.Column('html_plain', sa.String(), nullable=True),
-    sa.Column('tex', sa.String(), nullable=True),
+    sa.Column('name', sa.String(length=255), nullable=False),
+    sa.Column('description', sa.Text(), nullable=True),
+    sa.Column('html', sa.String(length=255), nullable=True),
+    sa.Column('html_plain', sa.String(length=255), nullable=True),
+    sa.Column('tex', sa.String(length=255), nullable=True),
     sa.Column('unit_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['unit_id'], ['units.id'], name=op.f('fk_quantities_unit_id_units')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_quantities')),
