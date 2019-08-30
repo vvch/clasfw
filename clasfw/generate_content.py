@@ -5,19 +5,19 @@ import numpy as np
 
 
 def create_amplitude_qu(qu):
-    tmpl_text = "H_{}"
-    tmpl_html = "H<sub>{}</sub>"
-    tmpl_tex  = "H_{{{}}}"
-    start_id = 200
+    H_tmpl_text = "H_{}"
+    H_tmpl_html = "H<sub>{}</sub>"
+    H_tmpl_tex  = "H_{{{}}}"
+    H_start_id  = 200
 
     for i in range(1, Amplitude.number+1):
         db.session.add(Quantity(
-            id = start_id + i,
-            name = tmpl_text.format(i),
-            html = tmpl_html.format(i),
-            tex  = tmpl_tex.format(i),
+            id = H_start_id + i,
+            name = H_tmpl_text.format(i),
+            html = H_tmpl_html.format(i),
+            tex  = H_tmpl_tex.format(i),
             unit = qu.GeVm1,
-            priority=-(start_id+i),
+            priority=-(H_start_id+i),
         ))
 
     R_tmpl_text = "R_{}_00"
@@ -28,31 +28,32 @@ def create_amplitude_qu(qu):
     s_tmpl_html = "d&sigma;<sub>{}</sub>/d&Omega;"
     s_tmpl_tex  = "\\frac{{d\\sigma_{{{0}}}}}{{d\\Omega}}"
 
-    R_start_id = 300
-    s_start_id = 400
+    R_start_id  = 300
+    s_start_id  = 400
 
-    strfun_indexes = "T  L  TT  TL  TL'".split()
-
-    for ii, i in enumerate(strfun_indexes):
+    for ii, i in enumerate(Amplitude.strfun_indexes):
         hi = i.replace("'", "&prime;")
-        db.session.add(Quantity(
-            id   = R_start_id + ii,
-            name = R_tmpl_text.format(i),
-            html = R_tmpl_html.format(hi),
-            tex  = R_tmpl_tex.format(i),
-            unit = qu.GeVm2,
-            priority    = -(R_start_id+ii),
-            description = "Response function",
-        ))
-        db.session.add(Quantity(
-            id   = s_start_id + ii,
-            name = s_tmpl_text.format(i),
-            html = s_tmpl_html.format(hi),
-            tex  = s_tmpl_tex.format(i),
-            unit = qu.mcb_sr,
-            priority    = -(s_start_id+ii),
-            description = "Interference term",
-        ))
+        db.session.add_all([
+            Quantity(
+                id   = R_start_id + ii,
+                name = R_tmpl_text.format(i),
+                html = R_tmpl_html.format(hi),
+                tex  = R_tmpl_tex.format(i),
+                # unit = qu.GeVm2,
+                unit = qu.mcb_sr,
+                priority    = -(R_start_id+ii),
+                description = "Response function",
+            ),
+            Quantity(
+                id   = s_start_id + ii,
+                name = s_tmpl_text.format(i),
+                html = s_tmpl_html.format(hi),
+                tex  = s_tmpl_tex.format(i),
+                unit = qu.mcb_sr,
+                priority    = -(s_start_id+ii),
+                description = "Interference term",
+            ),
+        ])
 
 
 def create_quantities_functions_qu(qu):

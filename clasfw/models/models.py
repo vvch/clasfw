@@ -171,6 +171,9 @@ class Amplitude(Base):
         self.H1, self.H2, self.H3, \
         self.H4, self.H5, self.H6 = value[1:]  #  skip [0] index
 
+
+    strfun_indexes = "T  L  TT  TL  TL'".split()
+
     @hybrid_property
     def strfuns(self):
         return self.R_T, self.R_L, self.R_TT, self.R_TL, self.R_TLp

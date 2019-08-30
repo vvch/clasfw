@@ -46,8 +46,8 @@ def register(app):
     @click.option('-v', '--verbose', count=True)
     @click.option('-m', '--models', multiple=True, type=str)
     @click.option('-i', '--ids', multiple=True, type=int)
-    def strfuns(verbose, models, ids):
-        """Calculate structure functions."""
+    def rfuncs(verbose, models, ids):
+        """Calculate response functions R^00_i."""
 
         cond = []
         m_list = []

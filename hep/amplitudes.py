@@ -37,7 +37,6 @@ def ampl_to_R_TL_00(H):
         + H[6].conjugate() * H[2]
         + H[6].conjugate() * H[3]
     ).real / np.sqrt(2)
-    #  fixme: take out sqrt(2) ? cf. Mokeev's comment in DT_only.pdf write-up
 
 
 def ampl_to_R_TT_00(H):
@@ -57,18 +56,19 @@ def ampl_to_R_TLp_00(H):
 
 
 def ampl_to_strfuns(H):
+    """Results in mcb/sr"""
     return np.array([
         ampl_to_R_T_00(H),
         ampl_to_R_L_00(H),
         ampl_to_R_TT_00(H),
         ampl_to_R_TL_00(H),
         ampl_to_R_TLp_00(H),
-    ])
+    ]) * mcb_per_GeVm2
 
 
 def R_to_dsigma_factors(Q2, W):
     """
-    dsigma_v, mcb/sr = R_v * response_funcs_to_dsigmas(Q2, W)
+    dsigma_v [mcb/sr] = R_v [mcb/sr] * response_funcs_to_dsigmas(Q2, W)
     """
     # fixme: use correct mass for pi^0 instead of pi^+- for pi0p reaction
     m_m = m_pi  ## or m_pi0 for pi0p final state
@@ -89,7 +89,7 @@ def R_to_dsigma_factors(Q2, W):
         1,              ##  TT
         sqrt_tmp,       ##  TL
         sqrt_tmp,       ##  TL'
-    ]) * ( p_m / k_γ_cm * mcb_per_GeVm2 )
+    ]) * ( p_m / k_γ_cm)
 
 
 def strfuns_to_dsigma(Q2, W, eps_T, phi, h, response_funcs):

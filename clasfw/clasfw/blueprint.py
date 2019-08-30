@@ -17,9 +17,8 @@ def cpx(value):
 
 
 class qu:
-    strfun_indexes = "T  L  TT  TL  TL'".split()
-    strfun_names = ["R_{}_00".format(i) for i in strfun_indexes]
-    dsigma_names = ["dsigma_{}/dOmega".format(i) for i in strfun_indexes]
+    strfun_names = ["R_{}_00".format(i) for i in Amplitude.strfun_indexes]
+    dsigma_names = ["dsigma_{}/dOmega".format(i) for i in Amplitude.strfun_indexes]
     strfuns = []
     dsigmas = []
     amplitudes = []

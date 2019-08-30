@@ -8,7 +8,6 @@ from flask import request, Response, url_for, send_file, redirect, \
     render_template, render_template_string, Markup
 
 import hep
-import hep.hep
 import hep.amplitudes
 
 from sqlalchemy import func
@@ -135,7 +134,7 @@ def phi_dependence():
     plot3D = cos_theta is None
 
     phi = np.linspace(0, 2*np.pi)
-    eps_T = hep.hep.ε_T(W, Q2, Eb)
+    eps_T = hep.ε_T(W, Q2, Eb)
 
     h=1
     if not plot3D:
@@ -220,7 +219,6 @@ def phi_dependence():
         plot3D=plot3D,
         hep=hep,
 
-        rfuncs_mcb_sr=np.array(ampl.strfuns)*hep.mcb_per_GeVm2,
         dsigmas=np.array(ampl.strfuns)*hep.amplitudes.R_to_dsigma_factors(ampl.q2, ampl.w),
     )
 

@@ -46,8 +46,6 @@
 	</td>
 </tr>
 
-
-{#
 <tr>
 	<td>
 	<table class="properties">
@@ -61,29 +59,6 @@
 	<tbody>
 	<tr>
 		{% for R in ampl.strfuns %}
-		<td>{{ R }}</td>
-		{% endfor %}
-	</tr>
-	</tbody>
-	</table>
-	</td>
-</tr>
-#}
-
-
-<tr>
-	<td>
-	<table class="properties">
-	<thead>
-	<tr>
-		{% for R in qu.strfuns %}
-		<th>{{ R }}, {{ qu.mcb_sr }}</th>
-		{% endfor %}
-	</tr>
-	</thead>
-	<tbody>
-	<tr>
-		{% for R in rfuncs_mcb_sr %}
 		<td>{{ R }}</td>
 		{% endfor %}
 	</tr>
