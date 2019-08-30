@@ -5,12 +5,13 @@ from .models import Model, Amplitude, Channel, Quantity
 from ..utils import equal_eps
 
 from flask import request, Response, url_for, send_file, redirect, \
-    render_template, render_template_string, Markup
+    render_template, render_template_string, Markup, abort
 
 import hep
 import hep.amplitudes
 
-from sqlalchemy import func
+from sqlalchemy import func, exc
+from sqlalchemy.orm import exc
 import numpy as np
 import json
 
@@ -74,7 +75,7 @@ def models_list():
 def model_data(model_id):
     channel = request.args.get('channel', None)
     q2 = request.args.get('q2', default=None, type=float)
-    model = Model.query.get(model_id)
+    model = Model.query.get_or_404(model_id)
     if channel:
         channel = Channel.query.get(channel)
 
@@ -138,9 +139,12 @@ def phi_dependence():
 
     h=1
     if not plot3D:
-        ampl = ampl.filter(
-            equal_eps(Amplitude.cos_theta, cos_theta),
-        ).one()
+        try:
+            ampl = ampl.filter(
+                equal_eps(Amplitude.cos_theta, cos_theta),
+            ).one()
+        except exc.NoResultFound:
+            abort(404)
         sig = hep.amplitudes.strfuns_to_dsigma(
             Q2, W, eps_T, phi, h, ampl.strfuns)
 
@@ -169,6 +173,8 @@ def phi_dependence():
         }
     else:  #  3D-plot
         ampls=ampl.all()
+        if not ampls:
+            abort(404)
         sig_M = np.zeros(shape=(len(ampls), len(phi)))
         cos_theta_v = np.zeros(shape=(len(ampls),))
 
@@ -186,6 +192,10 @@ def phi_dependence():
 
         plot = {
             'layout': {
+                'autosize': 'true',
+                'width':  1000,
+                'height': 800,
+
                 'scene': {
                     # 'autosize': 'true',
                     'xaxis': {
@@ -208,6 +218,8 @@ def phi_dependence():
                 'x': phi.tolist(),
                 'y': cos_theta_v.tolist(),
                 'z': sig_M.tolist(),
+                'hovertemplate':
+                    "φ: %{x} rad<br>cos<i>θ</i>: %{y}<br>dσ/dΩ: %{z} μb/sr<extra></extra>",
             }],
         }
         ampl=ampls[-1]  # temporary, for template args
