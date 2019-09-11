@@ -138,7 +138,9 @@
 var plot_json = {{ plot|safe }};
 Plotly.newPlot('plot', plot_json.data, plot_json.layout, {'displaylogo': false
 {%- if not config.DEBUG -%}
-, 'modeBarButtonsToRemove': ['sendDataToCloud','resetCameraLastSave3d']
+, 'modeBarButtonsToRemove': ['resetCameraLastSave3d']
+{%- else -%}
+, 'showSendToCloud': true
 {%- endif -%}
 });
 </script>

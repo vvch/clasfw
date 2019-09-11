@@ -3,7 +3,7 @@ from flask import Flask, request, render_template, render_template_string
 from .settings import ProdConfig, DevConfig
 from .extensions import db, migrate, assets, debug_toolbar
 from .clasfw.blueprint import blueprint
-from .clasfw import views
+from .clasfw import views, views_comparison
 
 import os
 
