@@ -54,9 +54,10 @@ def compare_maid():
         sig_v[i] = ds[ds_index]
 
     quantity = qu.dsigmas[ds_index]
+    finalstate = ampl.channel
 
     from load_maid import MAIDObservables
-    maid = MAIDObservables.load_kinematics(Q2=Q2, W=W)
+    maid = MAIDObservables.load_kinematics(Q2=Q2, W=W, FS=finalstate.name)
     maid_cos_theta = maid.keys()
     maid_sig = np.zeros(shape=(len(ampls),))
     for i, c in enumerate(maid_cos_theta):

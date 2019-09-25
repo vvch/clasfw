@@ -210,12 +210,22 @@ def generate_test_content(verbose=0):
         name="pi0 p",
         html=r"&pi;<sup>0</sup>p",
         tex=r"$\pi^0p$")
+    c3 = Channel(
+        id=22,
+        name="pi- p",
+        html=r"&pi;<sup>&minus;</sup>p",
+        tex=r"$\pi^-p$")
+    c4 = Channel(
+        id=23,
+        name="pi0 n",
+        html=r"&pi;<sup>0</sup>n",
+        tex=r"$\pi^0n$")
 
     w_all = np.arange(1.1, 4.1, 0.1)
     q2_all = np_linspace_left(0, 8, 16)
     cos_theta_all = np.linspace(-1, 1, 21)
 
-    for ch in c1, c2:
+    for ch in c1, c2, c3, c4:
       for q2 in q2_all:
         if verbose>0:
             # TODO: use logger instead of print

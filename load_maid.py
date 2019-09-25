@@ -87,15 +87,36 @@ class MAIDData(dict):
             url.args['value35'] = kvargs['Q2']
         if kvargs.get('W') is not None:
             W = kvargs['W'] * 1000  ##  GeV to MeV, MAID site uses MeV for W
+            W = "{:g}".format(W)    ##  drop insignificant fluctuations
             url.args['value36'] = W
-        return cls.load(url)
-
+        if kvargs.get('FS') is not None:
+            FS = kvargs['FS']
+            FS_idx = {
+                "pi0 p": 1,
+                "pi0 n": 2,
+                "pi+ n": 3,
+                "pi- p": 4,
+            }[FS]
+            url.args['param2'] = FS_idx
+        try:
+            self = cls.load(url)
+            if FS is not None:
+                self.FS = FS
+            return self
+        except ValueError as e:
+            print(
+                'ERROR processing url for Q2={} and W={}\n{}\n'.format(
+                    kvargs['Q2'], kvargs['W'], str(url)))
+            raise
 
 from sqlalchemy.orm import exc
 
 
-def save_maid(ses, out):
-    ch = Channel.query.filter_by(name='pi0 p').one()
+def store_maid(ses, maid, nocommit=False):
+    FS = maid.FS
+    if not FS:
+        FS = 'pi0 p'
+    ch = Channel.query.filter_by(name=FS).one()
     try:
         m = Model.query.filter_by(name='maid').one()
     except exc.NoResultFound:
@@ -104,10 +125,10 @@ def save_maid(ses, out):
             author='MAID',
             description='MAID',
             )
-    for k, v in out.items():
+    for k, v in maid.items():
         a = Amplitude(
-            q2=out.Q2,
-            w=out.W,
+            q2=maid.Q2,
+            w=maid.W,
             cos_theta=k,
             channel=ch)
 
@@ -117,9 +138,10 @@ def save_maid(ses, out):
         a.H = [None] + list(v)
         a.strfuns = hep.amplitudes.ampl_to_strfuns(a.H)
         m.amplitudes.append(a)
-    pprint(m)
+    # pprint(m)
     ses.add(m)
-    ses.commit()
+    if not nocommit:
+        ses.commit()
 
 
 class MAIDObservables(MAIDData):
@@ -155,31 +177,39 @@ from clasfw.extensions import db
 import click
 
 
+def download_maid_amplitudes(q2, w, fs):
+    app = create_app()
+    with app.test_request_context():
+        for FS in fs:
+            for Q2 in q2:
+                for W in w:
+                    out = MAIDData.load_kinematics(Q2=Q2, W=W, FS=FS)
+                    print("Q2={}, W={}, FS={}".format(out.Q2, out.W, out.FS))
+                    # pprint(out)
+                    store_maid(db.session, out, nocommit=True)
+                db.session.commit()
+
+
 @click.command()
 @click.option("--Q2")
 @click.option("--W")
-def main(Q2, W):
-
-    print(Q2, W)
-    return
-    app = create_app()
-    with app.test_request_context():
-        for Q2 in (1, 0.5):
-            for W in (2,):
-                out = MAIDData.load_kinematics(Q2=Q2, W=W)
-                print("Q2={}, W={}".format(out.Q2, out.W))
-                pprint(out)
-                save_maid(db.session, out)
+@click.option("--FS", default="pi0 p")
+def main_command(q2, w, fs):
+    q2 = np.array(q2.split(','))
+    w  = np.array( w.split(','))
+    fs = [s.strip() for s in fs.split(',')]
+    download_maid_amplitudes(q2, w, fs)
 
 
 if __name__ == '__main__':
-    # main()
+    # main_command()
 
-    app = create_app()
-    with app.test_request_context():
-        for Q2 in (0.5, 1):
-            for W in (1.5, 2,):
-                out = MAIDData.load_kinematics(Q2=Q2, W=W)
-                print("Q2={}, W={}".format(out.Q2, out.W))
-                pprint(out)
-                save_maid(db.session, out)
+    # download_maid_amplitudes([0.5, 1], [1.5, 2], ["pi0 p"])
+
+    # W = np.arange(1.1, 2.00001, 0.1)
+
+    download_maid_amplitudes(
+        np.arange(0,   5.00001, 0.1),
+        np.arange(1.1, 2.00001, 0.1),
+        ["pi0 p", "pi0 n", "pi+ n", "pi- p"],
+    )

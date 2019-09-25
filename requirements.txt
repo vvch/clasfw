@@ -9,6 +9,9 @@ Flask-SqlAlchemy >= 2.3  #  due to bugs in __tablename__ generation
 Flask-Migrate
 Flask-Assets
 
+requests_cache
+
+
 # Development
 
 flask-debugtoolbar >= 0.10.1
