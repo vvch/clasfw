@@ -124,7 +124,7 @@ def store_maid(ses, maid, nocommit=False):
             name="maid",
             author='MAID',
             description='MAID',
-            )
+        )
     for k, v in maid.items():
         a = Amplitude(
             q2=maid.Q2,

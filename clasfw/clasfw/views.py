@@ -229,7 +229,6 @@ def phi_dependence():
         Eb=Eb,
         ampl=ampl,
         plot3D=plot3D,
-        hep=hep,
 
         dsigmas=np.array(ampl.strfuns)*hep.amplitudes.R_to_dsigma_factors(ampl.q2, ampl.w),
     )

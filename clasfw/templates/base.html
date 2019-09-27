@@ -14,10 +14,6 @@
 {% assets "css_screen" -%}
 <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
 {% endassets -%}
-{#
-<script type="text/javascript"
-    src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
--#}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 {% block extrahead %}{% endblock -%}
 
@@ -31,18 +27,19 @@
 <div id="wrapper">
 <div id="wrapper-row">
 
-<div class="header">
+<header>
     <h1>CLAS Analysis Framework</h1>
     {% include "topmenu.html" %}
+</header>
+
+<main>
+{% block content %}
+{% endblock %}
+</main>
+
 </div>
 
-<div class="content">
-{% block content %}{% endblock %}
-</div>
-
-</div>
-
-<div class="footer">
+<footer>
     <div class="powered">
         Created by
         <a href="http://www.sinp.msu.ru">SINP</a>
@@ -50,7 +47,7 @@
         <a href="https://uconn.edu/">UCONN</a>,
         <a href="https://clasweb.jlab.org">CLAS Collaboration</a>
     </div>
-</div>
+</footer>
 
 </div>
 {% endblock %}

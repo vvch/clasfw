@@ -10,7 +10,7 @@ Flask-Migrate
 Flask-Assets
 
 requests_cache
-
+furl
 
 # Development
 

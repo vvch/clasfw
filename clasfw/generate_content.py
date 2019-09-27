@@ -1,6 +1,5 @@
 from .models import Model, Amplitude, Channel, Quantity, Unit
 from .extensions import db
-from .utils import np_linspace_left
 import numpy as np
 
 
@@ -221,9 +220,10 @@ def generate_test_content(verbose=0):
         html=r"&pi;<sup>0</sup>n",
         tex=r"$\pi^0n$")
 
-    w_all = np.arange(1.1, 4.1, 0.1)
-    q2_all = np_linspace_left(0, 8, 16)
-    cos_theta_all = np.linspace(-1, 1, 21)
+    ε = 0.00001
+    w_all     = np.arange( 1.1, 4.0 +ε, 0.1)
+    q2_all    = np.arange( 0.0, 8.0 +ε, 0.5)
+    cos_θ_all = np.arange(-1.0, 1.0 +ε, 0.1)
 
     for ch in c1, c2, c3, c4:
       for q2 in q2_all:
@@ -234,24 +234,24 @@ def generate_test_content(verbose=0):
             if verbose>1:
                 # TODO: use logger instead of print
                 print ("\tW = ", w)
-            for cos_theta in cos_theta_all:
+            for cos_θ in cos_θ_all:
                 a1 = Amplitude(
                     channel=ch,
                     w=w,
                     q2=q2,
-                    cos_theta=cos_theta,
+                    cos_theta=cos_θ,
                 )
                 a2 = Amplitude(
                     channel=ch,
                     w=w,
                     q2=q2,
-                    cos_theta=cos_theta,
+                    cos_theta=cos_θ,
                 )
                 # a3 = Amplitude(
                 #     channel=ch,
                 #     w=w,
                 #     q2=q2,
-                #     cos_theta=cos_theta,
+                #     cos_theta=cos_θ,
                 # )
                 a1.H = [None] + [1 ]*Amplitude.number
                 a2.H = [None] + [1j]*Amplitude.number

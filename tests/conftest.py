@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Defines fixtures available to all tests."""
 
 import pytest
@@ -8,8 +7,6 @@ from clasfw.app import create_app
 # from clasfw.database import db as _db
 from clasfw.extensions import db as _db
 from clasfw.settings import TestConfig
-
-# from .factories import UserFactory
 
 
 @pytest.fixture

@@ -1,23 +1,14 @@
-{%- macro delim() -%}
-    <span>|</span>
-{%- endmacro -%}
-
-<div class="top-menu">
+<nav>
     <a href="{{ url_for('clasfw.index') }}"
         accesskey="S"
         title="">Start</a>
 
-    {{delim()}}
-
     <a href="{{ url_for('clasfw.models_list') }}"
         accesskey="L"
         title="List of all available models">Models</a>
-    {{delim()}}
 
     <a href="{{ url_for('clasfw.groups_list') }}"
         accesskey="G"
         title="List of data groups">Groups</a>
-    {{delim()}}
-
-</div>
+</nav>
 

@@ -37,8 +37,8 @@ def compare_maid():
         equal_eps(Amplitude.w, W),
     )
 
-    eps_T = hep.ε_T(W, Q2, Eb)
-    h=1
+    # eps_T = hep.ε_T(W, Q2, Eb)
+    # h=1
 
     ampls=ampl.all()
     if not ampls:
@@ -113,6 +113,5 @@ def compare_maid():
         plot=plot,
         Eb=Eb,
         ampl=ampl,
-        hep=hep,
         plot3D=True,
     )
