@@ -8,6 +8,7 @@ Flask >= 1.0
 Flask-SqlAlchemy >= 2.3  #  due to bugs in __tablename__ generation
 Flask-Migrate
 Flask-Assets
+Flask-WTF
 
 requests_cache
 furl
