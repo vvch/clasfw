@@ -42,12 +42,11 @@ def enabled_quantities_factory():
         status=0
     ).filter(
         Quantity.name.in_([
-            "dsigma/dOmega",
-            "dsigma_T/dOmega",
-            "dsigma_L/dOmega",
-            "dsigma_TT/dOmega",
-            "dsigma_TL/dOmega",
-            "dsigma_TL'/dOmega",
+            "R_T_00",
+            "R_L_00",
+            "R_TT_00",
+            "R_TL_00",
+            "R_TL'_00",
         ])
     ).order_by(
         Quantity.priority.desc()
@@ -89,7 +88,7 @@ def create_form(session, qu):
             # widget          = widgets.TableWidget(),
             # default         = 'dsigma/dOmega',
             get_label       = get_html_field,
-            default         = Quantity.query.filter_by(name='dsigma_T/dOmega').one(),
+            default         = Quantity.query.filter_by(name='R_T_00').one(),
         )
 
         # channels = QuerySelectMultipleField(""""""
