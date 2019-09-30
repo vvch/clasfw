@@ -26,6 +26,8 @@ class Config:
     # to suppress 'overhead' warning
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    RECORDS_PER_PAGE = 100
+
 
 class ProdConfig(Config):
     """Production configuration."""

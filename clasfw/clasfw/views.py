@@ -72,12 +72,13 @@ def models_list():
 
 
 @bp.route('/model_data/<int:model_id>')
-def model_data(model_id):
+@bp.route('/model_data/<int:model_id>/p<int:page>')
+def model_data(model_id, page=1):
     channel = request.args.get('channel', None)
     q2 = request.args.get('q2', default=None, type=float)
     model = Model.query.get_or_404(model_id)
     if channel:
-        channel = Channel.query.get(channel)
+        channel = Channel.query.get_or_404(channel)
 
     amplitudes = Amplitude.query.filter_by(model_id=model.id)
     if channel or q2:
@@ -90,7 +91,9 @@ def model_data(model_id):
         Amplitude.q2,
         Amplitude.w,
         Amplitude.cos_theta,
-    ).all()
+    )
+    # amplitudes = amplitudes.all()
+    amplitudes = amplitudes.paginate(page, current_app.config['RECORDS_PER_PAGE'])
 
     return render_template('model_data.html',
         model=model,
