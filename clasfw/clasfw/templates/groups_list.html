@@ -25,6 +25,7 @@
 	<th>Model</th>
 	<th>Channel</th>
 	<th>{{ qu.Q2.wu }}</th>
+	<th>{{ qu.W.wu }}</th>
 	<th>Data points</th>
 </tr>
 </thead>
@@ -43,6 +44,11 @@
 	</td>
 	<td>{{ a.channel }}</td>
 	<td>{{ a.q2 }}</td>
+	<td>
+		{{ "{:g}".format(mm.w_min) }}
+		—
+		{{ "{:g}".format(mm.w_max) }}
+	</td>
 	<td>
 		{{ mm.count_ampl }}
 	</td>

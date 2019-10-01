@@ -254,8 +254,9 @@ def groups_list(page=1):
     ).group_by(
         Model.id, Channel.id, Amplitude.q2
     ).add_columns(
-        # func.count().label('count_ampl'),
         func.count(Amplitude.id).label('count_ampl'),
+        func.min(Amplitude.w).label('w_min'),
+        func.max(Amplitude.w).label('w_max'),
     ).order_by(
         # Model.priority.desc(),
         Model.id, # fixme: temporary, use priority
