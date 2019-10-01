@@ -14,6 +14,10 @@
 {% block content %}
 <h1>Data groups</h1>
 
+<p>
+{{ macros.render_pagination(models, partial(url_for, '.groups_list')) }}
+</p>
+
 <table class="clickable models">
 <thead>
 <tr>
@@ -24,7 +28,7 @@
 	<th>Data points</th>
 </tr>
 </thead>
-{% for mm in models %}
+{% for mm in models.items %}
 {% set a = mm.Amplitude %}
 <tr>
 	<td class="hidden-link">
@@ -45,4 +49,9 @@
 </tr>
 {% endfor %}
 </table>
+
+<p>
+{{ macros.render_pagination(models, partial(url_for, '.groups_list')) }}
+</p>
+
 {% endblock%}

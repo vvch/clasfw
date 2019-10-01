@@ -32,43 +32,8 @@
 	{% endif %}
 </dl>
 
-
-{% macro render_pagination(pagination) %}
-	<div class=pagination>
-	{% if amplitudes.has_prev %}
-		<a href="{{
-			url_for('.model_data', model_id=model.id, page=amplitudes.prev_num)
-		}}"><< prev</a>
-	{% else %}
-		&#x25C0; prev
-	{% endif %}
-
-	{%- for page in pagination.iter_pages() %}
-	{% if page %}
-		{% if page != pagination.page %}
-			<a href="{{
-				url_for('.model_data', model_id=model.id, page=page)
-			}}">{{ page }}</a>
-		{% else %}
-			<strong>{{ page }}</strong>
-		{% endif %}
-	{% else %}
-		<span class=ellipsis>…</span>
-	{% endif %}
-	{%- endfor %}
-
-	{% if amplitudes.has_next %}
-		<a href="{{
-			url_for('.model_data', model_id=model.id, page=amplitudes.next_num)
-		}}">next &#x25B6;</a>
-	{% else %}
-		next >>
-	{% endif %}
-	</div>
-{% endmacro %}
-
 <p>
-{{ render_pagination(amplitudes) }}
+{{ macros.render_pagination(amplitudes, partial(url_for, '.model_data', model_id=model.id)) }}
 </p>
 
 <table class="clickable amplitudes">
@@ -115,7 +80,8 @@
 </table>
 
 <p>
-{{ render_pagination(amplitudes) }}
+{# {{ render_pagination(amplitudes) }} #}
+{{ macros.render_pagination(amplitudes, partial(url_for, '.model_data', model_id=model.id)) }}
 </p>
 
 </div>

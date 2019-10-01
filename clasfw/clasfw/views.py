@@ -247,7 +247,8 @@ def phi_dependence():
 
 
 @bp.route('/groups')
-def groups_list():
+@bp.route('/groups/p<int:page>')
+def groups_list(page=1):
     models = Amplitude.query.join(
         Model, Channel
     ).group_by(
@@ -261,7 +262,7 @@ def groups_list():
         # Channel.priority.desc(),
         Channel.id, # fixme: temporary
         Amplitude.q2,
-    ).all()
+    ).paginate(page, current_app.config['RECORDS_PER_PAGE'])
 
     return render_template('groups_list.html',
         models=models)
