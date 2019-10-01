@@ -13,6 +13,9 @@
 	<th>Name</th>
 	<th>Author</th>
 	<th>Description</th>
+	<th>Channels</th>
+	<th>{{ qu.Q2.wu }}</th>
+	<th>{{ qu.W.wu }}</th>
 	<th>Data points</th>
 </tr>
 </thead>
@@ -29,6 +32,25 @@
 	</td>
 	<td>
 		{{ m.description }}
+	</td>
+	<td class="channel">
+		{% set comma = joiner(", ") %}
+		{% for ch in by_model_id[m.id].channels %}
+		{{ comma() }}
+		<a href="{{ url_for('.model_data', model_id=m.id, channel=ch.id) }}">
+			{{ ch }}
+		</a>
+		{% endfor %}
+	</td>
+	<td>
+		{{ '{:g}'.format(mm.q2_min) }}
+		—
+		{{ '{:g}'.format(mm.q2_max) }}
+	</td>
+	<td>
+		{{ '{:g}'.format(mm.w_min) }}
+		—
+		{{ '{:g}'.format(mm.w_max) }}
 	</td>
 	<td>
 		{{ mm.count_ampl }}

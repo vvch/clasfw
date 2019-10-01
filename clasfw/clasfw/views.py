@@ -51,13 +51,21 @@ def models_list():
     models = Model.query.join(
         Amplitude
     ).group_by(Model.id).add_columns(
-        # func.count().label('count_ampl'),
         func.count(Amplitude.id).label('count_ampl'),
-    # ).with_entities(
-    #     Model,
-    #     # func.count().label('count_ampl'),
-    #     func.count(Amplitude.id).label('count_ampl')
+        func.min(Amplitude.q2).label('q2_min'),
+        func.max(Amplitude.q2).label('q2_max'),
+        func.min(Amplitude.w).label('w_min'),
+        func.max(Amplitude.w).label('w_max'),
     ).all()
+
+    by_model_id = {}
+    for mm in models:
+        m = mm.Model
+        prop = {}
+        by_model_id[m.id] = prop
+        prop['channels'] = Channel.query.distinct().join(Amplitude).filter(Amplitude.model==m)
+        # prop['count_ampl'] = Amplitude.query.filter_by(model=m).count()
+        # prop['count_ampl'] = Amplitude.query.filter_by(model=m).value( func.count(Amplitude.id) )
 
     # models = Model.query.add_columns(Model.id.label('count_ampl')).all()
     # print('WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW')
@@ -68,7 +76,8 @@ def models_list():
     # print('WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW')
 
     return render_template('models_list.html',
-        models=models)
+        models=models,
+        by_model_id=by_model_id)
 
 
 @bp.route('/model_data/<int:model_id>')
