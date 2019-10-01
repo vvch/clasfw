@@ -19,7 +19,7 @@ class Channel(DatesMixin, ExtDictionaryMixin, Base):
 
 
 class Unit(DatesMixin, ExtDictionaryMixin, Base):
-    __tablename__  = 'units' 
+    __tablename__  = 'units'
 
 
 class Quantity(DatesMixin, ExtDictionaryMixin, Base):
@@ -182,7 +182,7 @@ class Amplitude(Base):
     def strfuns(self, strfuns):
         self.R_T, self.R_L, self.R_TT, self.R_TL, self.R_TLp = strfuns
 
-    __table_args__ = ( 
+    __table_args__ = (
         UniqueConstraint(
             channel_id, model_id,
             q2, w, cos_theta,

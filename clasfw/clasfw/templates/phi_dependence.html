@@ -4,8 +4,11 @@
 	Differential cross-section
 {%- endblock %}
 
+
 {% block content %}
-<h1>Differential cross-section</h1>
+<h1>
+	Differential cross-section
+</h1>
 
 <table class="void">
 {% if not plot3D %}
@@ -13,7 +16,7 @@
 	<td>
 	<table class="properties">
 	<thead>
-	<tr>	
+	<tr>
 		<th>Model</th>
 		<th class="channel">Channel</th>
 		<th>{{ qu.Q2.wu }}</th>
@@ -28,13 +31,34 @@
 			url_for('.model_data', model_id=ampl.model_id)
 		}}">{{ ampl.model }}</a></td>
 		<td class="channel">{{ ampl.channel }}</td>
-		<td>{{ ampl.q2 }}</td>
-		<td>{{ ampl.w }}</td>
+		<td>{{ ampl.q2 |cpx}}</td>
+		<td>{{ ampl.w |cpx}}</td>
 		<td>{{ ampl.cos_theta |cpx}}</td>
 		<td>{{ Eb }}</td>
 	</tr>
 	</tbody>
 	</table>
+	</td>
+</tr>
+
+<tr>
+	<td>
+		<table class="properties">
+		<thead>
+		<tr>
+			{% for aa in qu.amplitudes %}
+			<th>{{ aa.wu }}</th>
+			{% endfor %}
+		</tr>
+		</thead>
+		<tbody>
+		<tr>
+			{% for aa in ampl.H[1:] %}
+			<td>{{ aa |cpx}}</td>
+			{% endfor %}
+		</tr>
+		</tbody>
+		</table>
 	</td>
 </tr>
 
@@ -78,27 +102,6 @@
 	</tr>
 	</tbody>
 	</table>
-	</td>
-</tr>
-
-<tr>
-	<td>
-		<table class="properties">
-		<thead>
-		<tr>
-			{% for aa in qu.amplitudes %}
-			<th>{{ aa.wu }}</th>
-			{% endfor %}
-		</tr>
-		</thead>
-		<tbody>
-		<tr>
-			{% for aa in ampl.H[1:] %}
-			<td>{{ aa |cpx}}</td>
-			{% endfor %}
-		</tr>
-		</tbody>
-		</table>
 	</td>
 </tr>
 {% else %}{# 3D plot #}

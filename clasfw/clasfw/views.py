@@ -80,8 +80,8 @@ def models_list():
         by_model_id=by_model_id)
 
 
-@bp.route('/model_data/<int:model_id>')
-@bp.route('/model_data/<int:model_id>/p<int:page>')
+@bp.route('/model/<int:model_id>')
+@bp.route('/model/<int:model_id>/p<int:page>')
 def model_data(model_id, page=1):
     channel = request.args.get('channel', None)
     q2 = request.args.get('q2', default=None, type=float)

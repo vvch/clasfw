@@ -110,11 +110,35 @@ DIV.info
 
 
 DIV.pagination
-	font-family: sans-serif 
-	A 
-		text-decoration: none 
+	font-family: sans-serif
+	margin-top: 0.2em
+	margin-bottom: 0.2em
+	A
+		text-decoration: none
 		padding: 0.2em 0.2em
 	A:hover
 		color: yellow
 		background-color: green
-		 
+
+
+.math
+	font-family: serif
+	font-style: italic
+	white-space: nowrap
+.unit
+	font-family: serif
+	font-style: normal
+.math .op  //  operator in math formula like cos
+	font-style: normal
+	margin-right: 0.2em
+.channel
+	@extend .math
+.supsub
+	display: inline-block
+	SUP, SUB
+		display: block
+		position: relative
+		font-size: .5em
+		line-height: 1.2
+	SUB
+		top: .3em

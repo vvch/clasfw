@@ -10,10 +10,12 @@
 {% endassets -%}
 {% endblock %}
 
+
 {% block content %}
 <div class="model-data">
-
-<h1>Model <em>{{ model.name }}</em> data</h1>
+<h1>
+	Model <em>{{ model.name }}</em> data
+</h1>
 
 <dl>
 	<dt>Author</dt>
@@ -32,9 +34,10 @@
 	{% endif %}
 </dl>
 
-<p>
-{{ macros.render_pagination(amplitudes, partial(url_for, '.model_data', model_id=model.id)) }}
-</p>
+{{
+	macros.render_pagination(amplitudes,
+		partial(url_for, '.model_data', model_id=model.id))
+}}
 
 <table class="clickable amplitudes">
 <thead>
@@ -57,11 +60,15 @@
 <tbody>
 {% for a in amplitudes.items %}
 <tr>
-	<td class="hidden-link"><a href="{{
-		url_for('.phi_dependence',
-			channel=a.channel_id, model=a.model_id,
-			q2=a.q2, w=a.w, cos_theta=a.cos_theta)
-	}}">{{ qu.dsigma }}</a></td>
+	<td class="hidden-link">
+		<a href="{{
+			url_for('.phi_dependence',
+				channel=a.channel_id, model=a.model_id,
+				q2=a.q2, w=a.w, cos_theta=a.cos_theta)
+		}}">
+			{{ qu.dsigma }}
+		</a>
+	</td>
 	<td class="channel">{{ a.channel }}</td>
 	<td>{{ a.q2 |cpx }}</td>
 	<td>{{ a.w  |cpx }}</td>
@@ -79,10 +86,10 @@
 </tbody>
 </table>
 
-<p>
-{# {{ render_pagination(amplitudes) }} #}
-{{ macros.render_pagination(amplitudes, partial(url_for, '.model_data', model_id=model.id)) }}
-</p>
+{{
+	macros.render_pagination(amplitudes,
+		partial(url_for, '.model_data', model_id=model.id))
+}}
 
 </div>
 {% endblock%}

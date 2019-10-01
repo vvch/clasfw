@@ -4,8 +4,11 @@
 	Models list
 {%- endblock %}
 
+
 {% block content %}
-<h1>Reaction models for description of N&pi; electroproduction off protons</h1>
+<h1>
+	Reaction models for description of N&pi; electroproduction off protons
+</h1>
 
 <table class="models">
 <thead>
@@ -37,20 +40,18 @@
 		{% set comma = joiner(", ") %}
 		{% for ch in by_model_id[m.id].channels %}
 		{{ comma() }}
-		<a href="{{ url_for('.model_data', model_id=m.id, channel=ch.id) }}">
+		<a href="{{
+			url_for('.model_data', model_id=m.id, channel=ch.id)
+		}}">
 			{{ ch }}
 		</a>
 		{% endfor %}
 	</td>
 	<td>
-		{{ '{:g}'.format(mm.q2_min) }}
-		—
-		{{ '{:g}'.format(mm.q2_max) }}
+		{{ macros.range_if(mm.q2_min, mm.q2_max) }}
 	</td>
 	<td>
-		{{ '{:g}'.format(mm.w_min) }}
-		—
-		{{ '{:g}'.format(mm.w_max) }}
+		{{ macros.range_if(mm.w_min, mm.w_max) }}
 	</td>
 	<td>
 		{{ mm.count_ampl }}

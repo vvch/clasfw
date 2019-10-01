@@ -12,11 +12,14 @@
 
 
 {% block content %}
-<h1>Data groups</h1>
+<h1>
+	Data groups
+</h1>
 
-<p>
-{{ macros.render_pagination(models, partial(url_for, '.groups_list')) }}
-</p>
+{{
+	macros.render_pagination(models,
+		partial(url_for, '.groups_list'))
+}}
 
 <table class="clickable models">
 <thead>
@@ -34,20 +37,21 @@
 <tr>
 	<td class="hidden-link">
 		<a href="{{
-			url_for('.model_data', model_id=a.model_id, channel=a.channel_id, q2=a.q2)
+			url_for('.model_data',
+				model_id=a.model_id, channel=a.channel_id, q2=a.q2)
 		}}">group</a>
 	</td>
 	<td>
 		{# <a href="{{ url_for('.model_data', model=a.model_id) }}"> #}
-			{{ a.model.name }}
+		{{ a.model.name }}
 		{# </a> #}
 	</td>
-	<td>{{ a.channel }}</td>
+	<td>
+		{{ a.channel }}
+	</td>
 	<td>{{ a.q2 }}</td>
 	<td>
-		{{ "{:g}".format(mm.w_min) }}
-		—
-		{{ "{:g}".format(mm.w_max) }}
+		{{ macros.range_if(mm.w_min, mm.w_max) }}
 	</td>
 	<td>
 		{{ mm.count_ampl }}
@@ -56,8 +60,9 @@
 {% endfor %}
 </table>
 
-<p>
-{{ macros.render_pagination(models, partial(url_for, '.groups_list')) }}
-</p>
+{{
+	macros.render_pagination(models,
+		partial(url_for, '.groups_list'))
+}}
 
 {% endblock%}
