@@ -10,18 +10,6 @@ from .models import Channel, Quantity, Model
 from .blueprint import qu
 
 
-
-class CheckBoxSetField(SelectMultipleField):
-    """
-    Like a SelectMultipleField, except displays a list of checkboxes.
-
-    Iterating the field will produce subfields (each containing a label as
-    well) in order to allow custom rendering of the individual checkbox fields.
-    """
-    widget = widgets.ListWidget(prefix_label=False)
-    option_widget = widgets.CheckboxInput()
-
-
 def sorted_by_pattern(arr, pattern, key=None):
     if key is None:
         key = lambda o: o
@@ -77,6 +65,7 @@ def enabled_models_factory():
 def get_html_plain_field(obj):
     return Markup(obj.html_plain)
 def get_html_field(obj):
+    # return obj.__html__()
     return Markup(obj.html)
     # return obj
 
@@ -95,33 +84,43 @@ def create_form(session, qu):
         # ,)
         quantity = QuerySelectField('Quantity',
             query_factory   = enabled_quantities_factory,
-            default         = 'dsigma/dOmega',
+            option_widget   = widgets.RadioInput(),
+            widget          = widgets.ListWidget(prefix_label=False),
+            # widget          = widgets.TableWidget(),
+            # default         = 'dsigma/dOmega',
             get_label       = get_html_field,
+            default         = Quantity.query.filter_by(name='dsigma_T/dOmega').one(),
         )
 
-        channels = QuerySelectMultipleField(
+        # channels = QuerySelectMultipleField(""""""
+        channel = QuerySelectField(
             query_factory   = enabled_channels_factory,
-            option_widget   = widgets.CheckboxInput(),
+            # option_widget   = widgets.CheckboxInput(),
+            option_widget   = widgets.RadioInput(),
             widget          = widgets.ListWidget(prefix_label=False),
             get_label       = get_html_field,
             # get_label       = get_html_plain_field,
             # fixme: no database connection yet when class is creating
             # default         = Channel.query.filter_by(name='inclusive').all(),
             # default         = [''],
+            # default         = 'pi0 p',
+            default         = Channel.query.filter_by(name='pi0 p').one(),
         )
 
-        model = QuerySelectMultipleField('Model',
+        model = QuerySelectField('Model',
             query_factory   = enabled_models_factory,
-            option_widget   = widgets.CheckboxInput(),
+            option_widget   = widgets.RadioInput(),
             widget          = widgets.ListWidget(prefix_label=False),
-            # coerce=int,
         )
 
         q2      = FormField(MinMaxForm, qu.Q2.html,
+            widget = widgets.ListWidget(),
             default=dict(min=2, max=2, step=0.1))
         w       = FormField(MinMaxForm, qu.W.html,
+            widget = widgets.ListWidget(),
             default=dict(min=2, max=2, step=0.1))
         cos_theta = FormField(MinMaxForm, qu.cos_theta.html,
+            widget = widgets.ListWidget(),
             default=dict(min=-1, max=1, step=0.1))
         e_beam  = FloatField(qu.Eb.html,
             default=10.6)

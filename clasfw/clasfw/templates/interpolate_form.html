@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
 
+
 {% block content %}
 <h1>Interpolate</h1>
 
+<div class="interpolate-form">
 <form action="">
 
 {{ form.quantity.label }}
@@ -10,8 +12,8 @@
 
 <br>
 
-{{ form.channels.label }}
-{{ form.channels }}
+{{ form.channel.label }}
+{{ form.channel }}
 
 <br>
 
@@ -29,13 +31,17 @@
 {{ form.cos_theta.label }}
 {{ form.cos_theta }}
 
+<br>
+
 {{ form.e_beam.label }}
 {{ form.e_beam }}
 
+<br>
 <br>
 
 {{ form.submit }}
 
 </form>
+</div>
 
 {% endblock %}

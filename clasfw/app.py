@@ -3,7 +3,7 @@ from flask import Flask, request, render_template, render_template_string
 from .settings import ProdConfig, DevConfig
 from .extensions import db, migrate, assets, debug_toolbar
 from .clasfw.blueprint import blueprint
-from .clasfw import views, views_comparison
+from .clasfw import views, views_comparison, views_dev
 
 import os
 
@@ -57,7 +57,8 @@ def register_extensions(app):
     #     # '--line-numbers',
     # ]
     assets.register('css_screen',
-        'base.styl', 'views.styl',
+        'base.styl',
+        'views.styl',
         filters='stylus',
         output='gen/screen.css')
 
