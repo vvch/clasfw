@@ -99,7 +99,7 @@ def model_data(model_id, page=1):
         Amplitude.channel_id,  ##  fixme: use channel.priority
         Amplitude.q2,
         Amplitude.w,
-        Amplitude.cos_theta,
+        Amplitude.cos_theta.desc(),
     )
     # amplitudes = amplitudes.all()
     amplitudes = amplitudes.paginate(page, current_app.config['RECORDS_PER_PAGE'])
