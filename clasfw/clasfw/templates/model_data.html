@@ -36,7 +36,7 @@
 
 {{
 	macros.render_pagination(amplitudes,
-		partial(url_for, '.model_data', model_id=model.id))
+		partial(url_for, '.model_data', model_id=model.id, channel=channel.id, q2=q2))
 }}
 
 <table class="clickable amplitudes">
@@ -88,7 +88,7 @@
 
 {{
 	macros.render_pagination(amplitudes,
-		partial(url_for, '.model_data', model_id=model.id))
+		partial(url_for, '.model_data', model_id=model.id, channel=channel.id, q2=q2))
 }}
 
 </div>
