@@ -17,7 +17,7 @@ import json
 
 
 def tex(q):
-    return "${}$".format(q.wu_tex)
+    return "$${}$$".format(q.wu_tex)
 
 
 @bp.route('/compare_maid')

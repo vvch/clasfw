@@ -124,7 +124,7 @@ def plotly_3dlabel(q):
 
 
 def tex(q):
-    return "${}$".format(q.wu_tex)
+    return "$${}$$".format(q.wu_tex)
 
 
 @bp.route('/dsigma')
@@ -165,6 +165,8 @@ def phi_dependence():
                 # 'autosize': 'true',
                 'xaxis': {
                     'title': tex(qu.phi),
+                    # 'ticktext': [0, 1, '$\\frac{\\pi}{2}$', 2, 3, '$\\pi$', 4, '$\\frac{3\\pi}{2}$', 5, 6, '$2\\pi$'],
+                    # 'tickvals': [0, 1, np.pi/2,             2, 3, np.pi,    4, 3*np.pi/2,            5, 6, 2*np.pi],
                 },
                 'yaxis': {
                     'title': tex(qu.dsigma),

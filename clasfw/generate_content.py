@@ -125,7 +125,7 @@ def create_quantities_functions_qu(qu):
         id = 19,
         name = "dsigma/dOmega",
         html = "d&sigma;/d&Omega;",
-        tex  = r"\mathrm{d}\sigma/\mathrm{d}\Omega",
+        tex  = r"\frac{\mathrm{d}\sigma}{\mathrm{d}\Omega}",
         priority = 40,
         unit=qu.mcb_sr,
     ),

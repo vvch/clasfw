@@ -38,7 +38,7 @@ class Quantity(DatesMixin, ExtDictionaryMixin, Base):
             u = getattr(self.unit, type)
             fmt = {
                 'html': r'{0}, <span class="unit">{1}</span>',
-                'tex':  r"{0}, \mathrm{{{1}}}",
+                'tex':  r"{0}, \, \mathrm{{{1}}}",
             }.get(type, "{0}, {1}")
             q = fmt.format(q, u)
         if type == 'html':
