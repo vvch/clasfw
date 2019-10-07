@@ -27,9 +27,9 @@ class qu:
 
     @classmethod
     def load(cls):
-        cls.Q2, cls.W, cls.cos_theta, cls.phi, cls.dsigma, cls.Eb = (
+        cls.Q2, cls.W, cls.cos_theta, cls.phi, cls.dsigma, cls.Eb, cls.xB = (
             Quantity.query.filter_by(name=s).one()
-                for s in "Q^2 W cos(theta) phi dsigma/dOmega E_b".split() )
+                for s in "Q^2 W cos(theta) phi dsigma/dOmega E_b x_B".split() )
         cls.mcb_sr, = (
             Unit.query.filter_by(name=s).one()
                 for s in "mcb/sr".split() )

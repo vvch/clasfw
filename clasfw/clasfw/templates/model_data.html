@@ -46,7 +46,8 @@
 	<th class="channel">Channel</th>
 	<th>{{ qu.Q2.wu }}</th>
 	<th>{{ qu.W.wu }}</th>
-	<th class="rsplit">{{ qu.cos_theta.wu }}</th>
+	<th>{{ qu.cos_theta.wu }}</th>
+	<th class="rsplit">{{ qu.xB.wu }}</th>
 	{% for aa in qu.amplitudes %}
 	<th>{{ aa.wu }}</th>
 	{% endfor %}
@@ -72,7 +73,8 @@
 	<td class="channel">{{ a.channel }}</td>
 	<td>{{ a.q2 |cpx }}</td>
 	<td>{{ a.w  |cpx }}</td>
-	<td class="rsplit">{{ a.cos_theta |cpx }}</td>
+	<td>{{ a.cos_theta |cpx }}</td>
+	<td class="rsplit">{{ hep.W2xB(a.w, a.q2) |cpx }}</td>
 	{% for aa in a.H[1:] %}
 	<td>{{ aa|cpx }}</td>
 	{% endfor %}

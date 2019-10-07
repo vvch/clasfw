@@ -170,6 +170,7 @@ def phi_dependence():
                 },
                 'yaxis': {
                     'title': tex(qu.dsigma),
+                    'rangemode': 'tozero',
                 },
                 'margin': {
                      't': 32,

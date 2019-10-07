@@ -18,10 +18,11 @@
 	<thead>
 	<tr>
 		<th>Model</th>
-		<th class="channel">Channel</th>
+		<th>Channel</th>
 		<th>{{ qu.Q2.wu }}</th>
 		<th>{{ qu.W.wu }}</th>
 		<th>{{ qu.cos_theta.wu }}</th>
+		<th>{{ qu.xB.wu }}</th>
 		<th>{{ qu.Eb.wu }}</th>
 	</tr>
 	</thead>
@@ -34,6 +35,7 @@
 		<td>{{ ampl.q2 |cpx}}</td>
 		<td>{{ ampl.w |cpx}}</td>
 		<td>{{ ampl.cos_theta |cpx}}</td>
+		<td>{{ hep.W2xB(ampl.w, ampl.q2) |cpx}}</td>
 		<td>{{ Eb }}</td>
 	</tr>
 	</tbody>
