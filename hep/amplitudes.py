@@ -81,7 +81,8 @@ def R_to_dsigma_factors(Q2, W):
     # ω_γ is photon energy in the CM-frame
     ω_γ = (W**2 - Q2 - M_B**2) / (2*W)
 
-    sqrt_tmp = sqrt(Q2) / np.abs(ω_γ)
+    # sqrt_tmp = sqrt(Q2) / np.abs(ω_γ)
+    sqrt_tmp = sqrt(Q2) / ω_γ
 
     return np.array([  #  factors to multiply when ε is used instead of ε_T and ε_L
         1,              ##  T
