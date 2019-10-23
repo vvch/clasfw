@@ -234,7 +234,10 @@ def phi_dependence():
                 'y': cos_theta_v.tolist(),
                 'z': sig_M.tolist(),
                 'hovertemplate':
-                    "φ: %{x} rad<br>cos<i>θ</i>: %{y}<br>dσ/dΩ: %{z} μb/sr<extra></extra>",
+                    "φ: %{x} rad<br>"
+                    "cos<i>θ</i>: %{y}<br>"
+                    "dσ/dΩ: %{z} μb/sr"
+                    "<extra></extra>",
             }],
         }
         ampl=ampls[-1]  # temporary, for template args
