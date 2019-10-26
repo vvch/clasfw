@@ -2,6 +2,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+{% block head -%}
 <meta name="author" content="Vitaly Chesnokov">
 <meta charset="utf-8">
 <title>
@@ -16,7 +17,7 @@
 {% endassets -%}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 {% block extrahead %}{% endblock -%}
-
+{% endblock -%}
 </head>
 <body>
 {% block body %}

@@ -1,8 +1,55 @@
 {% extends 'base.html' %}
 
+{% block title %}
+	Interpolate data
+{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+
+<script>
+$(document).ready(function($) {
+    $('#e_beam').spinner({
+        step: 0.1,
+        min: 0,
+        max: 12,
+    })
+    $('#w-min, #w-max').spinner({
+        step: 0.1,
+        min: 1,
+        max: 4,
+    })
+    $('#q2-min, #q2-max').spinner({
+        step: 0.1,
+        min: 0,
+        max: 8,
+    })
+    $('#q2-step, #w-step').spinner({
+        step: 0.01,
+        min: 0,
+        max: 4,
+    })
+    $('#cos_theta-min, #cos_theta-max, #cos_theta-step').spinner({
+        step: 0.01,
+        min: 0,
+        max: 1,
+    })
+})
+</script>
+
+<style>
+
+</style>
+{% endblock %}
 
 {% block content %}
-<h1>Interpolate</h1>
+<h1>
+	Interpolate data
+</h1>
 
 <div class="interpolate-form">
 <form action="">

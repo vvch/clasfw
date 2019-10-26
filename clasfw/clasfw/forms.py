@@ -1,9 +1,8 @@
 from flask_wtf import FlaskForm
 # from wtforms.validators import DataRequired
-from wtforms import Form, StringField, IntegerField, \
-                    SelectField, SelectMultipleField, RadioField, \
-                    FloatField, BooleanField, SubmitField, \
-                    FormField, validators, widgets
+from wtforms import Form, validators, widgets, \
+    StringField, IntegerField, FloatField, BooleanField, SubmitField, \
+    SelectField, SelectMultipleField, RadioField, FormField
 from wtforms_alchemy.fields import QuerySelectField, QuerySelectMultipleField
 from markupsafe import Markup
 from .models import Channel, Quantity, Model
@@ -41,13 +40,7 @@ def enabled_quantities_factory():
     return Quantity.query.filter_by(
         status=0
     ).filter(
-        Quantity.name.in_([
-            "R_T_00",
-            "R_L_00",
-            "R_TT_00",
-            "R_TL_00",
-            "R_TL'_00",
-        ])
+        Quantity.name.in_(qu.strfun_names)
     ).order_by(
         Quantity.priority.desc()
     )
@@ -88,7 +81,7 @@ def create_form(session, qu):
             # widget          = widgets.TableWidget(),
             # default         = 'dsigma/dOmega',
             get_label       = get_html_field,
-            default         = Quantity.query.filter_by(name='R_T_00').one(),
+            default         = Quantity.query.filter_by(name=qu.strfun_names[0]).one(),
         )
 
         # channels = QuerySelectMultipleField(""""""
@@ -103,21 +96,24 @@ def create_form(session, qu):
             # default         = Channel.query.filter_by(name='inclusive').all(),
             # default         = [''],
             # default         = 'pi0 p',
-            default         = Channel.query.filter_by(name='pi0 p').one(),
+            default         = Channel.query.filter_by(name='pi0 p').one(),  ##  fixme!
         )
 
         model = QuerySelectField('Model',
+            [validators.DataRequired()],
             query_factory   = enabled_models_factory,
             option_widget   = widgets.RadioInput(),
+            # option_widget   = Select2Widget(),
             widget          = widgets.ListWidget(prefix_label=False),
+            # default         =  Model.query.order_by(Model.id.desc()).first(),  ##  fixme!
         )
 
         q2      = FormField(MinMaxForm, qu.Q2.html,
             widget = widgets.ListWidget(),
-            default=dict(min=2, max=2, step=0.1))
+            default=dict(min=1, max=1, step=0.1))
         w       = FormField(MinMaxForm, qu.W.html,
             widget = widgets.ListWidget(),
-            default=dict(min=2, max=2, step=0.1))
+            default=dict(min=1.5, max=1.5, step=0.1))
         cos_theta = FormField(MinMaxForm, qu.cos_theta.html,
             widget = widgets.ListWidget(),
             default=dict(min=-1, max=1, step=0.1))

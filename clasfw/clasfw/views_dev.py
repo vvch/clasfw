@@ -55,6 +55,8 @@ def interpolate_form():
             Amplitude.R_T,
         )
         t = np.array(list(data)).T
+        if not len(t):
+            abort(404)
         # Q2_v, W_v, cos_θ, data = np.array(list(data)).T
         # Q2_v, W_v, cos_θ, data = np.array(list(data)).T
         Q2_v, W_v, cos_θ = t[0:3]
@@ -96,7 +98,7 @@ def interpolate_form():
             cos_theta_v = np.zeros(shape=(len(ampls),))
             sig_v = np.zeros(shape=(len(ampls),))
 
-            ds_index = 0  ## R^00_T
+            # ds_index = 0  ## R^00_T
             for i in range(len(ampls)):
                 ampl = ampls[i]
                 cos_theta_v[i] = ampl.cos_theta
@@ -105,8 +107,20 @@ def interpolate_form():
                 sig_v[i] = ds[ds_index]
             return cos_theta_v.tolist(), sig_v.tolist()
 
-        cos_θ_lo, resf_lo = get_theta_dependence(0.5, 1.5)
-        cos_θ_hi, resf_hi = get_theta_dependence(0.5, 1.6)
+        nearest_W_lo = 1.5
+        nearest_W_hi = 1.6
+        nearest_Q2_lo = 0.5
+        nearest_Q2_hi = 0.5
+
+        try:
+            ds_index = qu.strfuns.index(quantity)
+        except ValueError:
+            raise # TODO
+
+        ds_index = { k:v for v,k in enumerate(qu.strfun_names) }[quantity.name]
+
+        cos_θ_lo, resf_lo = get_theta_dependence(nearest_Q2_lo, nearest_W_lo, ds_index)
+        cos_θ_hi, resf_hi = get_theta_dependence(nearest_Q2_lo, nearest_W_hi, ds_index)
 
         plot = {
             'layout': {
@@ -127,7 +141,7 @@ def interpolate_form():
             'data': [{
                 'mode': 'markers',
                 'type': 'scatter',
-                'name': 'Nearest Q², W',
+                'name': 'Nearest Q²={} GeV², W={} GeV'.format(nearest_Q2_lo, nearest_W_lo),
                 'x': cos_θ_lo,
                 'y': resf_lo,
                 'marker': {
@@ -140,7 +154,7 @@ def interpolate_form():
             }, {
                 'mode': 'markers',
                 'type': 'scatter',
-                'name': 'Nearest Q², W',
+                'name': 'Nearest Q²={} GeV², W={} GeV'.format(nearest_Q2_hi, nearest_W_hi),
                 'x': cos_θ_hi,
                 'y': resf_hi,
                 'marker': {
@@ -153,7 +167,7 @@ def interpolate_form():
             }, {
                 'mode': 'markers',
                 'type': 'scatter',
-                'name': 'Interpolated',
+                'name': 'Interpolated, Q2={} GeV², W={} GeV'.format(q2, w),
                 'x': grid_cθ.flatten().tolist(),
                 'y': grid_R.flatten().tolist(),
                 'marker': {
@@ -173,7 +187,11 @@ def interpolate_form():
             Eb=Eb,
             # ampl=ampl,
             ampl={
+                'model': model,
                 'model_id': model.id,
+                'channel': channel,
+                'q2': q2,
+                'w': w,
             },
             plot3D=True,
         )
