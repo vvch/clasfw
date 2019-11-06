@@ -114,3 +114,9 @@ def strfuns_to_dsigma(Q2, W, eps_T, phi, h, response_funcs):
        + dσ_TLp * sqrt(2*εL*(1-ε)) * sin(phi)   * h
 
     return ds
+
+
+def amplitudes_to_dsigma(Q2, W, eps_T, phi, h, H):
+    return strfuns_to_dsigma(
+        Q2, W, eps_T, phi, h,
+        ampl_to_strfuns(H) )

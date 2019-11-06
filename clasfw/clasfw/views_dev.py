@@ -20,10 +20,100 @@ import json
 from ..extensions import db
 from .forms import create_form
 
+from flask.views import MethodView
+
+
+# fixme: temporary workaround
+def ampl0_to_strfuns(H0):
+    H = np.concatenate(([None], H0))
+    return hep.amplitudes.ampl_to_strfuns(H)
+
+def ampl0_to_dsigma(Q2, W, eps_T, phi, h, H0):
+    return strfuns_to_dsigma(
+        Q2, W, eps_T, phi, h,
+        ampl0_to_strfuns(H0) )
+
+
+class BaseView(MethodView):
+    # template = 'phi_dependence.html'
+    template = 'interpolation_results.html'
+
+    def get(self, *args, **kwargs):
+        self.context = {}
+        res = self.prepare(*args, **kwargs)
+        if res is None:
+            return render_template(
+                self.template,
+                **self.context
+            )
+        else:
+            return res
+
+
+    def prepare(self, *args, **kwargs):
+        pass
+
+
+    @classmethod
+    def register_url(cls, app, rule, endpoint):
+        return app.add_url_rule(rule, view_func=cls.as_view(endpoint)) 
+
 
 
 def tex(q):
     return "${}$".format(q.wu_tex)
+
+
+def get_value_neighbours(val, model, channel, field=None):
+    if field is None:
+        field = Amplitude.q2
+
+    val_min = Amplitude.query.filter_by(
+        channel=channel,
+        model=model,
+    ).filter(
+        field <= val,
+        # equal_eps(Amplitude.w, W),
+    ).order_by(
+        field.desc()
+    ).limit(1).value(field)
+
+    val_max = Amplitude.query.filter_by(
+        channel=channel,
+        model=model,
+    ).filter(
+        field >= val,
+        # equal_eps(Amplitude.w, W),
+    ).order_by(
+        field
+    ).limit(1).value(field)
+
+    return val_min, val_max
+
+def get_theta_dependence(model, channel, Q2, W, ds_index=0):
+    ampl = Amplitude.query.filter_by(
+        channel=channel,
+        model=model,
+    ).filter(
+        equal_eps(Amplitude.q2, Q2),
+        equal_eps(Amplitude.w, W),
+    )
+
+    ampls=ampl.all()
+    if not ampls:
+        abort(404)
+
+    cos_theta_v = np.zeros(shape=(len(ampls),))
+    sig_v = np.zeros(shape=(len(ampls),))
+
+    # ds_index = 0  ## R^00_T
+    for i in range(len(ampls)):
+        ampl = ampls[i]
+        cos_theta_v[i] = ampl.cos_theta
+        # ds = np.array(ampl.strfuns)*hep.amplitudes.R_to_dsigma_factors(ampl.q2, ampl.w)
+        ds = ampl.strfuns
+        sig_v[i] = ds[ds_index]
+    return cos_theta_v.tolist(), sig_v.tolist()
 
 
 @bp.route('/interpolate')
@@ -42,9 +132,7 @@ def interpolate_form():
         model = form.model.data
         quantity = form.quantity.data
         channel = form.channel.data
-        q2 = 0.52
-        w  = 1.55
-        # data=0
+
         data = Amplitude.query.filter_by(
             model=model,
             channel=channel,
@@ -52,24 +140,62 @@ def interpolate_form():
             Amplitude.q2,
             Amplitude.w,
             Amplitude.cos_theta,
-            Amplitude.R_T,
+            # Amplitude.H1,
+            Amplitude.H1r,
+            Amplitude.H1j,
+            Amplitude.H2r,
+            Amplitude.H2j,
+            Amplitude.H3r,
+            Amplitude.H3j,
+            Amplitude.H4r,
+            Amplitude.H4j,
+            Amplitude.H5r,
+            Amplitude.H5j,
+            Amplitude.H6r,
+            Amplitude.H6j,
         )
         t = np.array(list(data)).T
         if not len(t):
             abort(404)
-        # Q2_v, W_v, cos_θ, data = np.array(list(data)).T
-        # Q2_v, W_v, cos_θ, data = np.array(list(data)).T
-        Q2_v, W_v, cos_θ = t[0:3]
-        cos_θ = cos_θ.copy()
-        points = t[0:3].T
-        data = t[3]
 
+        # # Q2_v, W_v, cos_θ, data = np.array(list(data)).T
+        # Q2_v, W_v, cos_θ = t[0:3]
+        # cos_θ = cos_θ.copy()
+        # points = t[0:3].T
+        # data = t[3]
+
+        points = t[0:3].T
+        # data = np.array([
+        #     np.complex(p, p)
+        #         for p in t[3] ])
+        # fixme: ugly temporary stub
+        data = np.array([
+            np.array([
+                complex(*c)
+                    for c in
+                        zip(*[iter(p)] * 2)  #  pairwise
+            ])
+                for p in t[3:3+12].T ] )
+            # complex(*p)
+            # p[1]
+                # for p in t[3:3+2].T ] )
 
         # t = np.fromiter(list(data), "float,float,float,float")
         # t = np.fromiter(list(data), "f,f,f,f")
         # Q2_v, W_v, cos_θ, data = np.fromiter(list(data), "f,f,f,f").T
         # Q2_v, W_v, cos_θ, data = t
         # data = list(data)
+
+        q2 = 0.65
+        w  = 1.55
+
+        # nearest_W_lo = 1.5
+        # nearest_W_hi = 1.6
+        # nearest_Q2_lo = 0.5
+        # nearest_Q2_hi = 0.5
+
+        nearest_Q2_lo, nearest_Q2_hi = get_value_neighbours(q2, model, channel)
+        nearest_W_lo,  nearest_W_hi  = get_value_neighbours(w,  model, channel)
 
         grid_q2, grid_w, grid_cθ = np.mgrid[
             q2 : q2: 1j,
@@ -81,46 +207,19 @@ def interpolate_form():
             (grid_q2, grid_w, grid_cθ),
             method='linear')
 
+        dsigma_index = {
+            k:v for v,k in enumerate(qu.strfun_names)
+        }[quantity.name]
 
-        def get_theta_dependence(Q2, W, ds_index=0):
-            ampl = Amplitude.query.filter_by(
-                channel=channel,
-                model=model,
-            ).filter(
-                equal_eps(Amplitude.q2, Q2),
-                equal_eps(Amplitude.w, W),
-            )
 
-            ampls=ampl.all()
-            if not ampls:
-                abort(404)
+        cos_θ_lo_v, resf_lo_v = get_theta_dependence(model, channel, nearest_Q2_lo, nearest_W_lo, dsigma_index)
+        cos_θ_hi_v, resf_hi_v = get_theta_dependence(model, channel, nearest_Q2_lo, nearest_W_hi, dsigma_index)
 
-            cos_theta_v = np.zeros(shape=(len(ampls),))
-            sig_v = np.zeros(shape=(len(ampls),))
-
-            # ds_index = 0  ## R^00_T
-            for i in range(len(ampls)):
-                ampl = ampls[i]
-                cos_theta_v[i] = ampl.cos_theta
-                # ds = np.array(ampl.strfuns)*hep.amplitudes.R_to_dsigma_factors(ampl.q2, ampl.w)
-                ds = ampl.strfuns
-                sig_v[i] = ds[ds_index]
-            return cos_theta_v.tolist(), sig_v.tolist()
-
-        nearest_W_lo = 1.5
-        nearest_W_hi = 1.6
-        nearest_Q2_lo = 0.5
-        nearest_Q2_hi = 0.5
-
-        try:
-            ds_index = qu.strfuns.index(quantity)
-        except ValueError:
-            raise # TODO
-
-        ds_index = { k:v for v,k in enumerate(qu.strfun_names) }[quantity.name]
-
-        cos_θ_lo, resf_lo = get_theta_dependence(nearest_Q2_lo, nearest_W_lo, ds_index)
-        cos_θ_hi, resf_hi = get_theta_dependence(nearest_Q2_lo, nearest_W_hi, ds_index)
+        # tmp
+        # print('SHAPE1', grid_R.shape)
+        grid_R_H1 = grid_R[:,:,:,0]  #  only H1
+        grid_R = grid_R_H1
+        # print('SHAPE2', grid_R.shape)
 
         plot = {
             'layout': {
@@ -139,37 +238,38 @@ def interpolate_form():
                 },
             },
             'data': [{
-                'mode': 'markers',
-                'type': 'scatter',
-                'name': 'Nearest Q²={} GeV², W={} GeV'.format(nearest_Q2_lo, nearest_W_lo),
-                'x': cos_θ_lo,
-                'y': resf_lo,
-                'marker': {
-                    'symbol': 'cross-thin-open',
-                    'size': 12,
-                    'line': {
-                        'width': 3,
-                    },
-                },
-            }, {
-                'mode': 'markers',
-                'type': 'scatter',
-                'name': 'Nearest Q²={} GeV², W={} GeV'.format(nearest_Q2_hi, nearest_W_hi),
-                'x': cos_θ_hi,
-                'y': resf_hi,
-                'marker': {
-                    'symbol': 'cross-thin-open',
-                    'size': 12,
-                    'line': {
-                        'width': 3,
-                    },
-                },
-            }, {
+            #     'mode': 'markers',
+            #     'type': 'scatter',
+            #     'name': 'Nearest Q²={} GeV², W={} GeV'.format(nearest_Q2_lo, nearest_W_lo),
+            #     'x': cos_θ_lo_v,
+            #     'y': resf_lo_v,
+            #     'marker': {
+            #         'symbol': 'cross-thin-open',
+            #         'size': 12,
+            #         'line': {
+            #             'width': 3,
+            #         },
+            #     },
+            # }, {
+            #     'mode': 'markers',
+            #     'type': 'scatter',
+            #     'name': 'Nearest Q²={} GeV², W={} GeV'.format(nearest_Q2_hi, nearest_W_hi),
+            #     'x': cos_θ_hi_v,
+            #     'y': resf_hi_v,
+            #     'marker': {
+            #         'symbol': 'cross-thin-open',
+            #         'size': 12,
+            #         'line': {
+            #             'width': 3,
+            #         },
+            #     },
+            # }, {
                 'mode': 'markers',
                 'type': 'scatter',
                 'name': 'Interpolated, Q2={} GeV², W={} GeV'.format(q2, w),
                 'x': grid_cθ.flatten().tolist(),
-                'y': grid_R.flatten().tolist(),
+                'y': grid_R.flatten().imag.tolist(),
+                # 'y': grid_R.flatten().real.tolist(),
                 'marker': {
                     'symbol': 'x-thin-open',
                     'size': 12,
@@ -179,7 +279,6 @@ def interpolate_form():
                 },
             }],
         }
-        # ampl=ampls[-1]  # temporary, for template args
 
         Eb = 10.6
         return render_template('phi_dependence.html',
