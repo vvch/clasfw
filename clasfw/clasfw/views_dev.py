@@ -116,215 +116,228 @@ def get_theta_dependence(model, channel, Q2, W, ds_index=0):
     return cos_theta_v.tolist(), sig_v.tolist()
 
 
-@bp.route('/interpolate')
-def interpolate_form():
-    InterpolateForm = create_form(db.session, qu)
-    form = InterpolateForm(request.args)
+class InterpolateForm(BaseView):
+    def prepare(self, *args, **kwargs):
 
-    # if form.validate() and form.submit.data:
-    if form.submit.data:
-    # if form.is_submitted() and form.validate_on_submit():
-        # form.validate()
-        # form.validate_on_submit()
-        # form.process()
-        # model = form.model.raw_data
-        # model = dir(form.model)
-        model = form.model.data
-        quantity = form.quantity.data
-        channel = form.channel.data
-        q2 = form.q2.data
-        w = form.w.data
+        InterpolateForm = create_form(db.session, qu)
+        form = InterpolateForm(request.args)
 
-        data = Amplitude.query.filter_by(
-            model=model,
-            channel=channel,
-        ).values(
-            Amplitude.q2,
-            Amplitude.w,
-            Amplitude.cos_theta,
-            # Amplitude.H1,
-            Amplitude.H1r,
-            Amplitude.H1j,
-            Amplitude.H2r,
-            Amplitude.H2j,
-            Amplitude.H3r,
-            Amplitude.H3j,
-            Amplitude.H4r,
-            Amplitude.H4j,
-            Amplitude.H5r,
-            Amplitude.H5j,
-            Amplitude.H6r,
-            Amplitude.H6j,
-        )
-        t = np.array(list(data)).T
-        if not len(t):
-            abort(404)
+        # if form.validate() and form.submit.data:
+        if form.submit.data:
+        # if form.is_submitted() and form.validate_on_submit():
+            # form.validate()
+            # form.validate_on_submit()
+            # form.process()
+            # model = form.model.raw_data
+            # model = dir(form.model)
+            model = form.model.data
+            quantity = form.quantity.data
+            channel = form.channel.data
+            q2 = form.q2.data
+            w = form.w.data
 
-        # # Q2_v, W_v, cos_θ, data = np.array(list(data)).T
-        # Q2_v, W_v, cos_θ = t[0:3]
-        # cos_θ = cos_θ.copy()
-        # points = t[0:3].T
-        # data = t[3]
+            data = Amplitude.query.filter_by(
+                model=model,
+                channel=channel,
+            ).values(
+                Amplitude.q2,
+                Amplitude.w,
+                Amplitude.cos_theta,
+                # Amplitude.H1,
+                Amplitude.H1r,
+                Amplitude.H1j,
+                Amplitude.H2r,
+                Amplitude.H2j,
+                Amplitude.H3r,
+                Amplitude.H3j,
+                Amplitude.H4r,
+                Amplitude.H4j,
+                Amplitude.H5r,
+                Amplitude.H5j,
+                Amplitude.H6r,
+                Amplitude.H6j,
+            )
+            t = np.array(list(data)).T
+            if not len(t):
+                abort(404)
 
-        points = t[0:3].T
-        # data = np.array([
-        #     np.complex(p, p)
-        #         for p in t[3] ])
-        # fixme: ugly temporary stub
-        data = np.array([
-            np.array([
-                complex(*c)
-                    for c in
-                        zip(*[iter(p)] * 2)  #  pairwise
-            ])
-                for p in t[3:3+12].T ] )
-            # complex(*p)
-            # p[1]
-                # for p in t[3:3+2].T ] )
+            # # Q2_v, W_v, cos_θ, data = np.array(list(data)).T
+            # Q2_v, W_v, cos_θ = t[0:3]
+            # cos_θ = cos_θ.copy()
+            # points = t[0:3].T
+            # data = t[3]
 
-        # t = np.fromiter(list(data), "float,float,float,float")
-        # t = np.fromiter(list(data), "f,f,f,f")
-        # Q2_v, W_v, cos_θ, data = np.fromiter(list(data), "f,f,f,f").T
-        # Q2_v, W_v, cos_θ, data = t
-        # data = list(data)
+            points = t[0:3].T
+            # data = np.array([
+            #     np.complex(p, p)
+            #         for p in t[3] ])
+            # fixme: ugly temporary stub
+            data = np.array([
+                np.array([
+                    complex(*c)
+                        for c in
+                            zip(*[iter(p)] * 2)  #  pairwise
+                ])
+                    for p in t[3:3+12].T ] )
+                # complex(*p)
+                # p[1]
+                    # for p in t[3:3+2].T ] )
 
-        # q2 = 0.65
-        # w  = 1.55
+            # t = np.fromiter(list(data), "float,float,float,float")
+            # t = np.fromiter(list(data), "f,f,f,f")
+            # Q2_v, W_v, cos_θ, data = np.fromiter(list(data), "f,f,f,f").T
+            # Q2_v, W_v, cos_θ, data = t
+            # data = list(data)
 
-        # nearest_W_lo = 1.5
-        # nearest_W_hi = 1.6
-        nearest_Q2_lo = q2
-        nearest_Q2_hi = q2
+            # q2 = 0.5
+            # w  = 1.55
 
-        # nearest_Q2_lo, nearest_Q2_hi = get_value_neighbours(q2, model, channel)
-        nearest_W_lo,  nearest_W_hi  = get_value_neighbours(w,  model, channel)
+            # nearest_W_lo = 1.5
+            # nearest_W_hi = 1.6
+            nearest_Q2_lo = q2
+            nearest_Q2_hi = q2
 
-        grid_q2, grid_w, grid_cθ = np.mgrid[
-            q2 : q2: 1j,
-            w  : w : 1j,
-            -1 : 1 : 0.1]
+            # nearest_Q2_lo, nearest_Q2_hi = get_value_neighbours(q2, model, channel)
+            nearest_W_lo,  nearest_W_hi = get_value_neighbours(w, model, channel)
 
-        grid_R = scipy.interpolate.griddata(
-            points, data,
-            (grid_q2, grid_w, grid_cθ),
-            method='linear')
+            grid_q2, grid_w, grid_cθ = np.mgrid[
+                q2 : q2: 1j,
+                w  : w : 1j,
+                -1 : 1 : 0.1]
 
-        dsigma_index = {
-            k:v for v,k in enumerate(qu.strfun_names)
-        }[quantity.name]
+            grid_R = scipy.interpolate.griddata(
+                points, data,
+                (grid_q2, grid_w, grid_cθ),
+                method='linear')
+
+            dsigma_index = {
+                k:v for v,k in enumerate(qu.strfun_names)
+            }[quantity.name]
 
 
-        cos_θ_lo_v, resf_lo_v = get_theta_dependence(model, channel,
-            nearest_Q2_lo, nearest_W_lo, dsigma_index)
-        cos_θ_hi_v, resf_hi_v = get_theta_dependence(model, channel,
-            nearest_Q2_lo, nearest_W_hi, dsigma_index)
+            cos_θ_lo_v, resf_lo_v = get_theta_dependence(model, channel,
+                nearest_Q2_lo, nearest_W_lo, dsigma_index)
+            cos_θ_hi_v, resf_hi_v = get_theta_dependence(model, channel,
+                nearest_Q2_lo, nearest_W_hi, dsigma_index)
 
-        # tmp
-        # print('SHAPE1', grid_R.shape)
-        grid_R_H1 = grid_R[:,:,:,0]  #  only H1
-        grid_R = grid_R_H1
-        # print('SHAPE2', grid_R.shape)
+            # tmp
+            print('SHAPE1', grid_R.shape)
+            if 1:
+                grid_R = np.apply_along_axis(
+                    ampl0_to_strfuns, 3, grid_R, #  3rd axis with amplitudes
+                    # np.sum, 3, grid_R,
+                )
+                grid_R = grid_R[:,:,:,0]  #  only R_T
+            else:
+                grid_R = grid_R[:,:,:,0].imag  #  only H1
+            print('SHAPE2', grid_R.shape)
 
-        plot = {
-            'layout': {
-                # 'autosize': 'true',
-                'xaxis': {
-                    'title': tex(qu.cos_theta),
-                },
-                'yaxis': {
-                    'title': tex(quantity),
-                },
-                'margin': {
-                     't': 32,
-                     # 'b': 65,
-                     # 'l': 65,
-                     # 'r': 50,
-                },
-            },
-            'data': [{
-            #     'mode': 'markers',
-            #     'type': 'scatter',
-            #     'name': 'Nearest Q²={} GeV², W={} GeV'.format(nearest_Q2_lo, nearest_W_lo),
-            #     'x': cos_θ_lo_v,
-            #     'y': resf_lo_v,
-            #     'marker': {
-            #         'symbol': 'cross-thin-open',
-            #         'size': 12,
-            #         'line': {
-            #             'width': 3,
-            #         },
-            #     },
-            # }, {
-            #     'mode': 'markers',
-            #     'type': 'scatter',
-            #     'name': 'Nearest Q²={} GeV², W={} GeV'.format(nearest_Q2_hi, nearest_W_hi),
-            #     'x': cos_θ_hi_v,
-            #     'y': resf_hi_v,
-            #     'marker': {
-            #         'symbol': 'cross-thin-open',
-            #         'size': 12,
-            #         'line': {
-            #             'width': 3,
-            #         },
-            #     },
-            # }, {
-                'mode': 'markers',
-                'type': 'scatter',
-                'name': 'Interpolated, Q2={} GeV², W={} GeV'.format(q2, w),
-                'x': grid_cθ.flatten().tolist(),
-                'y': grid_R.flatten().imag.tolist(),
-                # 'y': grid_R.flatten().real.tolist(),
-                'marker': {
-                    'symbol': 'x-thin-open',
-                    'size': 12,
-                    'line': {
-                        'width': 3,
+
+            self.plot = {
+                'layout': {
+                    # 'autosize': 'true',
+                    'xaxis': {
+                        'title': tex(qu.cos_theta),
+                    },
+                    'yaxis': {
+                        'title': tex(quantity),
+                    },
+                    'margin': {
+                         't': 32,
+                         # 'b': 65,
+                         # 'l': 65,
+                         # 'r': 50,
                     },
                 },
-            }],
-        }
+                'data': [{
+                    'mode': 'markers',
+                    'type': 'scatter',
+                    'name': 'Nearest Q²={} GeV², W={} GeV'
+                        .format(nearest_Q2_lo, nearest_W_lo),
+                    'x': cos_θ_lo_v,
+                    'y': resf_lo_v,
+                    'marker': {
+                        'symbol': 'cross-thin-open',
+                        'size': 12,
+                        'color': 'blue',
+                        'line': {
+                            'width': 3,
+                        },
+                    },
+                }, {
+                    'mode': 'markers',
+                    'type': 'scatter',
+                    'name': 'Nearest Q²={} GeV², W={} GeV'
+                        .format(nearest_Q2_hi, nearest_W_hi),
+                    'x': cos_θ_hi_v,
+                    'y': resf_hi_v,
+                    'marker': {
+                        'symbol': 'cross-thin-open',
+                        'size': 12,
+                        'color': 'green',
+                        'line': {
+                            'width': 3,
+                        },
+                    },
+                }, {
+                    'mode': 'markers',
+                    'type': 'scatter',
+                    'name': 'Interpolated, Q²={} GeV², W={} GeV'
+                        .format(q2, w),
+                    'x': grid_cθ.flatten().tolist(),
+                    # 'y': grid_R.flatten().imag.tolist(),
+                    'y': grid_R.flatten().tolist(),
+                    'marker': {
+                        'symbol': 'x-thin-open',
+                        'size': 12,
+                        'color': 'orange',
+                        'line': {
+                            'width': 3,
+                        },
+                    },
+                }],
+            }
 
-        return render_template('interpolation_results.html',
-            plot=plot,
-            # ampl=ampl,
-            ampl={
-                'model': model,
-                'model_id': model.id,
-                'channel': channel,
-                'q2': q2,
-                'w': w,
-            },
-            plot3D=True,
-        )
+            self.context.update(
+                plot=self.plot,
+                # ampl=ampl,
+                ampl={
+                    'model': model,
+                    'model_id': model.id,
+                    'channel': channel,
+                    'q2': q2,
+                    'w': w,
+                },
+                plot3D=True,
+            )
+            return None
 
-        return render_template_string("""
-            <dt>`model` var:</dt>
-                <dd>{{ model }}</dd>
-            <dt>`model` field:</dt>
-                <dd>{{ form.model }}</dd>
-            <dt>`form.model.data`:</dt>
-                <dd>{{ form.model.data }}</dd>
-            <dt>`form.model.raw_data`:</dt>
-                <dd>{{ form.model.raw_data }}</dd>
-            <dt>`grid_R`:</dt>
-                <dd>{{ grid_R }}</dd>
-            {#
-            <dt>`form.is_submitted()`:</dt>
-                <dd>{{ form.is_submitted() }}</dd>
-            <dt>`form.validate_on_submit()`:</dt>
-                <dd>{{ form.validate_on_submit() }}</dd>
-            #}
-            <dt>`data`</dt>
-                <dd>{{ data }}</dd>
-        """, form=form, model=model, data=data,
-            grid_R=grid_R,
-                # form.q2.min.data,
-        )
+            return render_template_string("""
+                <dt>`model` var:</dt>
+                    <dd>{{ model }}</dd>
+                <dt>`model` field:</dt>
+                    <dd>{{ form.model }}</dd>
+                <dt>`form.model.data`:</dt>
+                    <dd>{{ form.model.data }}</dd>
+                <dt>`form.model.raw_data`:</dt>
+                    <dd>{{ form.model.raw_data }}</dd>
+                <dt>`grid_R`:</dt>
+                    <dd>{{ grid_R }}</dd>
+                {#
+                <dt>`form.is_submitted()`:</dt>
+                    <dd>{{ form.is_submitted() }}</dd>
+                <dt>`form.validate_on_submit()`:</dt>
+                    <dd>{{ form.validate_on_submit() }}</dd>
+                #}
+                <dt>`data`</dt>
+                    <dd>{{ data }}</dd>
+            """, form=form, model=model, data=data,
+                grid_R=grid_R,
+                    # form.q2.min.data,
+            )
 
-    return render_template("interpolate_form.html", form=form)
+        return render_template("interpolate_form.html", form=form)
 
 
-# @bp.route('/interpolate')
-# def interpolate():
-#     return render_template("interpolate_form.html", form=form)
-
+InterpolateForm.register_url(bp,
+    '/interpolate', 'interpolate_form')
