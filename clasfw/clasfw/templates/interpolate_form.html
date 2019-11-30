@@ -18,12 +18,12 @@ $(document).ready(function($) {
         min: 0,
         max: 12,
     })
-    $('#w-min, #w-max').spinner({
+    $('#w-min, #w-max, #w').spinner({
         step: 0.1,
         min: 1,
         max: 4,
     })
-    $('#q2-min, #q2-max').spinner({
+    $('#q2-min, #q2-max, #q2').spinner({
         step: 0.1,
         min: 0,
         max: 8,
@@ -74,16 +74,22 @@ FORM INPUT#submit {
 {{ form.q2.label }}
 {{ form.q2 }}
 
+<br>
+
 {{ form.w.label }}
 {{ form.w }}
+
+<br>
 
 {{ form.cos_theta.label }}
 {{ form.cos_theta }}
 
 <br>
 
+{#
 {{ form.e_beam.label }}
 {{ form.e_beam }}
+#}
 
 <br>
 <br>

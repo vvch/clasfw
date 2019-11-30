@@ -108,15 +108,22 @@ def create_form(session, qu):
             # default         =  Model.query.order_by(Model.id.desc()).first(),  ##  fixme!
         )
 
-        q2      = FormField(MinMaxForm, qu.Q2.html,
-            widget = widgets.ListWidget(),
-            default=dict(min=1, max=1, step=0.1))
-        w       = FormField(MinMaxForm, qu.W.html,
-            widget = widgets.ListWidget(),
-            default=dict(min=1.5, max=1.5, step=0.1))
+        # q2      = FormField(MinMaxForm, qu.Q2.html,
+        #     widget = widgets.ListWidget(),
+        #     default=dict(min=1, max=1, step=0.1))
+        # w       = FormField(MinMaxForm, qu.W.html,
+        #     widget = widgets.ListWidget(),
+        #     default=dict(min=1.5, max=1.5, step=0.1))
+
+        q2      = FloatField(qu.Q2.html,
+            default=0.5)
+        w       = FloatField(qu.W.html,
+            default=1.5)
+
         cos_theta = FormField(MinMaxForm, qu.cos_theta.html,
             widget = widgets.ListWidget(),
             default=dict(min=-1, max=1, step=0.1))
+
         e_beam  = FloatField(qu.Eb.html,
             default=10.6)
 

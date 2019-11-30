@@ -5,7 +5,11 @@
 {%- endblock %}
 
 {% block content %}
-<h1>Differential cross-section</h1>
+{% block page_header -%}
+<h1>
+	Differential cross-section
+</h1>
+{%- endblock %}
 
 <table class="void">
 {% if not plot3D %}
@@ -116,8 +120,10 @@
 			<td>{{ ampl.q2 }}</td>
 			<th>{{ qu.W.wu }}</th>
 			<td>{{ ampl.w }}</td>
+			{% if Eb is defined -%}
 			<th>{{ qu.Eb.wu }}</th>
 			<td>{{ Eb }}</td>
+			{%- endif %}
 		</tr>
 		</table>
 	</td>

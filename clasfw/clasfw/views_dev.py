@@ -132,6 +132,8 @@ def interpolate_form():
         model = form.model.data
         quantity = form.quantity.data
         channel = form.channel.data
+        q2 = form.q2.data
+        w = form.w.data
 
         data = Amplitude.query.filter_by(
             model=model,
@@ -186,15 +188,15 @@ def interpolate_form():
         # Q2_v, W_v, cos_θ, data = t
         # data = list(data)
 
-        q2 = 0.65
-        w  = 1.55
+        # q2 = 0.65
+        # w  = 1.55
 
         # nearest_W_lo = 1.5
         # nearest_W_hi = 1.6
-        # nearest_Q2_lo = 0.5
-        # nearest_Q2_hi = 0.5
+        nearest_Q2_lo = q2
+        nearest_Q2_hi = q2
 
-        nearest_Q2_lo, nearest_Q2_hi = get_value_neighbours(q2, model, channel)
+        # nearest_Q2_lo, nearest_Q2_hi = get_value_neighbours(q2, model, channel)
         nearest_W_lo,  nearest_W_hi  = get_value_neighbours(w,  model, channel)
 
         grid_q2, grid_w, grid_cθ = np.mgrid[
@@ -212,8 +214,10 @@ def interpolate_form():
         }[quantity.name]
 
 
-        cos_θ_lo_v, resf_lo_v = get_theta_dependence(model, channel, nearest_Q2_lo, nearest_W_lo, dsigma_index)
-        cos_θ_hi_v, resf_hi_v = get_theta_dependence(model, channel, nearest_Q2_lo, nearest_W_hi, dsigma_index)
+        cos_θ_lo_v, resf_lo_v = get_theta_dependence(model, channel,
+            nearest_Q2_lo, nearest_W_lo, dsigma_index)
+        cos_θ_hi_v, resf_hi_v = get_theta_dependence(model, channel,
+            nearest_Q2_lo, nearest_W_hi, dsigma_index)
 
         # tmp
         # print('SHAPE1', grid_R.shape)
@@ -280,10 +284,8 @@ def interpolate_form():
             }],
         }
 
-        Eb = 10.6
-        return render_template('phi_dependence.html',
+        return render_template('interpolation_results.html',
             plot=plot,
-            Eb=Eb,
             # ampl=ampl,
             ampl={
                 'model': model,
