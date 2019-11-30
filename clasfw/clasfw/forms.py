@@ -96,7 +96,8 @@ def create_form(session, qu):
             # default         = Channel.query.filter_by(name='inclusive').all(),
             # default         = [''],
             # default         = 'pi0 p',
-            default         = Channel.query.filter_by(name='pi0 p').one(),  ##  fixme!
+            # default         = Channel.query.filter_by(name='pi0 p').one(),  ##  fixme!
+            default         = Channel.query.first(),  ##  fixme!
         )
 
         model = QuerySelectField('Model',
@@ -106,6 +107,7 @@ def create_form(session, qu):
             # option_widget   = Select2Widget(),
             widget          = widgets.ListWidget(prefix_label=False),
             # default         =  Model.query.order_by(Model.id.desc()).first(),  ##  fixme!
+            default         =  Model.query.order_by(Model.id.desc()).first(),
         )
 
         # q2      = FormField(MinMaxForm, qu.Q2.html,
