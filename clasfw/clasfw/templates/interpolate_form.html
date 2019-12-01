@@ -33,11 +33,36 @@ $(document).ready(function($) {
         min: 0,
         max: 4,
     })
+    $('#t-min, #t-max, #t-step').spinner({
+        step: 0.1,
+        min: 0,
+        max: 4,
+    })
+    $('#x-min, #x-max, #x-step').spinner({
+        step: 0.1,
+        min: 0,
+        max: 4,
+    })
     $('#cos_theta-min, #cos_theta-max, #cos_theta-step').spinner({
         step: 0.01,
         min: 0,
         max: 1,
     })
+    $('#theta-min, #theta-max, #theta-step').spinner({
+        step: 1,
+        min: 0,
+        max: 180,
+    })
+    $('#tabs').tabs({
+        activate: function(event, ui) {
+            new_panel_id = ui.newPanel.attr('id')
+            varset = new_panel_id.replace(/^tabs-/, '')
+            $('input#varset').val(varset)
+            // TODO: disable input elements in inactive tabs and enable in active one
+            // alert(varset)
+        }
+    })
+
 })
 </script>
 
@@ -71,18 +96,64 @@ FORM INPUT#submit {
 
 <br>
 
-{{ form.q2.label }}
-{{ form.q2 }}
+{{ form.varset }}
+
+<dl>
+    <dt>
+        {{ form.q2.label(qu.Q2.wu) }}
+    </dt>
+    <dd>
+        {{ form.q2 }}
+    </dd>
+    <br>
+    <dt>
+        {{ form.w.label(qu.W.wu) }}
+    </dt>
+    <dd>
+        {{ form.w }}
+    </dd>
+</dl>
 
 <br>
 
-{{ form.w.label }}
-{{ form.w }}
+<div id="tabs">
+<ul>
+##    <li style="font-style: italic; font-weight: normal; margin-left: 1em; margin-right: 1em; padding-top: 0.6em">
+##        Kinematic variables set:
+##    </li>
+    <li>
+        <a href="#tabs-cos_theta">
+##            {{qu.Q2}}, {{qu.W}},
+            {{qu.cos_theta}}
+        </a>
+    </li>
+    <li>
+        <a href="#tabs-theta">
+            {{qu.theta}}
+        </a>
+    </li>
+    <li>
+        <a href="#tabs-t">
+            {{qu.t}}
+        </a>
+    </li>
+</ul>
 
-<br>
+<div id="tabs-cos_theta">
+    {{ form.cos_theta.label(qu.cos_theta.wu) }}
+    {{ form.cos_theta }}
+</div>
 
-{{ form.cos_theta.label }}
-{{ form.cos_theta }}
+<div id="tabs-theta">
+    {{ form.theta.label(qu.theta.with_unit(qu.deg)) }}
+    {{ form.theta }}
+</div>
+
+<div id="tabs-t">
+    {{ form.t.label(qu.t.wu) }}
+    {{ form.t }}
+</div>
+</div>
 
 <br>
 

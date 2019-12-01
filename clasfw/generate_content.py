@@ -126,16 +126,8 @@ def create_quantities_functions_qu(qu):
         name = "dsigma/dOmega",
         html = "d&sigma;/d&Omega;",
         tex  = r"\mathrm{d}\sigma/\mathrm{d}\Omega",
-        priority = 40,
+        priority = 50,
         unit=qu.mcb_sr,
-    ),
-    qq += Quantity(
-        id = 1017,
-        name = "cos(theta)",
-        html = '<span class="op">cos</span>&theta;',
-        tex  = r"\cos\theta",
-        priority = 30,
-        unit=qu.dimensionless,
     ),
     qq += Quantity(
         id = 1014,
@@ -162,6 +154,22 @@ def create_quantities_functions_qu(qu):
         unit=qu.rad,
     ),
     qq += Quantity(
+        id = 1017,
+        name = "cos(theta)",
+        html = '<span class="op">cos</span>&theta;',
+        tex  = r"\cos\theta",
+        priority = 30,
+        unit=qu.dimensionless,
+    ),
+    qq += Quantity(
+        id = 1018,
+        name = "theta",
+        html = '&theta;',
+        tex  = r"\theta",
+        priority = 40,
+        unit=qu.rad,
+    ),
+    qq += Quantity(
         id = 1666,
         name = "E_b",
         html = "E<sub>b</sub>",
@@ -170,7 +178,17 @@ def create_quantities_functions_qu(qu):
         unit=qu.GeV,
         description="Beam energy",
     ),
+    qq += Quantity(
+        id = 1667,
+        name = "t",
+        html = 't',
+        tex  = r"t",
+        priority = -20,
+        unit=qu.GeV2,
+        description="Mandelstam variable t",
+    ),
     db.session.add_all(qq)
+    db.session.add(qu.deg)  # not linked to any quantity as default unit
     return qu
 
 

@@ -31,11 +31,21 @@ class Quantity(DatesMixin, ExtDictionaryMixin, Base):
     # for preliminary loaded quantities in before_first_request likq 'qu' object
     unit           = relationship(Unit, lazy='immediate')
 
-    def with_unit(self, type='html'):
+    def with_unit(self, unit=None, type='html'):
         # fixme: do not use plain unit ID for comparison!!
+        if type=='text':
+            type = 'name'
         q = getattr(self, type)
-        if self.unit_id not in (0, 1, None):  #  not dimensionless or unknown
-            u = getattr(self.unit, type)
+
+        if self.unit_id not in (0, 1, None) \
+        or unit is not None:
+            if unit is not None:
+                try:
+                    u = getattr(unit, type)
+                except AttributeError:
+                    u = str(unit)
+            else:
+                u = getattr(self.unit, type)
             fmt = {
                 'html': r'{0}, <span class="unit">{1}</span>',
                 'tex':  r"{0}, \mathrm{{{1}}}",
@@ -52,7 +62,7 @@ class Quantity(DatesMixin, ExtDictionaryMixin, Base):
 
     @property
     def wu_tex(self):
-        return self.with_unit('tex')
+        return self.with_unit(type='tex')
 
     def __html__(self):
         return '<span class="math">{}</span>'.format(self.html)

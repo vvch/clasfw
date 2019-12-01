@@ -9,6 +9,7 @@ from flask import request, Response, url_for, send_file, redirect, \
 
 import hep
 import hep.amplitudes
+import hep.mandelstam
 
 from sqlalchemy import func, exc
 from sqlalchemy.orm import exc
@@ -104,7 +105,7 @@ def get_theta_dependence(model, channel, Q2, W, ds_index=0):
         abort(404)
 
     cos_theta_v = np.zeros(shape=(len(ampls),))
-    sig_v = np.zeros(shape=(len(ampls),))
+    resf_v = np.zeros(shape=(len(ampls),))
 
     # ds_index = 0  ## R^00_T
     for i in range(len(ampls)):
@@ -112,8 +113,8 @@ def get_theta_dependence(model, channel, Q2, W, ds_index=0):
         cos_theta_v[i] = ampl.cos_theta
         # ds = np.array(ampl.strfuns)*hep.amplitudes.R_to_dsigma_factors(ampl.q2, ampl.w)
         ds = ampl.strfuns
-        sig_v[i] = ds[ds_index]
-    return cos_theta_v.tolist(), sig_v.tolist()
+        resf_v[i] = ds[ds_index]
+    return cos_theta_v, resf_v
 
 
 class InterpolateForm(BaseView):
@@ -150,9 +151,21 @@ class InterpolateForm(BaseView):
                 Amplitude.H6r,
                 Amplitude.H6j,
             )
-            t = np.array(list(data)).T
+            t = np.array(list(data))
             if not len(t):
                 abort(404)
+
+            if form.varset.data == 'cos_theta':
+                t = t.T
+            elif form.varset.data == 'theta':
+                # t = t[::-1]  # reverse
+                t = t.T
+                t[2] = np.rad2deg(np.arccos(t[2]))  #  3rd column
+                print(t[2])
+            elif form.varset.data == 't':
+                t = t.T
+                t[2] = hep.mandelstam.cos_theta_to_t(t[2], t[1], t[0])  #  cos_theta, W, Q²
+
 
             # # Q2_v, W_v, cos_θ, data = np.array(list(data)).T
             # Q2_v, W_v, cos_θ = t[0:3]
@@ -193,10 +206,41 @@ class InterpolateForm(BaseView):
             # nearest_Q2_lo, nearest_Q2_hi = get_value_neighbours(q2, model, channel)
             nearest_W_lo,  nearest_W_hi = get_value_neighbours(w, model, channel)
 
-            grid_q2, grid_w, grid_cθ = np.mgrid[
-                q2 : q2: 1j,
-                w  : w : 1j,
-                -1 : 1 : 0.1]
+            if form.varset.data == 'cos_theta':
+                cθ_min  = form.cos_theta.min.data
+                cθ_max  = form.cos_theta.max.data
+                cθ_step = form.cos_theta.step.data
+                cθ_qu = qu.cos_theta
+            elif form.varset.data == 'theta':
+                cθ_min  = form.theta.min.data
+                cθ_max  = form.theta.max.data
+                cθ_step = form.theta.step.data
+                cθ_qu = qu.theta
+            elif form.varset.data == 't':
+                cθ_min  = form.t.min.data
+                cθ_max  = form.t.max.data
+                cθ_step = form.t.step.data
+                cθ_qu = qu.t
+            else:
+                raise ValueError("Invalid 'varset' value: '{}'".format(form.varset.data))
+            # print('COS THETA', cθ_min, cθ_max, cθ_step)
+            ε = 0.00000001
+            cθv = np.arange(cθ_min, cθ_max +ε, cθ_step)
+            # print('cθv', cθv)
+
+
+            if 0:
+                grid_q2, grid_w, grid_cθ = np.mgrid[
+                    q2 : q2: 1j,
+                    w  : w : 1j,
+                    -1 : 1 : 0.1]
+            else:
+                grid_q2, grid_w, grid_cθ = np.array(np.meshgrid(
+                    q2, w, cθv
+                    # q2, w, np.arange(-1, 1, 0.1)
+                    # q2, w, np.arange(-1, 1 +ε, 0.1)
+                ))
+                # )).transpose((0, 2, 1))
 
             grid_R = scipy.interpolate.griddata(
                 points, data,
@@ -209,9 +253,18 @@ class InterpolateForm(BaseView):
 
 
             cos_θ_lo_v, resf_lo_v = get_theta_dependence(model, channel,
-                nearest_Q2_lo, nearest_W_lo, dsigma_index)
+                q2, nearest_W_lo, dsigma_index)
             cos_θ_hi_v, resf_hi_v = get_theta_dependence(model, channel,
-                nearest_Q2_lo, nearest_W_hi, dsigma_index)
+                q2, nearest_W_hi, dsigma_index)
+
+            if form.varset.data == 'theta':
+                cos_θ_lo_v = np.rad2deg(np.arccos(cos_θ_lo_v))[::-1]
+                cos_θ_hi_v = np.rad2deg(np.arccos(cos_θ_hi_v))[::-1]
+                resf_lo_v = resf_lo_v[::-1]
+                resf_hi_v = resf_hi_v[::-1]
+            elif form.varset.data == 't':
+                cos_θ_lo_v = hep.mandelstam.cos_theta_to_t(cos_θ_lo_v, q2, nearest_W_lo)  #  cos_theta, W, Q²
+                cos_θ_hi_v = hep.mandelstam.cos_theta_to_t(cos_θ_hi_v, q2, nearest_W_hi)  #  cos_theta, W, Q²
 
             # tmp
             print('SHAPE1', grid_R.shape)
@@ -230,7 +283,7 @@ class InterpolateForm(BaseView):
                 'layout': {
                     # 'autosize': 'true',
                     'xaxis': {
-                        'title': tex(qu.cos_theta),
+                        'title': tex(cθ_qu),
                     },
                     'yaxis': {
                         'title': tex(quantity),
@@ -245,10 +298,26 @@ class InterpolateForm(BaseView):
                 'data': [{
                     'mode': 'markers',
                     'type': 'scatter',
+                    'name': 'Interpolated, Q²={} GeV², W={} GeV'
+                        .format(q2, w),
+                    'x': grid_cθ.flatten().tolist(),
+                    # 'y': grid_R.flatten().imag.tolist(),
+                    'y': grid_R.flatten().tolist(),
+                    'marker': {
+                        'symbol': 'x-thin-open',
+                        'size': 12,
+                        'color': 'orange',
+                        'line': {
+                            'width': 3,
+                        },
+                    },
+                }, {
+                    'mode': 'markers',
+                    'type': 'scatter',
                     'name': 'Nearest Q²={} GeV², W={} GeV'
                         .format(nearest_Q2_lo, nearest_W_lo),
-                    'x': cos_θ_lo_v,
-                    'y': resf_lo_v,
+                    'x': cos_θ_lo_v.tolist(),
+                    'y': resf_lo_v.tolist(),
                     'marker': {
                         'symbol': 'cross-thin-open',
                         'size': 12,
@@ -262,28 +331,12 @@ class InterpolateForm(BaseView):
                     'type': 'scatter',
                     'name': 'Nearest Q²={} GeV², W={} GeV'
                         .format(nearest_Q2_hi, nearest_W_hi),
-                    'x': cos_θ_hi_v,
-                    'y': resf_hi_v,
+                    'x': cos_θ_hi_v.tolist(),
+                    'y': resf_hi_v.tolist(),
                     'marker': {
                         'symbol': 'cross-thin-open',
                         'size': 12,
                         'color': 'green',
-                        'line': {
-                            'width': 3,
-                        },
-                    },
-                }, {
-                    'mode': 'markers',
-                    'type': 'scatter',
-                    'name': 'Interpolated, Q²={} GeV², W={} GeV'
-                        .format(q2, w),
-                    'x': grid_cθ.flatten().tolist(),
-                    # 'y': grid_R.flatten().imag.tolist(),
-                    'y': grid_R.flatten().tolist(),
-                    'marker': {
-                        'symbol': 'x-thin-open',
-                        'size': 12,
-                        'color': 'orange',
                         'line': {
                             'width': 3,
                         },

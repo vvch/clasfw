@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 # from wtforms.validators import DataRequired
 from wtforms import Form, validators, widgets, \
     StringField, IntegerField, FloatField, BooleanField, SubmitField, \
-    SelectField, SelectMultipleField, RadioField, FormField
+    SelectField, SelectMultipleField, RadioField, FormField, HiddenField
 from wtforms_alchemy.fields import QuerySelectField, QuerySelectMultipleField
 from markupsafe import Markup
 from .models import Channel, Quantity, Model
@@ -118,13 +118,27 @@ def create_form(session, qu):
         #     default=dict(min=1.5, max=1.5, step=0.1))
 
         q2      = FloatField(qu.Q2.html,
+            [validators.NumberRange(min=0)],
             default=0.5)
         w       = FloatField(qu.W.html,
+            [validators.NumberRange(min=0)],
             default=1.5)
+
+        varset  = HiddenField("Kinematic variables set",
+            [validators.AnyOf([
+                'cos_theta', 'theta', 't'
+            ])],
+            default="cos_theta")
 
         cos_theta = FormField(MinMaxForm, qu.cos_theta.html,
             widget = widgets.ListWidget(),
             default=dict(min=-1, max=1, step=0.1))
+        theta = FormField(MinMaxForm, qu.theta.html,
+            widget = widgets.ListWidget(),
+            default=dict(min=0, max=180, step=10))
+        t = FormField(MinMaxForm, qu.t.html,
+            widget = widgets.ListWidget(),
+            default=dict(min=1, max=2, step=0.1))
 
         e_beam  = FloatField(qu.Eb.html,
             default=10.6)
