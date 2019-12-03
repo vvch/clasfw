@@ -1,5 +1,3 @@
-from flask_wtf import FlaskForm
-# from wtforms.validators import DataRequired
 from wtforms import Form, validators, widgets, \
     StringField, IntegerField, FloatField, BooleanField, SubmitField, \
     SelectField, SelectMultipleField, RadioField, FormField, HiddenField
@@ -70,10 +68,6 @@ class MinMaxForm(Form):
 
 def create_form(session, qu):
     class InterpolateForm(Form):
-        # quantity = RadioField('Quantity',
-        #     default='dsigma/dOmega',
-        #     choices=enabled_quantities_factory
-        # ,)
         quantity = QuerySelectField('Quantity',
             query_factory   = enabled_quantities_factory,
             option_widget   = widgets.RadioInput(),
@@ -84,7 +78,6 @@ def create_form(session, qu):
             default         = Quantity.query.filter_by(name=qu.strfun_names[0]).one(),
         )
 
-        # channels = QuerySelectMultipleField(""""""
         channel = QuerySelectField(
             query_factory   = enabled_channels_factory,
             # option_widget   = widgets.CheckboxInput(),

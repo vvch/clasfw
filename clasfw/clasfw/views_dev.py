@@ -97,7 +97,6 @@ def get_theta_dependence(model, channel, Q2, W, ds_index=0):
     cos_theta_v = np.zeros(shape=(len(ampls),))
     resf_v = np.zeros(shape=(len(ampls),))
 
-    # ds_index = 0  ## R^00_T
     for i in range(len(ampls)):
         ampl = ampls[i]
         cos_theta_v[i] = ampl.cos_theta
@@ -109,11 +108,10 @@ def get_theta_dependence(model, channel, Q2, W, ds_index=0):
 
 class InterpolateForm(BaseView):
     def prepare(self, *args, **kwargs):
-
         InterpolateForm = create_form(db.session, qu)
         form = InterpolateForm(request.args)
 
-        if form.submit.data:
+        if form.submit.data and form.validate():
             model = form.model.data
             quantity = form.quantity.data
             channel = form.channel.data
@@ -128,18 +126,12 @@ class InterpolateForm(BaseView):
                 Amplitude.w,
                 Amplitude.cos_theta,
                 # Amplitude.H1,
-                Amplitude.H1r,
-                Amplitude.H1j,
-                Amplitude.H2r,
-                Amplitude.H2j,
-                Amplitude.H3r,
-                Amplitude.H3j,
-                Amplitude.H4r,
-                Amplitude.H4j,
-                Amplitude.H5r,
-                Amplitude.H5j,
-                Amplitude.H6r,
-                Amplitude.H6j,
+                Amplitude.H1r, Amplitude.H1j,
+                Amplitude.H2r, Amplitude.H2j,
+                Amplitude.H3r, Amplitude.H3j,
+                Amplitude.H4r, Amplitude.H4j,
+                Amplitude.H5r, Amplitude.H5j,
+                Amplitude.H6r, Amplitude.H6j,
             )
             t = np.array(list(data))
             if not len(t):
@@ -222,12 +214,9 @@ class InterpolateForm(BaseView):
             else:
                 grid_q2, grid_w, grid_cθ = np.array(np.meshgrid(
                     q2, w, cθv
-                    # q2, w, np.arange(-1, 1, 0.1)
-                    # q2, w, np.arange(-1, 1 +ε, 0.1)
                 ))
                 # )).transpose((0, 2, 1))
 
-            # print(grid_q2, grid_w, grid_cθ)
             print('SHAPE OF POINTS', points.shape)
             print(points)
             print('SHAPE OF DATA', points.shape)
@@ -276,7 +265,6 @@ class InterpolateForm(BaseView):
                     'name': 'Interpolated, Q²={} GeV², W={} GeV'
                         .format(q2, w),
                     'x': cθv_source.tolist(),
-                    # 'y': grid_R.flatten().imag.tolist(),
                     'y': grid_R.flatten().tolist(),
                     'marker': {
                         'symbol': 'x-thin-open',
@@ -289,6 +277,8 @@ class InterpolateForm(BaseView):
                 }]
             }
 
+
+            ## Comparison
 
             nearest_Q2_lo = q2
             nearest_Q2_hi = q2
@@ -346,6 +336,7 @@ class InterpolateForm(BaseView):
                     },
                 }
             ]
+
 
             self.context.update(
                 plot=self.plot,

@@ -1,0 +1,17 @@
+{%- macro form_errors(form) -%}
+{% if form.errors %}
+<div class="errors">
+    <h3>Errors:</h3>
+    <ul>
+    {%- for field_name, field_errors in form.errors|dictsort if field_errors %}
+        {% for error in field_errors -%}
+        <li>
+            <dt>{{ form[field_name].label }}:</dt>
+            <dd>{{ error }}</dd>
+        </li>
+        {% endfor %}
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}
+{%- endmacro -%}
