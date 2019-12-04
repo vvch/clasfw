@@ -22,7 +22,7 @@ class qu:
     dsigma_names = ["dsigma_{}/dOmega".format(i) for i in Amplitude.strfun_indexes]
     strfuns = []
     dsigmas = []
-    amplitudes = []
+    amplitudes = []  ##  amplitudes list starting from 0, e. g. amplitudes[0]==H1, etc...
 
     @classmethod
     def load(cls):

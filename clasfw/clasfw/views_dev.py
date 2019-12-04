@@ -24,14 +24,14 @@ from flask.views import MethodView
 
 
 # fixme: temporary workaround
-def ampl0_to_strfuns(H0):
+def ampl0_to_rfuncs(H0):
     H = np.concatenate(([None], H0))
     return hep.amplitudes.ampl_to_strfuns(H)
 
 def ampl0_to_dsigma(Q2, W, eps_T, phi, h, H0):
     return strfuns_to_dsigma(
         Q2, W, eps_T, phi, h,
-        ampl0_to_strfuns(H0) )
+        ampl0_to_rfuncs(H0) )
 
 
 class BaseView(MethodView):
@@ -81,7 +81,7 @@ def get_value_neighbours(val, model, channel, field=None):
             for q in (q_min, q_max) ]
 
 
-def get_theta_dependence(model, channel, Q2, W, ds_index=0):
+def get_theta_dependence(model, channel, Q2, W, ds_index=0, qu_type='respfunc'):
     ampl = Amplitude.query.filter_by(
         channel=channel,
         model=model,
@@ -97,12 +97,17 @@ def get_theta_dependence(model, channel, Q2, W, ds_index=0):
     cos_theta_v = np.zeros(shape=(len(ampls),))
     resf_v = np.zeros(shape=(len(ampls),))
 
+    is_respfunc = qu_type=='respfunc'
+
     for i in range(len(ampls)):
         ampl = ampls[i]
         cos_theta_v[i] = ampl.cos_theta
         # ds = np.array(ampl.strfuns)*hep.amplitudes.R_to_dsigma_factors(ampl.q2, ampl.w)
-        ds = ampl.strfuns
-        resf_v[i] = ds[ds_index]
+        if is_respfunc:
+            resf_v[i] = ampl.strfuns[ds_index]
+        else:
+            # fixme: temporary real part only
+            resf_v[i] = ampl.H[ds_index+1].real  # "+1" here since ds_index starts from 0 but Amplitude.H starts from 1
     return cos_theta_v, resf_v
 
 
@@ -217,30 +222,44 @@ class InterpolateForm(BaseView):
                 ))
                 # )).transpose((0, 2, 1))
 
-            print('SHAPE OF POINTS', points.shape)
-            print(points)
-            print('SHAPE OF DATA', points.shape)
-            print(data)
+            # print('SHAPE OF POINTS', points.shape)
+            # print(points)
+            # print('SHAPE OF DATA', points.shape)
+            # print(data)
 
             grid_R = scipy.interpolate.griddata(
                 points, data,
                 (grid_q2, grid_w, grid_cθ),
                 method='linear')
 
-            dsigma_index = qu.strfun_names.index(quantity.name)
+            try:
+                dsigma_index = qu.strfun_names.index(quantity.name)
+                qu_type = 'respfunc'
+            except ValueError:
+                qu_type = 'amplitude'
+                # dsigma_index = qu.amplitudes.index(quantity)  ## index starting from 0!
+                # ##  fixme!!! can fail if loaded `quantity` session differs from `qu.amplitudes` section
+                # ##  models.dictionarymixin.__eq__ should be implemented, comparing __class__, id or name
+                dsigma_index = [
+                    q.name for q in qu.amplitudes
+                ].index(quantity.name)  ## fixme: temporary workaround
 
             # tmp
-            print('SHAPE1', grid_R.shape)
-            print(grid_R)
-            if 1:
+            # print('SHAPE1', grid_R.shape)
+            # print(grid_R)
+
+            if qu_type == 'respfunc':
                 grid_R = np.apply_along_axis(
-                    ampl0_to_strfuns, 3, grid_R, #  3rd axis of grid_R with amplitudes
+                    ampl0_to_rfuncs, 3, grid_R, #  3rd axis of grid_R with amplitudes
                     # np.sum, 3, grid_R,
                 )
-                grid_R = grid_R[:,:,:,0]  #  only R_T
+                grid_R = grid_R[:,:,:,dsigma_index]
             else:
-                grid_R = grid_R[:,:,:,0].imag  #  only H1
-            print('SHAPE2', grid_R.shape)
+                grid_R = grid_R[:,:,:,dsigma_index]
+                # fixme: temporary real part only
+                grid_R = grid_R.real
+
+            # print('SHAPE2', grid_R.shape)
 
 
             self.plot = {
@@ -280,62 +299,63 @@ class InterpolateForm(BaseView):
 
             ## Comparison
 
-            nearest_Q2_lo = q2
-            nearest_Q2_hi = q2
+            if 1:
+                nearest_Q2_lo = q2
+                nearest_Q2_hi = q2
 
-            # nearest_Q2_lo, nearest_Q2_hi = get_value_neighbours(q2, model, channel)
-            nearest_W_lo,  nearest_W_hi = get_value_neighbours(w, model, channel)
+                # nearest_Q2_lo, nearest_Q2_hi = get_value_neighbours(q2, model, channel)
+                nearest_W_lo,  nearest_W_hi = get_value_neighbours(w, model, channel)
 
-            cos_θ_lo_v, resf_lo_v = get_theta_dependence(model, channel,
-                q2, nearest_W_lo, dsigma_index)
-            cos_θ_hi_v, resf_hi_v = get_theta_dependence(model, channel,
-                q2, nearest_W_hi, dsigma_index)
+                cos_θ_lo_v, resf_lo_v = get_theta_dependence(model, channel,
+                    q2, nearest_W_lo, dsigma_index, qu_type)
+                cos_θ_hi_v, resf_hi_v = get_theta_dependence(model, channel,
+                    q2, nearest_W_hi, dsigma_index, qu_type)
 
-            if form.varset.data == 'theta':
-                cos_θ_lo_v = np.rad2deg(np.arccos(cos_θ_lo_v))[::-1]
-                cos_θ_hi_v = np.rad2deg(np.arccos(cos_θ_hi_v))[::-1]
-                resf_lo_v = resf_lo_v[::-1]
-                resf_hi_v = resf_hi_v[::-1]
-            elif form.varset.data == 't':
-                cos_θ_lo_v = hep.mandelstam.cos_theta_to_t(
-                    cos_θ_lo_v, nearest_W_lo, q2)
-                cos_θ_hi_v = hep.mandelstam.cos_theta_to_t(
-                    cos_θ_hi_v, nearest_W_hi, q2)
+                if form.varset.data == 'theta':
+                    cos_θ_lo_v = np.rad2deg(np.arccos(cos_θ_lo_v))[::-1]
+                    cos_θ_hi_v = np.rad2deg(np.arccos(cos_θ_hi_v))[::-1]
+                    resf_lo_v = resf_lo_v[::-1]
+                    resf_hi_v = resf_hi_v[::-1]
+                elif form.varset.data == 't':
+                    cos_θ_lo_v = hep.mandelstam.cos_theta_to_t(
+                        cos_θ_lo_v, nearest_W_lo, q2)
+                    cos_θ_hi_v = hep.mandelstam.cos_theta_to_t(
+                        cos_θ_hi_v, nearest_W_hi, q2)
 
 
-            self.plot['data'] += [
-                {
-                    'mode': 'markers',
-                    'type': 'scatter',
-                    'name': 'Nearest Q²={} GeV², W={} GeV'
-                        .format(nearest_Q2_lo, nearest_W_lo),
-                    'x': cos_θ_lo_v.tolist(),
-                    'y': resf_lo_v.tolist(),
-                    'marker': {
-                        'symbol': 'cross-thin-open',
-                        'size': 12,
-                        'color': 'blue',
-                        'line': {
-                            'width': 3,
+                self.plot['data'] += [
+                    {
+                        'mode': 'markers',
+                        'type': 'scatter',
+                        'name': 'Nearest Q²={} GeV², W={} GeV'
+                            .format(nearest_Q2_lo, nearest_W_lo),
+                        'x': cos_θ_lo_v.tolist(),
+                        'y': resf_lo_v.tolist(),
+                        'marker': {
+                            'symbol': 'cross-thin-open',
+                            'size': 12,
+                            'color': 'blue',
+                            'line': {
+                                'width': 3,
+                            },
                         },
-                    },
-                }, {
-                    'mode': 'markers',
-                    'type': 'scatter',
-                    'name': 'Nearest Q²={} GeV², W={} GeV'
-                        .format(nearest_Q2_hi, nearest_W_hi),
-                    'x': cos_θ_hi_v.tolist(),
-                    'y': resf_hi_v.tolist(),
-                    'marker': {
-                        'symbol': 'cross-thin-open',
-                        'size': 12,
-                        'color': 'green',
-                        'line': {
-                            'width': 3,
+                    }, {
+                        'mode': 'markers',
+                        'type': 'scatter',
+                        'name': 'Nearest Q²={} GeV², W={} GeV'
+                            .format(nearest_Q2_hi, nearest_W_hi),
+                        'x': cos_θ_hi_v.tolist(),
+                        'y': resf_hi_v.tolist(),
+                        'marker': {
+                            'symbol': 'cross-thin-open',
+                            'size': 12,
+                            'color': 'green',
+                            'line': {
+                                'width': 3,
+                            },
                         },
-                    },
-                }
-            ]
+                    }
+                ]
 
 
             self.context.update(

@@ -38,7 +38,9 @@ def enabled_quantities_factory():
     return Quantity.query.filter_by(
         status=0
     ).filter(
-        Quantity.name.in_(qu.strfun_names)
+        Quantity.name.in_(
+            qu.strfun_names +
+                [q.name for q in qu.amplitudes])
     ).order_by(
         Quantity.priority.desc()
     )
@@ -73,9 +75,9 @@ def create_form(session, qu):
             option_widget   = widgets.RadioInput(),
             widget          = widgets.ListWidget(prefix_label=False),
             # widget          = widgets.TableWidget(),
-            # default         = 'dsigma/dOmega',
             get_label       = get_html_field,
             default         = Quantity.query.filter_by(name=qu.strfun_names[0]).one(),
+            # default         = qu.strfuns[0],
         )
 
         channel = QuerySelectField(
