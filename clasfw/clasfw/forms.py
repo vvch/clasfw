@@ -133,7 +133,7 @@ def create_form(session, qu):
             default=dict(min=0, max=180, step=10))
         t = FormField(MinMaxForm, qu.t.html,
             widget = widgets.ListWidget(),
-            default=dict(min=1, max=2, step=0.1))
+            default=dict(min=-2, max=0, step=0.1))
 
         e_beam  = FloatField(qu.Eb.html,
             default=10.6)

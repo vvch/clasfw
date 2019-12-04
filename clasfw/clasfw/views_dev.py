@@ -333,10 +333,10 @@ class InterpolateForm(BaseView):
                         'y': resf_lo_v.tolist(),
                         'marker': {
                             'symbol': 'cross-thin-open',
-                            'size': 12,
+                            'size': 10,
                             'color': 'blue',
                             'line': {
-                                'width': 3,
+                                'width': 1,
                             },
                         },
                     }, {
@@ -348,10 +348,10 @@ class InterpolateForm(BaseView):
                         'y': resf_hi_v.tolist(),
                         'marker': {
                             'symbol': 'cross-thin-open',
-                            'size': 12,
+                            'size': 10,
                             'color': 'green',
                             'line': {
-                                'width': 3,
+                                'width': 1,
                             },
                         },
                     }
@@ -359,7 +359,7 @@ class InterpolateForm(BaseView):
 
 
             self.context.update(
-                plot=self.plot,
+                plot=json.dumps(self.plot),
                 # ampl=ampl,
                 ampl={
                     'model': model,
