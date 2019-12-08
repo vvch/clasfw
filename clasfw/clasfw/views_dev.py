@@ -16,6 +16,7 @@ from sqlalchemy.orm import exc
 import numpy as np
 import scipy.interpolate
 import json
+import copy
 
 from ..extensions import db
 from .forms import create_form
@@ -198,6 +199,8 @@ class InterpolateForm(BaseView):
                 c_max  = form.theta.max.data
                 c_step = form.theta.step.data
                 cθ_source_qu = qu.theta
+                cθ_source_qu = copy.deepcopy(qu.theta)
+                cθ_source_qu.unit = qu.deg
 
                 cθv_source = np.arange(c_min, c_max +ε, c_step)
                 cθv = np.cos(np.deg2rad(cθv_source))
