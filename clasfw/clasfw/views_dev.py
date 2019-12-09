@@ -118,6 +118,17 @@ class InterpolateForm(BaseView):
         form = InterpolateForm(request.args)
 
         if form.submit.data and form.validate():
+            self.create_plot(form)
+            self.context.update(
+                plot=json.dumps(self.plot,
+                    indent=(4 if current_app.debug else None) ),
+            )
+            return None
+
+        return render_template("interpolate_form.html", form=form)
+
+
+    def create_plot(self, form):
             model = form.model.data
             quantity = form.quantity.data
             channel = form.channel.data
@@ -198,7 +209,6 @@ class InterpolateForm(BaseView):
                 c_min  = form.theta.min.data
                 c_max  = form.theta.max.data
                 c_step = form.theta.step.data
-                cθ_source_qu = qu.theta
                 cθ_source_qu = copy.deepcopy(qu.theta)
                 cθ_source_qu.unit = qu.deg
 
@@ -251,6 +261,8 @@ class InterpolateForm(BaseView):
             # print('SHAPE1', grid_R.shape)
             # print(grid_R)
 
+            use_maid_units = True
+
             if qu_type == 'respfunc':
                 grid_R = np.apply_along_axis(
                     ampl0_to_rfuncs, 3, grid_R, #  3rd axis of grid_R with amplitudes
@@ -260,10 +272,21 @@ class InterpolateForm(BaseView):
             else:
                 grid_R = grid_R[:,:,:,dsigma_index]
                 # fixme: temporary real part only
+
+                if use_maid_units:  # convert units to MAID compatible
+                    grid_R *= 1000 * hep.m_pi
+                    quantity = copy.deepcopy(quantity)
+                    quantity.unit.tex = r'10^3 / m_{\pi^+}'
+
+                grid_R_im = grid_R.imag
                 grid_R = grid_R.real
 
             # print('SHAPE2', grid_R.shape)
 
+            if qu_type == 'amplitude':
+                trace_name_suffix = ' (Re)'
+            else:
+                trace_name_suffix = ''
 
             self.plot = {
                 'layout': {
@@ -284,12 +307,12 @@ class InterpolateForm(BaseView):
                 'data': [{
                     'mode': 'markers',
                     'type': 'scatter',
-                    'name': 'Interpolated, Q²={} GeV², W={} GeV'
-                        .format(q2, w),
+                    'name': 'Interpolated{}, Q²={} GeV², W={} GeV'
+                        .format(trace_name_suffix, q2, w),
                     'x': cθv_source.tolist(),
                     'y': grid_R.flatten().tolist(),
                     'marker': {
-                        'symbol': 'x-thin-open',
+                        'symbol': 'cross-thin-open',
                         'size': 12,
                         'color': 'orange',
                         'line': {
@@ -298,6 +321,25 @@ class InterpolateForm(BaseView):
                     },
                 }]
             }
+
+            if qu_type == 'amplitude':
+                self.plot['data'].append({
+                    'mode': 'markers',
+                    'type': 'scatter',
+                    'name': 'Interpolated (Im), Q²={} GeV², W={} GeV'
+                        .format(q2, w),
+                    'x': cθv_source.tolist(),
+                    'y': grid_R_im.flatten().tolist(),
+                    'marker': {
+                        'symbol': 'x-thin-open',
+                        'size': 8,
+                        'color': 'brown',
+                        'opacity': 0.5,
+                        'line': {
+                            'width': 1,
+                        },
+                    },
+                })
 
 
             ## Comparison
@@ -325,44 +367,47 @@ class InterpolateForm(BaseView):
                     cos_θ_hi_v = hep.mandelstam.cos_theta_to_t(
                         cos_θ_hi_v, nearest_W_hi, q2)
 
+                if use_maid_units and qu_type == 'amplitude':  # convert units to MAID compatible
+                    resf_lo_v *= 1000 * hep.m_pi
+                    resf_hi_v *= 1000 * hep.m_pi
 
-                self.plot['data'] += [
-                    {
-                        'mode': 'markers',
-                        'type': 'scatter',
-                        'name': 'Nearest Q²={} GeV², W={} GeV'
-                            .format(nearest_Q2_lo, nearest_W_lo),
-                        'x': cos_θ_lo_v.tolist(),
-                        'y': resf_lo_v.tolist(),
-                        'marker': {
-                            'symbol': 'cross-thin-open',
-                            'size': 10,
-                            'color': 'blue',
-                            'line': {
-                                'width': 1,
-                            },
+
+                self.plot['data'] += [{
+                    'mode': 'markers',
+                    'type': 'scatter',
+                    'name': 'Nearest Q²={} GeV², W={} GeV'
+                        .format(nearest_Q2_lo, nearest_W_lo),
+                    'x': cos_θ_lo_v.tolist(),
+                    'y': resf_lo_v.tolist(),
+                    'marker': {
+                        'symbol': 'triangle-down-open',
+                        'size': 10,
+                        'opacity': 0.5,
+                        'color': 'blue',
+                        'line': {
+                            'width': 1,
                         },
-                    }, {
-                        'mode': 'markers',
-                        'type': 'scatter',
-                        'name': 'Nearest Q²={} GeV², W={} GeV'
-                            .format(nearest_Q2_hi, nearest_W_hi),
-                        'x': cos_θ_hi_v.tolist(),
-                        'y': resf_hi_v.tolist(),
-                        'marker': {
-                            'symbol': 'cross-thin-open',
-                            'size': 10,
-                            'color': 'green',
-                            'line': {
-                                'width': 1,
-                            },
+                    },
+                }, {
+                    'mode': 'markers',
+                    'type': 'scatter',
+                    'name': 'Nearest Q²={} GeV², W={} GeV'
+                        .format(nearest_Q2_hi, nearest_W_hi),
+                    'x': cos_θ_hi_v.tolist(),
+                    'y': resf_hi_v.tolist(),
+                    'marker': {
+                        'symbol': 'triangle-up-open',
+                        'size': 10,
+                        'opacity': 0.5,
+                        'color': 'green',
+                        'line': {
+                            'width': 1,
                         },
-                    }
-                ]
+                    },
+                }]
 
 
             self.context.update(
-                plot=json.dumps(self.plot),
                 # ampl=ampl,
                 ampl={
                     'model': model,
@@ -373,9 +418,6 @@ class InterpolateForm(BaseView):
                 },
                 plot3D=True,
             )
-            return None
-
-        return render_template("interpolate_form.html", form=form)
 
 
 InterpolateForm.register_url(bp,
