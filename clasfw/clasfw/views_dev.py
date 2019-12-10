@@ -247,15 +247,16 @@ class InterpolateForm(BaseView):
 
             try:
                 dsigma_index = qu.strfun_names.index(quantity.name)
-                qu_type = 'respfunc'
+                self.qu_type = 'respfunc'
             except ValueError:
-                qu_type = 'amplitude'
+                self.qu_type = 'amplitude'
                 # dsigma_index = qu.amplitudes.index(quantity)  ## index starting from 0!
                 # ##  fixme!!! can fail if loaded `quantity` session differs from `qu.amplitudes` section
                 # ##  models.dictionarymixin.__eq__ should be implemented, comparing __class__, id or name
-                dsigma_index = [
+                dsigma_index = [  ## index starting from 0!
                     q.name for q in qu.amplitudes
                 ].index(quantity.name)  ## fixme: temporary workaround
+            self.dsigma_index = dsigma_index
 
             # tmp
             # print('SHAPE1', grid_R.shape)
@@ -263,7 +264,7 @@ class InterpolateForm(BaseView):
 
             use_maid_units = True
 
-            if qu_type == 'respfunc':
+            if self.qu_type == 'respfunc':
                 grid_R = np.apply_along_axis(
                     ampl0_to_rfuncs, 3, grid_R, #  3rd axis of grid_R with amplitudes
                     # np.sum, 3, grid_R,
@@ -283,7 +284,7 @@ class InterpolateForm(BaseView):
 
             # print('SHAPE2', grid_R.shape)
 
-            if qu_type == 'amplitude':
+            if self.qu_type == 'amplitude':
                 trace_name_suffix = ' (Re)'
             else:
                 trace_name_suffix = ''
@@ -322,7 +323,7 @@ class InterpolateForm(BaseView):
                 }]
             }
 
-            if qu_type == 'amplitude':
+            if self.qu_type == 'amplitude':
                 self.plot['data'].append({
                     'mode': 'markers',
                     'type': 'scatter',
@@ -352,9 +353,9 @@ class InterpolateForm(BaseView):
                 nearest_W_lo,  nearest_W_hi = get_value_neighbours(w, model, channel)
 
                 cos_θ_lo_v, resf_lo_v = get_theta_dependence(model, channel,
-                    q2, nearest_W_lo, dsigma_index, qu_type)
+                    q2, nearest_W_lo, dsigma_index, self.qu_type)
                 cos_θ_hi_v, resf_hi_v = get_theta_dependence(model, channel,
-                    q2, nearest_W_hi, dsigma_index, qu_type)
+                    q2, nearest_W_hi, dsigma_index, self.qu_type)
 
                 if form.varset.data == 'theta':
                     cos_θ_lo_v = np.rad2deg(np.arccos(cos_θ_lo_v))[::-1]
@@ -367,7 +368,7 @@ class InterpolateForm(BaseView):
                     cos_θ_hi_v = hep.mandelstam.cos_theta_to_t(
                         cos_θ_hi_v, nearest_W_hi, q2)
 
-                if use_maid_units and qu_type == 'amplitude':  # convert units to MAID compatible
+                if use_maid_units and self.qu_type == 'amplitude':  # convert units to MAID compatible
                     resf_lo_v *= 1000 * hep.m_pi
                     resf_hi_v *= 1000 * hep.m_pi
 
@@ -406,7 +407,6 @@ class InterpolateForm(BaseView):
                     },
                 }]
 
-
             self.context.update(
                 # ampl=ampl,
                 ampl={
@@ -419,6 +419,116 @@ class InterpolateForm(BaseView):
                 plot3D=True,
             )
 
+            if 0 and self.qu_type == 'amplitude':
+                from load_maid import MAIDData
+                maid = MAIDData.load_kinematics(Q2=q2, W=w, FS=channel.name)
+                cos_θ = np.array(list(maid.keys()))
+                H = np.array(list(maid.values()))
+                H = H[:,dsigma_index]
+                # if use_maid_units:  # convert units to MAID compatible
+                #     H *= 1000 * hep.m_pi
+                if form.varset.data == 'theta':
+                    cos_θ = np.rad2deg(np.arccos(cos_θ))[::-1]
+                    H = H[::-1]
+                elif form.varset.data == 't':
+                    cos_θ = hep.mandelstam.cos_theta_to_t(
+                        cos_θ, w, q2)
+
+                self.plot['data'] += [{
+                    'mode': 'markers',
+                    'type': 'scatter',
+                    'name': 'MAID Re Q²={} GeV², W={} GeV'
+                        .format(q2, w),
+                    'x': cos_θ.tolist(),
+                    'y': H.real.tolist(),
+                    'marker': {
+                        'symbol': 'square-open',
+                        'size': 8,
+                        'opacity': 1,
+                        # 'color': 'blue',
+                        'line': {
+                            'width': 1,
+                        },
+                    },
+                }, {
+                    'mode': 'markers',
+                    'type': 'scatter',
+                    'name': 'MAID Im Q²={} GeV², W={} GeV'
+                        .format(q2, w),
+                    'x': cos_θ.tolist(),
+                    'y': H.imag.tolist(),
+                    'marker': {
+                        'symbol': 'square-open',
+                        'size': 8,
+                        'opacity': 0.5,
+                        # 'color': 'green',
+                        'line': {
+                            'width': 1,
+                        },
+                    },
+                }]
+
+
+class InterpolateForm2(InterpolateForm):
+    def create_plot(self, form):
+        super().create_plot(form)
+        channel = form.channel.data
+        q2 = form.q2.data
+        w = form.w.data
+
+        if 1 or self.qu_type == 'amplitude':
+            from load_maid import MAIDData
+            maid = MAIDData.load_kinematics(
+                Q2=q2, W=w, FS=channel.name)
+            cos_θ = np.array(list(maid.keys()))
+            H = np.array(list(maid.values()))
+            H = H[:,self.dsigma_index]
+            # if use_maid_units:  # convert units to MAID compatible
+            #     H *= 1000 * hep.m_pi
+            if form.varset.data == 'theta':
+                cos_θ = np.rad2deg(np.arccos(cos_θ))[::-1]
+                H = H[::-1]
+            elif form.varset.data == 't':
+                cos_θ = hep.mandelstam.cos_theta_to_t(
+                    cos_θ, w, q2)
+
+            self.plot['data'] += [{
+                'mode': 'markers',
+                'type': 'scatter',
+                'name': 'MAID Re Q²={} GeV², W={} GeV'
+                    .format(q2, w),
+                'x': cos_θ.tolist(),
+                'y': H.real.tolist(),
+                'marker': {
+                    'symbol': 'square-open',
+                    'size': 8,
+                    'opacity': 1,
+                    # 'color': 'blue',
+                    'line': {
+                        'width': 1,
+                    },
+                },
+            }, {
+                'mode': 'markers',
+                'type': 'scatter',
+                'name': 'MAID Im Q²={} GeV², W={} GeV'
+                    .format(q2, w),
+                'x': cos_θ.tolist(),
+                'y': H.imag.tolist(),
+                'marker': {
+                    'symbol': 'square-open',
+                    'size': 8,
+                    'opacity': 0.5,
+                    # 'color': 'green',
+                    'line': {
+                        'width': 1,
+                    },
+                },
+            }]
+
 
 InterpolateForm.register_url(bp,
     '/interpolate', 'interpolate_form')
+
+InterpolateForm2.register_url(bp,
+    '/interpolate_compare', 'interpolate_form_compare')
