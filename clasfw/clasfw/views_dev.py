@@ -112,6 +112,15 @@ def get_theta_dependence(model, channel, Q2, W, ds_index=0, qu_type='respfunc'):
     return cos_theta_v, resf_v
 
 
+def to_json(obj, **kvargs):
+    class npJSONEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, np.ndarray):
+                return obj.tolist()
+            return super().default(obj)
+    return json.dumps(obj, cls=npJSONEncoder, **kvargs)
+
+
 class InterpolateForm(BaseView):
     def prepare(self, *args, **kwargs):
         InterpolateForm = create_form(db.session, qu)
@@ -120,7 +129,7 @@ class InterpolateForm(BaseView):
         if form.submit.data and form.validate():
             self.create_plot(form)
             self.context.update(
-                plot=json.dumps(self.plot,
+                plot=to_json(self.plot,
                     indent=(4 if current_app.debug else None) ),
             )
             return None
@@ -310,8 +319,8 @@ class InterpolateForm(BaseView):
                     'type': 'scatter',
                     'name': 'Interpolated{}, Q²={} GeV², W={} GeV'
                         .format(trace_name_suffix, q2, w),
-                    'x': cθv_source.tolist(),
-                    'y': grid_R.flatten().tolist(),
+                    'x': cθv_source,
+                    'y': grid_R.flatten(),
                     'marker': {
                         'symbol': 'cross-thin-open',
                         'size': 12,
@@ -329,8 +338,8 @@ class InterpolateForm(BaseView):
                     'type': 'scatter',
                     'name': 'Interpolated (Im), Q²={} GeV², W={} GeV'
                         .format(q2, w),
-                    'x': cθv_source.tolist(),
-                    'y': grid_R_im.flatten().tolist(),
+                    'x': cθv_source,
+                    'y': grid_R_im.flatten(),
                     'marker': {
                         'symbol': 'x-thin-open',
                         'size': 8,
@@ -378,8 +387,8 @@ class InterpolateForm(BaseView):
                     'type': 'scatter',
                     'name': 'Nearest Q²={} GeV², W={} GeV'
                         .format(nearest_Q2_lo, nearest_W_lo),
-                    'x': cos_θ_lo_v.tolist(),
-                    'y': resf_lo_v.tolist(),
+                    'x': cos_θ_lo_v,
+                    'y': resf_lo_v,
                     'marker': {
                         'symbol': 'triangle-down-open',
                         'size': 10,
@@ -394,8 +403,8 @@ class InterpolateForm(BaseView):
                     'type': 'scatter',
                     'name': 'Nearest Q²={} GeV², W={} GeV'
                         .format(nearest_Q2_hi, nearest_W_hi),
-                    'x': cos_θ_hi_v.tolist(),
-                    'y': resf_hi_v.tolist(),
+                    'x': cos_θ_hi_v,
+                    'y': resf_hi_v,
                     'marker': {
                         'symbol': 'triangle-up-open',
                         'size': 10,
@@ -439,8 +448,8 @@ class InterpolateForm(BaseView):
                     'type': 'scatter',
                     'name': 'MAID Re Q²={} GeV², W={} GeV'
                         .format(q2, w),
-                    'x': cos_θ.tolist(),
-                    'y': H.real.tolist(),
+                    'x': cos_θ,
+                    'y': H.real,
                     'marker': {
                         'symbol': 'square-open',
                         'size': 8,
@@ -455,8 +464,8 @@ class InterpolateForm(BaseView):
                     'type': 'scatter',
                     'name': 'MAID Im Q²={} GeV², W={} GeV'
                         .format(q2, w),
-                    'x': cos_θ.tolist(),
-                    'y': H.imag.tolist(),
+                    'x': cos_θ,
+                    'y': H.imag,
                     'marker': {
                         'symbol': 'square-open',
                         'size': 8,
@@ -497,8 +506,8 @@ class InterpolateForm2(InterpolateForm):
                 'type': 'scatter',
                 'name': 'MAID Re Q²={} GeV², W={} GeV'
                     .format(q2, w),
-                'x': cos_θ.tolist(),
-                'y': H.real.tolist(),
+                'x': cos_θ,
+                'y': H.real,
                 'marker': {
                     'symbol': 'square-open',
                     'size': 8,
@@ -513,8 +522,8 @@ class InterpolateForm2(InterpolateForm):
                 'type': 'scatter',
                 'name': 'MAID Im Q²={} GeV², W={} GeV'
                     .format(q2, w),
-                'x': cos_θ.tolist(),
-                'y': H.imag.tolist(),
+                'x': cos_θ,
+                'y': H.imag,
                 'marker': {
                     'symbol': 'square-open',
                     'size': 8,
