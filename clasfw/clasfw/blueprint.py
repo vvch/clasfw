@@ -25,6 +25,18 @@ class qu:
     amplitudes = []  ##  amplitudes list starting from 0, e. g. amplitudes[0]==H1, etc...
 
     @classmethod
+    def respfunc_index(cls, q: Quantity):
+        return cls.strfun_names.index(q.name)
+
+    @classmethod
+    def amplitude_index(cls, q: Quantity):
+        # ##  fixme!!! can fail if loaded `quantity` session differs from `qu.amplitudes` section
+        # ##  models.dictionarymixin.__eq__ should be implemented, comparing __class__, id or name
+        return [  ## index starting from 0!
+            qq.name for qq in cls.amplitudes
+        ].index(q.name)  ## fixme: temporary workaround
+
+    @classmethod
     def load(cls):
         cls.Q2, cls.W, cls.cos_theta, cls.theta, cls.t, cls.phi, cls.dsigma, cls.Eb = (
             Quantity.query.filter_by(name=s).one()

@@ -245,17 +245,11 @@ class InterpolateForm(BaseView):
                 method='linear')
 
             try:
-                dsigma_index = qu.strfun_names.index(quantity.name)
+                self.dsigma_index = qu.respfunc_index(quantity)
                 self.qu_type = 'respfunc'
             except ValueError:
                 self.qu_type = 'amplitude'
-                # dsigma_index = qu.amplitudes.index(quantity)  ## index starting from 0!
-                # ##  fixme!!! can fail if loaded `quantity` session differs from `qu.amplitudes` section
-                # ##  models.dictionarymixin.__eq__ should be implemented, comparing __class__, id or name
-                dsigma_index = [  ## index starting from 0!
-                    q.name for q in qu.amplitudes
-                ].index(quantity.name)  ## fixme: temporary workaround
-            self.dsigma_index = dsigma_index
+                self.dsigma_index = qu.amplitude_index(quantity)  ## index starting from 0!
 
             # tmp
             # print('SHAPE1', grid_R.shape)
@@ -268,9 +262,9 @@ class InterpolateForm(BaseView):
                     ampl0_to_rfuncs, 3, grid_R, #  3rd axis of grid_R with amplitudes
                     # np.sum, 3, grid_R,
                 )
-                grid_R = grid_R[:,:,:,dsigma_index]
+                grid_R = grid_R[:,:,:,self.dsigma_index]
             else:
-                grid_R = grid_R[:,:,:,dsigma_index]
+                grid_R = grid_R[:,:,:,self.dsigma_index]
                 # fixme: temporary real part only
 
                 if self.use_maid_units:  # convert units to MAID compatible
@@ -352,9 +346,9 @@ class InterpolateForm(BaseView):
                 nearest_W_lo,  nearest_W_hi = get_value_neighbours(w, model, channel)
 
                 cos_θ_lo_v, resf_lo_v = get_theta_dependence(model, channel,
-                    q2, nearest_W_lo, dsigma_index, self.qu_type)
+                    q2, nearest_W_lo, self.dsigma_index, self.qu_type)
                 cos_θ_hi_v, resf_hi_v = get_theta_dependence(model, channel,
-                    q2, nearest_W_hi, dsigma_index, self.qu_type)
+                    q2, nearest_W_hi, self.dsigma_index, self.qu_type)
 
                 if form.varset.data == 'theta':
                     cos_θ_lo_v = np.rad2deg(np.arccos(cos_θ_lo_v))[::-1]
@@ -423,7 +417,7 @@ class InterpolateForm(BaseView):
                 maid = MAIDData.load_kinematics(Q2=q2, W=w, FS=channel.name)
                 cos_θ = np.array(list(maid.keys()))
                 H = np.array(list(maid.values()))
-                H = H[:,dsigma_index]
+                H = H[:,self.dsigma_index]
                 # if self.use_maid_units:  # convert units to MAID compatible
                 #     H *= 1000 * hep.m_pi
                 if form.varset.data == 'theta':
