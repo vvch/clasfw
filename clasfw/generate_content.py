@@ -125,7 +125,8 @@ def create_quantities_functions_qu(qu):
         id = 19,
         name = "dsigma/dOmega",
         html = "d&sigma;/d&Omega;",
-        tex  = r"\mathrm{d}\sigma/\mathrm{d}\Omega",
+        tex  = r"\frac{\mathrm{d}\sigma}{\mathrm{d}\Omega}",
+        description = "Differential cross-section",
         priority = 50,
         unit=qu.mcb_sr,
     ),
@@ -134,6 +135,7 @@ def create_quantities_functions_qu(qu):
         name = "Q^2",
         html = "Q<sup>2</sup>",
         tex  = r"Q^2",
+        description = "Photon virtuality",
         priority = 20,
         unit=qu.GeV2,
     ),
@@ -142,8 +144,18 @@ def create_quantities_functions_qu(qu):
         name = "W",
         html = "W",
         tex  = r"W",
+        description = "Invariant mass of the final hadronic system",
         priority = 10,
         unit=qu.GeV,
+    ),
+    qq += Quantity(
+        id = 1013,
+        name = "x_B",
+        html = "x<sub>B</sub>",
+        tex  = r"x_B",
+        description = "Bjorken variable",
+        priority = 5,
+        unit=qu.dimensionless,
     ),
     qq += Quantity(
         id = 1016,
@@ -174,9 +186,9 @@ def create_quantities_functions_qu(qu):
         name = "E_b",
         html = "E<sub>b</sub>",
         tex  = r"E_{b}",
+        description = "Beam energy",
         priority = -10,
         unit=qu.GeV,
-        description="Beam energy",
     ),
     qq += Quantity(
         id = 1667,
@@ -221,22 +233,26 @@ def generate_test_content(verbose=0):
         id=1,
         name="pi+ n",
         html=r"&pi;<sup>+</sup>n",
-        tex=r"$\pi^+n$", )
+        tex=r"$\pi^+n$",
+        priority=0 )
     c2 = Channel(
         id=2,
         name="pi0 p",
         html=r"&pi;<sup>0</sup>p",
-        tex=r"$\pi^0p$")
+        tex=r"$\pi^0p$",
+        priority=-10 )
     c3 = Channel(
         id=22,
         name="pi- p",
         html=r"&pi;<sup>&minus;</sup>p",
-        tex=r"$\pi^-p$")
+        tex=r"$\pi^-p$",
+        priority=-20 )
     c4 = Channel(
         id=23,
         name="pi0 n",
         html=r"&pi;<sup>0</sup>n",
-        tex=r"$\pi^0n$")
+        tex=r"$\pi^0n$",
+        priority=-30 )
 
     ε = 0.00001
     w_all     = np.arange( 1.1, 4.0 +ε, 0.1)

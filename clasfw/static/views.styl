@@ -1,30 +1,9 @@
-.math
-	font-family: serif
-	font-style: italic
-	white-space: nowrap
-.unit
-	font-family: serif
-	font-style: normal
-.math .op  //  operator in math formula like cos
-	font-style: normal
-	margin-right: 0.2em
-.supsub
-	display: inline-block
-	SUP, SUB
-		display: block
-		position: relative
-		font-size: .5em
-		line-height: 1.2
-	SUB
-		top: .3em
-
-
 TABLE.models, TABLE.amplitudes
 	font-family: sans-serif
 	border: solid 1px
 	border-collapse: collapse
 	margin-bottom: 2em
-	THEAD 
+	THEAD
 		border-bottom: solid 5px
 	TD, TH
 		border: solid 1px
@@ -37,8 +16,6 @@ TABLE.models, TABLE.amplitudes
 		border-right: solid 5px
 	TD.lsplit, TH.lsplit
 		border-left: solid 5px
-	TD.channel
-		@extend .math
 
 
 TABLE.amplitudes
@@ -60,7 +37,7 @@ TABLE.void
 	TD, TH
 		border: none
 		padding: 0
-		margin: 0	
+		margin: 0
 	TABLE.properties
 		@extend TABLE.models
 		margin-bottom: 0.5em

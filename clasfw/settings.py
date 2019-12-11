@@ -7,7 +7,7 @@ class Config:
     PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
 
     SECRET_KEY = '\x9d\x8a\xcf\xa0\xbb\xd9\xe6\xc1"\x00\xc1\x84\x9e\xfa\xa8&6k\xfcR\x80<\xc31'
-    
+
     DEBUG = False
     DEBUG_TB_INTERCEPT_REDIRECTS = False
 
@@ -20,11 +20,13 @@ class Config:
     # MAIL_DEFAULT_SENDER = ('CLAS DB Support Team', 'clasdb@depni.sinp.msu.ru')
     MAIL_DEFAULT_SENDER = 'clasdb@depni.sinp.msu.ru'
     ADMINS = ['chesn@depni.sinp.msu.ru']
-    
+
     # STYLUS_BIN = '/usr/local/bin/stylus'
 
     # to suppress 'overhead' warning
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    RECORDS_PER_PAGE = 100
 
 
 class ProdConfig(Config):

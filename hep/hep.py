@@ -42,7 +42,10 @@ def W2xB(W, Q2):
     return nu2xB(W2nu(W, Q2), Q2)
 
 
+@np.vectorize
 def ε_T(W, Q2, E, ν=None):
+    if np.isclose(Q2, 0):
+        return 0
     if ν is None:
         ν = W2nu(W, Q2)
     ν2 = ν**2

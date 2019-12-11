@@ -2,6 +2,7 @@ from flask import Blueprint, current_app
 from .models import Quantity, Amplitude, Unit
 from ..utils import arxiv_url
 import hep
+from functools import partial
 
 
 blueprint = Blueprint("clasfw", __name__,
@@ -38,9 +39,9 @@ class qu:
 
     @classmethod
     def load(cls):
-        cls.Q2, cls.W, cls.cos_theta, cls.theta, cls.t, cls.phi, cls.dsigma, cls.Eb = (
+        cls.Q2, cls.W, cls.cos_theta, cls.theta, cls.xB, cls.t, cls.phi, cls.dsigma, cls.Eb = (
             Quantity.query.filter_by(name=s).one()
-                for s in "Q^2 W cos(theta) theta t phi dsigma/dOmega E_b".split() )
+                for s in "Q^2 W cos(theta) theta x_B t phi dsigma/dOmega E_b".split() )
         cls.mcb_sr, cls.deg = (
             Unit.query.filter_by(name=s).one()
                 for s in "mcb/sr deg".split() )
@@ -73,4 +74,5 @@ def inject_qu():
         zip=zip,
         arxiv_url=arxiv_url,
         hep=hep,
+        partial=partial,
     )

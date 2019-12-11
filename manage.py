@@ -18,7 +18,7 @@ def make_shell_context():
     return {
         'np': np,
         'db': db,
-        'qu': qu,  #  fixme: not initialized 
+        'qu': qu,  #  fixme: not initialized
         'hep': hep,
         'Amplitude': Amplitude,
         'Quantity': Quantity,

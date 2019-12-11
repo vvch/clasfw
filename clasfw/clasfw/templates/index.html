@@ -12,7 +12,9 @@
 {% endblock %}
 
 {% block content %}
-<h1>CLAS Analysis Framework</h1>
+<h1>
+    CLAS Analysis Framework
+</h1>
 <ul>
     <li>
         <a href="{{ url_for('clasfw.models_list') }}">
@@ -21,7 +23,7 @@
     </li>
     <li>
         <a href="{{ url_for('clasfw.groups_list') }}">
-            Data grouped by model, channel, <span class="math">Q²</span>
+            Data grouped by model, channel, <span class="math">Q²</span> value
         </a>
     </li>
     <li>
@@ -33,6 +35,71 @@
 
 <div class="info">
 <h2>Formalism used</h2>
+<p>
+    Differential cross-section is
+</p>
+<p>
+$$
+\frac{d\sigma}{d\Omega} =
+                                        \frac{d\sigma_{T  }}{d\Omega}               +
+    \varepsilon                         \frac{d\sigma_{L  }}{d\Omega}               +
+    \sqrt{2\varepsilon(1+\varepsilon)}  \frac{d\sigma_{TL }}{d\Omega}  \cos \varphi +
+    \varepsilon                         \frac{d\sigma_{TT }}{d\Omega}  \cos2\varphi +
+   h\sqrt{2\varepsilon(1-\varepsilon)}  \frac{d\sigma_{TL'}}{d\Omega}  \sin \varphi
+$$
+</p>
+<p>
+\( \varepsilon \) stands for virtual photon polarization parameter
+    (please, note: here we do NOT use the longitudinal polarization \( \varepsilon_L \) so the longitudinal cross-sections differ from those in <a href="#ref-1">[1]</a>),
+\( h \) describes the longitudinal polarization of the incident electron:
+\( h = +1(-1) \) if electrons are polarized parallel (anti-parallel) to the beam direction,
+\( \varphi \) stands for meson emission angle,
+\( \frac{d\sigma_{i}}{d\Omega} (i = T, L, TT, TL, TL&prime;) \) are interference terms,
+related to corresponding response functions \( R^{00}_{i} \) as follows:
+</p>
+
+\begin{align}
+\frac{d\sigma_{T  }}{d\Omega} & = R^{00}_{T  } \frac{p_m}{k_{\gamma}^{cm}}
+\\
+\frac{d\sigma_{L  }}{d\Omega} & = R^{00}_{L  } \frac{p_m}{k_{\gamma}^{cm}}
+    \frac{Q^2}{\omega_{\gamma}^2}
+\\
+\frac{d\sigma_{TL }}{d\Omega} & = R^{00}_{TL } \frac{p_m}{k_{\gamma}^{cm}}
+    \frac{\sqrt{Q^2}}{\omega_{\gamma}}
+\\
+\frac{d\sigma_{TT }}{d\Omega} & = R^{00}_{TT } \frac{p_m}{k_{\gamma}^{cm}}
+\\
+\frac{d\sigma_{TL'}}{d\Omega} & = R^{00}_{TL'} \frac{p_m}{k_{\gamma}^{cm}}
+    \frac{\sqrt{Q^2}}{\omega_{\gamma}}
+\end{align}
+
+<p>
+\( p_m \) is absolute value of meson three-momentum,
+\( \omega_{\gamma} \) stands for photon energy in the CM-frame:
+</p>
+
+<p>
+\begin{align}
+    \omega_{\gamma} & = \frac{W^2 - Q^2 - M_B^2}{2W}
+\\
+    k_{\gamma}^{cm} & = \frac{W^2 - M_B^2}{2W}
+\\
+    p_m & = \sqrt{E_m^2 - m_m^2}
+\\
+    E_m & = \frac{W^2 + m_m^2 - M_B^2}{2W}
+\end{align}
+</p>
+
+<p>
+    \( E_m \) stands for meson energy in c. m.,
+    \( m_m \) and \( M_B \) stand for meson and baryon masses,
+    \( Q^2 \) is photon virtuality,
+    \( W   \) is invariant mass of the final hadronic system.
+</p>
+
+<p>
+    \( R^{00}_i (i = T, L, TT, TL, TL&prime;) \) are response functions:
+</p>
 <p>
 \begin{align}
 	R^{00}_{T  }   & = \frac{1}{2}(|H_1|^2 + |H_2|^2 + |H_3|^2 + |H_4|^2)
@@ -46,68 +113,12 @@
 	R^{00}_{TL'}   & = \frac{1}{\sqrt{2}}(-H_5^*H_1 + H_5^*H_4 - H_6^*H_2 - H_6^*H_3)
 \end{align}
 </p>
-<p>
-    \( H_i \; (i = T, L, TT, TL, TL&prime;) \) stand for helicity amplitudes;
-    \( R^{00}_i \) are response functions.
-    Differential cross-section is
-</p>
-<p>
-$$
-\frac{d\sigma}{d\Omega} =
-                                        \frac{d\sigma_{T  }}{d\Omega}               +
-    \varepsilon                         \frac{d\sigma_{L  }}{d\Omega}               +
-    \sqrt{2\varepsilon(1+\varepsilon)}  \frac{d\sigma_{TL }}{d\Omega}  \cos \varphi +
-    \varepsilon                         \frac{d\sigma_{TT }}{d\Omega}  \cos2\varphi +
-    h\sqrt{2\varepsilon(1-\varepsilon)} \frac{d\sigma_{TL'}}{d\Omega}  \sin \varphi
-$$
-</p>
-<p>
-\( \varepsilon \) stands for virtual photon polarization parameter
-    (please, note: here we do NOT use the longitudinal polarization \( \varepsilon_L \) so the longitudinal cross-sections differ from those in <a href="#ref-1">[1]</a>),
-\( h \) describes the longitudinal polarization of the incident electron:
-\( h = +1(-1) \) if electrons are polarized parallel (anti-parallel) to the beam direction,
-\( \varphi \) stands for meson emission angle,
-\( \frac{d\sigma_{i}}{d\Omega} \) are interference terms,
-related to corresponding response functions \( R^{00}_{i} \) as follows:
-</p>
-
-\begin{align}
-\frac{d\sigma_{T  }}{d\Omega} & = R^{00}_{T  } \frac{p_m}{k_{\gamma}^{cm}}
-\\
-\frac{d\sigma_{L  }}{d\Omega} & = R^{00}_{L  } \frac{p_m}{k_{\gamma}^{cm}}
-    \frac{Q^2}{\omega_{\gamma}^2}
-\\
-\frac{d\sigma_{TL }}{d\Omega} & = R^{00}_{TL } \frac{p_m}{k_{\gamma}^{cm}}
-    \frac{\sqrt{Q^2}}{|\omega_{\gamma}|}
-\\
-\frac{d\sigma_{TT }}{d\Omega} & = R^{00}_{TT } \frac{p_m}{k_{\gamma}^{cm}}
-\\
-\frac{d\sigma_{TL'}}{d\Omega} & = R^{00}_{TL'} \frac{p_m}{k_{\gamma}^{cm}}
-    \frac{\sqrt{Q^2}}{|\omega_{\gamma}|}
-\end{align}
 
 <p>
-\( p_m \) is absolute value of meson three-momentum,
-\( \omega_{\gamma} \) stands for photon energy in the CM-frame:
-</p>
-<p>
-\begin{align}
-    \omega_{\gamma} & = \frac{W^2 - Q^2 - M_B^2}{2W}
-\\
-    k_{\gamma}^{cm} & = \frac{W^2 - M_B^2}{2W}
-\\
-    p_m & = \sqrt{E_m^2 - m_m^2}
-\\
-    E_m & = \frac{W^2 + m_m^2 - M_B^2}{2W}
-\end{align}
-</p>
-<p>
-    \( E_m \) stands for meson energy in c. m.,
-    \( m_m \) and \( M_B \) stand for meson and baryon masses,
-    \( Q^2 \) is photon virtuality,
-    \( W   \) is invariant mass of the final hadronic system.
+    \( H_i \; (i = 1..6) \) stand for helicity amplitudes.
 </p>
 </div>
+
 <div>
 <h2>References</h2>
 <ol class="references">

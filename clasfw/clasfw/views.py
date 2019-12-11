@@ -51,13 +51,21 @@ def models_list():
     models = Model.query.join(
         Amplitude
     ).group_by(Model.id).add_columns(
-        # func.count().label('count_ampl'),
         func.count(Amplitude.id).label('count_ampl'),
-    # ).with_entities(
-    #     Model,
-    #     # func.count().label('count_ampl'),
-    #     func.count(Amplitude.id).label('count_ampl')
+        func.min(Amplitude.q2).label('q2_min'),
+        func.max(Amplitude.q2).label('q2_max'),
+        func.min(Amplitude.w).label('w_min'),
+        func.max(Amplitude.w).label('w_max'),
     ).all()
+
+    by_model_id = {}
+    for mm in models:
+        m = mm.Model
+        prop = {}
+        by_model_id[m.id] = prop
+        prop['channels'] = Channel.query.distinct().join(Amplitude).filter(Amplitude.model==m)
+        # prop['count_ampl'] = Amplitude.query.filter_by(model=m).count()
+        # prop['count_ampl'] = Amplitude.query.filter_by(model=m).value( func.count(Amplitude.id) )
 
     # models = Model.query.add_columns(Model.id.label('count_ampl')).all()
     # print('WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW')
@@ -68,16 +76,18 @@ def models_list():
     # print('WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW')
 
     return render_template('models_list.html',
-        models=models)
+        models=models,
+        by_model_id=by_model_id)
 
 
-@bp.route('/model_data/<int:model_id>')
-def model_data(model_id):
+@bp.route('/model/<int:model_id>')
+@bp.route('/model/<int:model_id>/p<int:page>')
+def model_data(model_id, page=1):
     channel = request.args.get('channel', None)
     q2 = request.args.get('q2', default=None, type=float)
     model = Model.query.get_or_404(model_id)
     if channel:
-        channel = Channel.query.get(channel)
+        channel = Channel.query.get_or_404(channel)
 
     amplitudes = Amplitude.query.filter_by(model_id=model.id)
     if channel or q2:
@@ -89,8 +99,10 @@ def model_data(model_id):
         Amplitude.channel_id,  ##  fixme: use channel.priority
         Amplitude.q2,
         Amplitude.w,
-        Amplitude.cos_theta,
-    ).all()
+        Amplitude.cos_theta.desc(),
+    )
+    # amplitudes = amplitudes.all()
+    amplitudes = amplitudes.paginate(page, current_app.config['RECORDS_PER_PAGE'])
 
     return render_template('model_data.html',
         model=model,
@@ -112,7 +124,7 @@ def plotly_3dlabel(q):
 
 
 def tex(q):
-    return "${}$".format(q.wu_tex)
+    return "$${}$$".format(q.wu_tex)
 
 
 @bp.route('/dsigma')
@@ -153,9 +165,12 @@ def phi_dependence():
                 # 'autosize': 'true',
                 'xaxis': {
                     'title': tex(qu.phi),
+                    # 'ticktext': [0, 1, '$\\frac{\\pi}{2}$', 2, 3, '$\\pi$', 4, '$\\frac{3\\pi}{2}$', 5, 6, '$2\\pi$'],
+                    # 'tickvals': [0, 1, np.pi/2,             2, 3, np.pi,    4, 3*np.pi/2,            5, 6, 2*np.pi],
                 },
                 'yaxis': {
                     'title': tex(qu.dsigma),
+                    'rangemode': 'tozero',
                 },
                 'margin': {
                      't': 32,
@@ -219,7 +234,10 @@ def phi_dependence():
                 'y': cos_theta_v.tolist(),
                 'z': sig_M.tolist(),
                 'hovertemplate':
-                    "φ: %{x} rad<br>cos<i>θ</i>: %{y}<br>dσ/dΩ: %{z} μb/sr<extra></extra>",
+                    "φ: %{x} rad<br>"
+                    "cos<i>θ</i>: %{y}<br>"
+                    "dσ/dΩ: %{z} μb/sr"
+                    "<extra></extra>",
             }],
         }
         ampl=ampls[-1]  # temporary, for template args
@@ -235,21 +253,23 @@ def phi_dependence():
 
 
 @bp.route('/groups')
-def groups_list():
+@bp.route('/groups/p<int:page>')
+def groups_list(page=1):
     models = Amplitude.query.join(
         Model, Channel
     ).group_by(
         Model.id, Channel.id, Amplitude.q2
     ).add_columns(
-        # func.count().label('count_ampl'),
         func.count(Amplitude.id).label('count_ampl'),
+        func.min(Amplitude.w).label('w_min'),
+        func.max(Amplitude.w).label('w_max'),
     ).order_by(
         # Model.priority.desc(),
         Model.id, # fixme: temporary, use priority
         # Channel.priority.desc(),
         Channel.id, # fixme: temporary
         Amplitude.q2,
-    ).all()
+    ).paginate(page, current_app.config['RECORDS_PER_PAGE'])
 
     return render_template('groups_list.html',
         models=models)

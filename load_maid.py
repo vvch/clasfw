@@ -56,9 +56,9 @@ class MAIDData(dict):
                 if np.isclose(c, 0):
                     c = 0
                 H1, H2, H3 = [
-                    np.complex(v[1],v[2]),
-                    np.complex(v[3],v[4]),
-                    np.complex(v[5],v[6]),
+                    complex(v[1],v[2]),
+                    complex(v[3],v[4]),
+                    complex(v[5],v[6]),
                 ]
                 try:
                     out[c].extend([H1, H2, H3])
