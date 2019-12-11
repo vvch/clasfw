@@ -271,7 +271,7 @@ class InterpolateForm(BaseView):
             # print('SHAPE1', grid_R.shape)
             # print(grid_R)
 
-            use_maid_units = True
+            self.use_maid_units = True
 
             if self.qu_type == 'respfunc':
                 grid_R = np.apply_along_axis(
@@ -283,7 +283,7 @@ class InterpolateForm(BaseView):
                 grid_R = grid_R[:,:,:,dsigma_index]
                 # fixme: temporary real part only
 
-                if use_maid_units:  # convert units to MAID compatible
+                if self.use_maid_units:  # convert units to MAID compatible
                     grid_R *= 1000 * hep.m_pi
                     quantity = copy.deepcopy(quantity)
                     quantity.unit.tex = r'10^3 / m_{\pi^+}'
@@ -354,7 +354,7 @@ class InterpolateForm(BaseView):
 
             ## Comparison
 
-            if 1:
+            if 0:
                 nearest_Q2_lo = q2
                 nearest_Q2_hi = q2
 
@@ -377,7 +377,7 @@ class InterpolateForm(BaseView):
                     cos_θ_hi_v = hep.mandelstam.cos_theta_to_t(
                         cos_θ_hi_v, nearest_W_hi, q2)
 
-                if use_maid_units and self.qu_type == 'amplitude':  # convert units to MAID compatible
+                if self.use_maid_units and self.qu_type == 'amplitude':  # convert units to MAID compatible
                     resf_lo_v *= 1000 * hep.m_pi
                     resf_hi_v *= 1000 * hep.m_pi
 
@@ -434,7 +434,7 @@ class InterpolateForm(BaseView):
                 cos_θ = np.array(list(maid.keys()))
                 H = np.array(list(maid.values()))
                 H = H[:,dsigma_index]
-                # if use_maid_units:  # convert units to MAID compatible
+                # if self.use_maid_units:  # convert units to MAID compatible
                 #     H *= 1000 * hep.m_pi
                 if form.varset.data == 'theta':
                     cos_θ = np.rad2deg(np.arccos(cos_θ))[::-1]
@@ -481,19 +481,84 @@ class InterpolateForm(BaseView):
 class InterpolateForm2(InterpolateForm):
     def create_plot(self, form):
         super().create_plot(form)
+        model = form.model.data
         channel = form.channel.data
         q2 = form.q2.data
         w = form.w.data
 
-        if 1 or self.qu_type == 'amplitude':
+        ## Comparison
+
+        if 1:
+            nearest_Q2_lo = q2
+            nearest_Q2_hi = q2
+
+            # nearest_Q2_lo, nearest_Q2_hi = get_value_neighbours(q2, model, channel)
+            nearest_W_lo,  nearest_W_hi = get_value_neighbours(w, model, channel)
+
+            cos_θ_lo_v, resf_lo_v = get_theta_dependence(model, channel,
+                q2, nearest_W_lo, self.dsigma_index, self.qu_type)
+            cos_θ_hi_v, resf_hi_v = get_theta_dependence(model, channel,
+                q2, nearest_W_hi, self.dsigma_index, self.qu_type)
+
+            if form.varset.data == 'theta':
+                cos_θ_lo_v = np.rad2deg(np.arccos(cos_θ_lo_v))[::-1]
+                cos_θ_hi_v = np.rad2deg(np.arccos(cos_θ_hi_v))[::-1]
+                resf_lo_v = resf_lo_v[::-1]
+                resf_hi_v = resf_hi_v[::-1]
+            elif form.varset.data == 't':
+                cos_θ_lo_v = hep.mandelstam.cos_theta_to_t(
+                    cos_θ_lo_v, nearest_W_lo, q2)
+                cos_θ_hi_v = hep.mandelstam.cos_theta_to_t(
+                    cos_θ_hi_v, nearest_W_hi, q2)
+
+            if self.use_maid_units and self.qu_type == 'amplitude':  # convert units to MAID compatible
+                resf_lo_v *= 1000 * hep.m_pi
+                resf_hi_v *= 1000 * hep.m_pi
+
+
+            self.plot['data'] += [{
+                'mode': 'markers',
+                'type': 'scatter',
+                'name': 'Nearest Q²={} GeV², W={} GeV'
+                    .format(nearest_Q2_lo, nearest_W_lo),
+                'x': cos_θ_lo_v,
+                'y': resf_lo_v,
+                'marker': {
+                    'symbol': 'triangle-down-open',
+                    'size': 10,
+                    'opacity': 0.5,
+                    'color': 'blue',
+                    'line': {
+                        'width': 1,
+                    },
+                },
+            }, {
+                'mode': 'markers',
+                'type': 'scatter',
+                'name': 'Nearest Q²={} GeV², W={} GeV'
+                    .format(nearest_Q2_hi, nearest_W_hi),
+                'x': cos_θ_hi_v,
+                'y': resf_hi_v,
+                'marker': {
+                    'symbol': 'triangle-up-open',
+                    'size': 10,
+                    'opacity': 0.5,
+                    'color': 'green',
+                    'line': {
+                        'width': 1,
+                    },
+                },
+            }]
+
+        if 1 and self.qu_type == 'amplitude':
             from load_maid import MAIDData
             maid = MAIDData.load_kinematics(
                 Q2=q2, W=w, FS=channel.name)
             cos_θ = np.array(list(maid.keys()))
             H = np.array(list(maid.values()))
             H = H[:,self.dsigma_index]
-            # if use_maid_units:  # convert units to MAID compatible
-            #     H *= 1000 * hep.m_pi
+            if not self.use_maid_units:  # convert units from MAID-specific to Gev^-1
+                H /= 1000 * hep.m_pi
             if form.varset.data == 'theta':
                 cos_θ = np.rad2deg(np.arccos(cos_θ))[::-1]
                 H = H[::-1]
