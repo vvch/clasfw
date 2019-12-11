@@ -2,7 +2,7 @@ from .blueprint import qu, blueprint as bp
 from flask import current_app
 
 from .models import Model, Amplitude, Channel, Quantity
-from ..utils import equal_eps
+from ..utils import equal_eps, to_json
 
 from flask import request, Response, url_for, send_file, redirect, \
     render_template, render_template_string, Markup, abort
@@ -15,7 +15,6 @@ from sqlalchemy import func, exc
 from sqlalchemy.orm import exc
 import numpy as np
 import scipy.interpolate
-import json
 import copy
 
 from ..extensions import db
@@ -110,15 +109,6 @@ def get_theta_dependence(model, channel, Q2, W, ds_index=0, qu_type='respfunc'):
             # fixme: temporary real part only
             resf_v[i] = ampl.H[ds_index+1].real  # "+1" here since ds_index starts from 0 but Amplitude.H starts from 1
     return cos_theta_v, resf_v
-
-
-def to_json(obj, **kvargs):
-    class npJSONEncoder(json.JSONEncoder):
-        def default(self, obj):
-            if isinstance(obj, np.ndarray):
-                return obj.tolist()
-            return super().default(obj)
-    return json.dumps(obj, cls=npJSONEncoder, **kvargs)
 
 
 class InterpolateForm(BaseView):
