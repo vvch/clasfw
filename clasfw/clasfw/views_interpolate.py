@@ -92,7 +92,7 @@ def get_theta_dependence(model, channel, Q2, W, ds_index=0, qu_type='respfunc'):
 
     ampls=ampl.all()
     if not ampls:
-        abort(404)
+        return np.array([]), np.array([])
 
     cos_theta_v = np.zeros(shape=(len(ampls),))
     resf_v = np.zeros(shape=(len(ampls),))
