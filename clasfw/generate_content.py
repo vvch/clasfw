@@ -258,6 +258,10 @@ def generate_test_content(verbose=0):
     w_all     = np.arange( 1.1, 4.0 +ε, 0.1)
     q2_all    = np.arange( 0.0, 8.0 +ε, 0.5)
     cos_θ_all = np.arange(-1.0, 1.0 +ε, 0.1)
+    cos_θ_all = np.array([  ##  drop insignificant fluctuations
+        0 if np.isclose(_, 0) else _
+            for _ in cos_θ_all
+    ])
 
     for ch in c1, c2, c3, c4:
       for q2 in q2_all:

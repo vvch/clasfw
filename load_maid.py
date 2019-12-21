@@ -4,6 +4,7 @@ load_dotenv(find_dotenv())
 import re, requests, requests_cache
 import numpy as np
 from pprint import pprint
+import time
 from furl import furl
 
 from clasfw.models import Model, Amplitude, Channel
@@ -178,16 +179,24 @@ import click
 
 
 def download_maid_amplitudes(q2, w, fs):
+    start_time = time.time()
+    counter = 0
     app = create_app()
     with app.test_request_context():
         for FS in fs:
             for Q2 in q2:
                 for W in w:
                     out = MAIDData.load_kinematics(Q2=Q2, W=W, FS=FS)
-                    print("Q2={}, W={}, FS={}".format(out.Q2, out.W, out.FS))
+                    elapsed_time = time.time() - start_time
+                    print("{}: Q2={}, W={}\t\tElapsed: {:d}:{:.2f}"
+                        .format(out.FS, out.Q2, out.W,
+                            int(elapsed_time/60), elapsed_time%60, ++counter))
                     # pprint(out)
                     store_maid(db.session, out, nocommit=True)
                 db.session.commit()
+    elapsed_time = time.time() - start_time
+    print("TOTAL: {} objects for {:d}m{:.2f}s"
+        .format(counter, int(elapsed_time/60), elapsed_time%60))
 
 
 @click.command()
@@ -210,6 +219,6 @@ if __name__ == '__main__':
 
     download_maid_amplitudes(
         np.arange(0,   5.00001, 0.1),
-        np.arange(1.1, 2.00001, 0.1),
+        np.arange(1.1, 2.00001, 0.02),
         ["pi0 p", "pi0 n", "pi+ n", "pi- p"],
     )
