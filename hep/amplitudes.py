@@ -14,6 +14,8 @@ DOI:10.1007/BF01289506
 """
 
 
+strfun_indexes = "T  L  TT  TL  TL'".split()
+
 def ampl_to_R_T_00(H):
     return (
         np.abs(H[1])**2 +

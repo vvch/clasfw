@@ -1,7 +1,7 @@
 from flask import Blueprint, current_app
 from .models import Quantity, Amplitude, Unit
 from ..utils import arxiv_url
-import hep
+import hep, hep.amplitudes
 from functools import partial
 
 
@@ -19,8 +19,8 @@ def cpx(value):
 
 
 class qu:
-    strfun_names = ["R_{}_00".format(i) for i in Amplitude.strfun_indexes]
-    dsigma_names = ["dsigma_{}/dOmega".format(i) for i in Amplitude.strfun_indexes]
+    strfun_names = ["R_{}_00".format(i) for i in hep.amplitudes.strfun_indexes]
+    dsigma_names = ["dsigma_{}/dOmega".format(i) for i in hep.amplitudes.strfun_indexes]
     strfuns = []
     dsigmas = []
     amplitudes = []  ##  amplitudes list starting from 0, e. g. amplitudes[0]==H1, etc...

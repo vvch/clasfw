@@ -109,12 +109,6 @@ class Amplitude(Base):
     H6r            = Column(Float)
     H6j            = Column(Float)
 
-    R_T            = Column(Float)
-    R_L            = Column(Float)
-    R_TT           = Column(Float)
-    R_TL           = Column(Float)
-    R_TLp          = Column(Float)
-
     @hybrid_property
     def H1(self):
         return complex_or_none(self.H1r, self.H1j)
@@ -181,16 +175,6 @@ class Amplitude(Base):
         self.H1, self.H2, self.H3, \
         self.H4, self.H5, self.H6 = value[1:]  #  skip [0] index
 
-
-    strfun_indexes = "T  L  TT  TL  TL'".split()
-
-    @hybrid_property
-    def strfuns(self):
-        return self.R_T, self.R_L, self.R_TT, self.R_TL, self.R_TLp
-
-    @strfuns.setter
-    def strfuns(self, strfuns):
-        self.R_T, self.R_L, self.R_TT, self.R_TL, self.R_TLp = strfuns
 
     __table_args__ = (
         UniqueConstraint(

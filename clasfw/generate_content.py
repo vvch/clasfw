@@ -1,6 +1,7 @@
 from .models import Model, Amplitude, Channel, Quantity, Unit
 from .extensions import db
 import numpy as np
+import hep.amplitudes
 
 
 def create_amplitude_qu(qu):
@@ -30,7 +31,7 @@ def create_amplitude_qu(qu):
     R_start_id  = 300
     s_start_id  = 400
 
-    for ii, i in enumerate(Amplitude.strfun_indexes):
+    for ii, i in enumerate(hep.amplitudes.strfun_indexes):
         hi = i.replace("'", "&prime;")
         db.session.add_all([
             Quantity(

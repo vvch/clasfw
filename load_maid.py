@@ -137,7 +137,6 @@ def store_maid(ses, maid, nocommit=False):
         v = np.array(v) / 1000 / hep.m_pi
 
         a.H = [None] + list(v)
-        a.strfuns = hep.amplitudes.ampl_to_strfuns(a.H)
         m.amplitudes.append(a)
     # pprint(m)
     ses.add(m)
