@@ -19,15 +19,15 @@ def cpx(value):
 
 
 class qu:
-    strfun_names = ["R_{}_00".format(i) for i in hep.amplitudes.strfun_indexes]
+    respfunc_names = ["R_{}_00".format(i) for i in hep.amplitudes.strfun_indexes]
     dsigma_names = ["dsigma_{}/dOmega".format(i) for i in hep.amplitudes.strfun_indexes]
-    strfuns = []
+    respfuncs = []
     dsigmas = []
     amplitudes = []  ##  amplitudes list starting from 0, e. g. amplitudes[0]==H1, etc...
 
     @classmethod
     def respfunc_index(cls, q: Quantity):
-        return cls.strfun_names.index(q.name)
+        return cls.respfunc_names.index(q.name)
 
     @classmethod
     def amplitude_index(cls, q: Quantity):
@@ -46,9 +46,9 @@ class qu:
             Unit.query.filter_by(name=s).one()
                 for s in "mcb/sr deg".split() )
 
-        for s in cls.strfun_names:
+        for s in cls.respfunc_names:
             q = Quantity.query.filter_by(name=s).one()
-            cls.strfuns.append(q)
+            cls.respfuncs.append(q)
 
         for s in cls.dsigma_names:
             q = Quantity.query.filter_by(name=s).one()

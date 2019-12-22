@@ -39,7 +39,7 @@ def enabled_quantities_factory():
         status=0
     ).filter(
         Quantity.name.in_(
-            qu.strfun_names +
+            qu.respfunc_names +
                 [q.name for q in qu.amplitudes])
     ).order_by(
         Quantity.priority.desc()
@@ -76,8 +76,8 @@ def create_form(session, qu):
             widget          = widgets.ListWidget(prefix_label=False),
             # widget          = widgets.TableWidget(),
             get_label       = get_html_field,
-            default         = Quantity.query.filter_by(name=qu.strfun_names[0]).one(),
-            # default         = qu.strfuns[0],
+            default         = Quantity.query.filter_by(name=qu.respfunc_names[0]).one(),
+            # default         = qu.respfuncs[0],
         )
 
         channel = QuerySelectField(

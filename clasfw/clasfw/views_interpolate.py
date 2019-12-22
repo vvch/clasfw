@@ -26,10 +26,10 @@ from flask.views import MethodView
 # fixme: temporary workaround
 def ampl0_to_rfuncs(H0):
     H = np.concatenate(([None], H0))
-    return hep.amplitudes.ampl_to_strfuns(H)
+    return hep.amplitudes.ampl_to_R(H)
 
 def ampl0_to_dsigma(Q2, W, eps_T, phi, h, H0):
-    return strfuns_to_dsigma(
+    return R_to_dsigma(
         Q2, W, eps_T, phi, h,
         ampl0_to_rfuncs(H0) )
 
@@ -102,9 +102,8 @@ def get_theta_dependence(model, channel, Q2, W, ds_index=0, qu_type='respfunc'):
     for i in range(len(ampls)):
         ampl = ampls[i]
         cos_theta_v[i] = ampl.cos_theta
-        # ds = np.array(ampl.strfuns)*hep.amplitudes.R_to_dsigma_factors(ampl.q2, ampl.w)
         if is_respfunc:
-            resf_v[i] = hep.amplitudes.ampl_to_strfuns(ampl.H)[ds_index]
+            resf_v[i] = hep.amplitudes.ampl_to_R(ampl.H)[ds_index]
         else:
             # fixme: temporary real part only
             resf_v[i] = ampl.H[ds_index+1].real  # "+1" here since ds_index starts from 0 but Amplitude.H starts from 1

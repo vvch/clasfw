@@ -156,8 +156,8 @@ def phi_dependence():
         except exc.NoResultFound:
             abort(404)
 
-        respfuncs = hep.amplitudes.ampl_to_strfuns(ampl.H)
-        sig = hep.amplitudes.strfuns_to_dsigma(
+        respfuncs = hep.amplitudes.ampl_to_R(ampl.H)
+        sig = hep.amplitudes.R_to_dsigma(
             Q2, W, eps_T, phi, h, respfuncs)
 
         plot = {
@@ -205,14 +205,9 @@ def phi_dependence():
             ampl = ampls[i]
             cos_theta = ampl.cos_theta
             cos_theta_v[i] = ampl.cos_theta
-            sig = hep.amplitudes.strfuns_to_dsigma(
-                Q2, W, eps_T, phi, h,
-                hep.amplitudes.ampl_to_strfuns(ampl.H))
+            sig = hep.amplitudes.H_to_dsigma(
+                Q2, W, eps_T, phi, h, ampl.H)
             sig_M[i] = sig
-
-        # i = np.arange(len(ampls))
-        # sig_M[i] = hep.amplitudes.strfuns_to_dsigma(
-            # Q2, W, eps_T, phi, *(ampl[i].strfuns))
 
         plot = {
             'layout': {

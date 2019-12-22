@@ -57,8 +57,8 @@ def ampl_to_R_TLp_00(H):
     ).imag / np.sqrt(2)
 
 
-def ampl_to_strfuns(H):
-    """Results in mcb/sr"""
+def ampl_to_R(H):
+    """Results in mcb/sr, amplitudes in GeV^-1"""
     return np.array([
         ampl_to_R_T_00(H),
         ampl_to_R_L_00(H),
@@ -95,7 +95,7 @@ def R_to_dsigma_factors(Q2, W):
     ]) * ( p_m / k_γ_cm)
 
 
-def strfuns_to_dsigma(Q2, W, eps_T, phi, h, response_funcs):
+def R_to_dsigma(Q2, W, eps_T, phi, h, response_funcs):
     """
     Calculate differential cross-section
     from response functions
@@ -119,7 +119,7 @@ def strfuns_to_dsigma(Q2, W, eps_T, phi, h, response_funcs):
     return ds
 
 
-def amplitudes_to_dsigma(Q2, W, eps_T, phi, h, H):
-    return strfuns_to_dsigma(
+def H_to_dsigma(Q2, W, eps_T, phi, h, H):
+    return R_to_dsigma(
         Q2, W, eps_T, phi, h,
-        ampl_to_strfuns(H) )
+        ampl_to_R(H) )
