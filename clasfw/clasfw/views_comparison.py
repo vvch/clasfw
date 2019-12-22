@@ -107,11 +107,9 @@ def compare_maid():
             },
         }],
     }
-    ampl=ampls[-1]  # temporary, for template args
 
     return render_template('phi_dependence.html',
         plot=plot,
         Eb=Eb,
-        ampl=ampl,
-        plot3D=True,
+        ampl=ampls[0],
     )

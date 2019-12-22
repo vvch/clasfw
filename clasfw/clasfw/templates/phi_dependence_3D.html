@@ -1,0 +1,41 @@
+{% extends "base_plotly.html" %}
+
+{% block title -%}
+	Differential cross-section
+{%- endblock %}
+
+
+{% block content %}
+{% block page_header -%}
+<h1>
+	Differential cross-section
+</h1>
+{%- endblock %}
+
+<table class="void">
+<tr>
+	<td>
+		<table class="properties">
+		<tr>
+			<th>Channel</th>
+			<td>{{ ampl.channel }}</td>
+			<th>Model</th>
+			<td><a href="{{
+				url_for('.model_data', model_id=ampl.model_id)
+			}}">{{ ampl.model }}</a></td>
+			<th>{{ qu.Q2.wu }}</th>
+			<td>{{ ampl.q2 }}</td>
+			<th>{{ qu.W.wu }}</th>
+			<td>{{ ampl.w }}</td>
+			{% if Eb is defined -%}
+			<th>{{ qu.Eb.wu }}</th>
+			<td>{{ Eb }}</td>
+			{%- endif %}
+		</tr>
+		</table>
+	</td>
+</tr>
+</table>
+
+{{ super() }}
+{% endblock%}

@@ -144,13 +144,11 @@ def phi_dependence():
         equal_eps(Amplitude.w, W),
     )
 
-    plot3D = cos_theta is None
-
     phi = np.linspace(0, 2*np.pi)
     eps_T = hep.ε_T(W, Q2, Eb)
-
     h=1
-    if not plot3D:
+
+    if cos_theta is not None:  #  2D slice plot
         try:
             ampl = ampl.filter(
                 equal_eps(Amplitude.cos_theta, cos_theta),
@@ -186,6 +184,12 @@ def phi_dependence():
                 'y': sig.tolist(),
             }],
         }
+        return render_template('phi_dependence.html',
+            plot=plot,
+            Eb=Eb,
+            ampl=ampl,
+            dsigmas=np.array(ampl.strfuns)*hep.amplitudes.R_to_dsigma_factors(ampl.q2, ampl.w),
+        )
     else:  #  3D-plot
         ampls=ampl.all()
         if not ampls:
@@ -240,16 +244,12 @@ def phi_dependence():
                     "<extra></extra>",
             }],
         }
-        ampl=ampls[-1]  # temporary, for template args
 
-    return render_template('phi_dependence.html',
-        plot=plot,
-        Eb=Eb,
-        ampl=ampl,
-        plot3D=plot3D,
-
-        dsigmas=np.array(ampl.strfuns)*hep.amplitudes.R_to_dsigma_factors(ampl.q2, ampl.w),
-    )
+        return render_template('phi_dependence_3D.html',
+            plot=plot,
+            Eb=Eb,
+            ampl=ampls[0]
+        )
 
 
 @bp.route('/groups')

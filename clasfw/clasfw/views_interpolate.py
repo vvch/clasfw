@@ -409,7 +409,6 @@ class InterpolateForm(BaseView):
                     'q2': q2,
                     'w': w,
                 },
-                plot3D=True,
             )
 
             if 0 and self.qu_type == 'amplitude':
