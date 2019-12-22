@@ -180,6 +180,7 @@ import click
 def download_maid_amplitudes(q2, w, fs):
     start_time = time.time()
     counter = 0
+    size = len(fs) * len(q2) * len(w)
     app = create_app()
     with app.test_request_context():
         model = load_or_create_maid_model()
@@ -188,14 +189,18 @@ def download_maid_amplitudes(q2, w, fs):
                 for W in w:
                     out = MAIDData.load_by_kinematics(Q2=Q2, W=W, FS=FS)
                     elapsed_time = time.time() - start_time
-                    print("{}: Q2={}, W={}\t\tElapsed: {:d}:{:.2f}\t{}"
+                    counter += 1
+                    estimated_time = elapsed_time*size/counter - elapsed_time
+                    print("{}: Q2={}, W={}\t\tElapsed: {:d}:{:.1f}  \tEstimated: {:d}:{:.1f} \t{:4}/{}"
                         .format(out.FS, out.Q2, out.W,
-                            int(elapsed_time/60), elapsed_time%60, ++counter))
+                            int(elapsed_time/60), elapsed_time%60,
+                            int(estimated_time/60), estimated_time%60,
+                            counter, size))
                     db.session.add(
                         store_maid(db.session, out, model=model))
                 db.session.commit()
     elapsed_time = time.time() - start_time
-    print("TOTAL: {} objects for {:d}m{:.2f}s"
+    print("TOTAL: {} objects for {:d}m{:.1f}s"
         .format(counter, int(elapsed_time/60), elapsed_time%60))
 
 
