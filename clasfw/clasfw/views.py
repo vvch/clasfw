@@ -155,8 +155,10 @@ def phi_dependence():
             ).one()
         except exc.NoResultFound:
             abort(404)
+
+        respfuncs = hep.amplitudes.ampl_to_strfuns(ampl.H)
         sig = hep.amplitudes.strfuns_to_dsigma(
-            Q2, W, eps_T, phi, h, ampl.strfuns)
+            Q2, W, eps_T, phi, h, respfuncs)
 
         plot = {
             'layout': {
@@ -184,11 +186,13 @@ def phi_dependence():
                 'y': sig.tolist(),
             }],
         }
+
         return render_template('phi_dependence.html',
             plot=plot,
             Eb=Eb,
             ampl=ampl,
-            dsigmas=np.array(ampl.strfuns)*hep.amplitudes.R_to_dsigma_factors(ampl.q2, ampl.w),
+            respfuncs=respfuncs,
+            dsigmas=respfuncs*hep.amplitudes.R_to_dsigma_factors(ampl.q2, ampl.w),
         )
     else:  #  3D-plot
         ampls=ampl.all()
@@ -202,7 +206,8 @@ def phi_dependence():
             cos_theta = ampl.cos_theta
             cos_theta_v[i] = ampl.cos_theta
             sig = hep.amplitudes.strfuns_to_dsigma(
-                Q2, W, eps_T, phi, h, ampl.strfuns)
+                Q2, W, eps_T, phi, h,
+                hep.amplitudes.ampl_to_strfuns(ampl.H))
             sig_M[i] = sig
 
         # i = np.arange(len(ampls))
@@ -248,7 +253,7 @@ def phi_dependence():
         return render_template('phi_dependence_3D.html',
             plot=plot,
             Eb=Eb,
-            ampl=ampls[0]
+            ampl=ampls[0],
         )
 
 

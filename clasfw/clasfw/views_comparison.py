@@ -50,7 +50,7 @@ def compare_maid():
     for i in range(len(ampls)):
         ampl = ampls[i]
         cos_theta_v[i] = ampl.cos_theta
-        ds = np.array(ampl.strfuns)*hep.amplitudes.R_to_dsigma_factors(ampl.q2, ampl.w)
+        ds = hep.amplitudes.ampl_to_strfuns(ampl.H)*hep.amplitudes.R_to_dsigma_factors(ampl.q2, ampl.w)
         sig_v[i] = ds[ds_index]
 
     quantity = qu.dsigmas[ds_index]

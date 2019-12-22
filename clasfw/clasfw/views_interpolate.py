@@ -104,7 +104,7 @@ def get_theta_dependence(model, channel, Q2, W, ds_index=0, qu_type='respfunc'):
         cos_theta_v[i] = ampl.cos_theta
         # ds = np.array(ampl.strfuns)*hep.amplitudes.R_to_dsigma_factors(ampl.q2, ampl.w)
         if is_respfunc:
-            resf_v[i] = ampl.strfuns[ds_index]
+            resf_v[i] = hep.amplitudes.ampl_to_strfuns(ampl.H)[ds_index]
         else:
             # fixme: temporary real part only
             resf_v[i] = ampl.H[ds_index+1].real  # "+1" here since ds_index starts from 0 but Amplitude.H starts from 1
