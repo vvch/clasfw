@@ -413,7 +413,7 @@ class InterpolateForm(BaseView):
 
             if 0 and self.qu_type == 'amplitude':
                 from load_maid import MAIDData
-                maid = MAIDData.load_kinematics(Q2=q2, W=w, FS=channel.name)
+                maid = MAIDData.load_by_kinematics(Q2=q2, W=w, FS=channel.name)
                 cos_θ = np.array(list(maid.keys()))
                 H = np.array(list(maid.values()))
                 H = H[:,self.dsigma_index]
@@ -535,7 +535,7 @@ class InterpolateForm2(InterpolateForm):
 
         if 1 and self.qu_type == 'amplitude':
             from load_maid import MAIDData
-            maid = MAIDData.load_kinematics(
+            maid = MAIDData.load_by_kinematics(
                 Q2=q2, W=w, FS=channel.name)
             cos_θ = np.array(list(maid.keys()))
             H = np.array(list(maid.values()))

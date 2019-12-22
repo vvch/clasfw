@@ -46,7 +46,6 @@ class MAIDData(dict):
             re.M+re.S+re.X)
 
         t1, t2 = [m.group(1) for m in matches]
-        # print(t1, "\n", t2)
 
         def parse_block(t, out=None):
             if out is None:
@@ -82,7 +81,7 @@ class MAIDData(dict):
 
 
     @classmethod
-    def load_kinematics(cls, **kvargs):
+    def load_by_kinematics(cls, **kvargs):
         url = furl(cls.url)
         if kvargs.get('Q2') is not None:
             url.args['value35'] = kvargs['Q2']
@@ -110,14 +109,10 @@ class MAIDData(dict):
                     kvargs['Q2'], kvargs['W'], str(url)))
             raise
 
+
 from sqlalchemy.orm import exc
 
-
-def store_maid(ses, maid, nocommit=False):
-    FS = maid.FS
-    if not FS:
-        FS = 'pi0 p'
-    ch = Channel.query.filter_by(name=FS).one()
+def load_or_create_maid_model():
     try:
         m = Model.query.filter_by(name='maid').one()
     except exc.NoResultFound:
@@ -126,6 +121,16 @@ def store_maid(ses, maid, nocommit=False):
             author='MAID',
             description='MAID',
         )
+    return m
+
+
+def store_maid(ses, maid, model=None):
+    FS = maid.FS
+    if not FS:
+        FS = 'pi0 p'
+    ch = Channel.query.filter_by(name=FS).one()
+    if model is None:
+        model = load_or_create_maid_model()
     for k, v in maid.items():
         a = Amplitude(
             q2=maid.Q2,
@@ -133,15 +138,12 @@ def store_maid(ses, maid, nocommit=False):
             cos_theta=k,
             channel=ch)
 
-        # convert units since on site H units are in 10^-3/m_pi+
+        # convert units since on MAID site H units are in 10^-3/m_pi+
         v = np.array(v) / 1000 / hep.m_pi
 
         a.H = [None] + list(v)
-        m.amplitudes.append(a)
-    # pprint(m)
-    ses.add(m)
-    if not nocommit:
-        ses.commit()
+        model.amplitudes.append(a)
+    return model
 
 
 class MAIDObservables(MAIDData):
@@ -159,7 +161,6 @@ class MAIDObservables(MAIDData):
             text, re.M+re.S+re.X)
 
         t = mo.group(1)
-        # print('GROUP:\n', t)
 
         for line in t.split("\n"):
             v = [float(x) for x in line.split()]
@@ -182,16 +183,17 @@ def download_maid_amplitudes(q2, w, fs):
     counter = 0
     app = create_app()
     with app.test_request_context():
+        model = load_or_create_maid_model()
         for FS in fs:
             for Q2 in q2:
                 for W in w:
-                    out = MAIDData.load_kinematics(Q2=Q2, W=W, FS=FS)
+                    out = MAIDData.load_by_kinematics(Q2=Q2, W=W, FS=FS)
                     elapsed_time = time.time() - start_time
-                    print("{}: Q2={}, W={}\t\tElapsed: {:d}:{:.2f}"
+                    print("{}: Q2={}, W={}\t\tElapsed: {:d}:{:.2f}\t{}"
                         .format(out.FS, out.Q2, out.W,
                             int(elapsed_time/60), elapsed_time%60, ++counter))
-                    # pprint(out)
-                    store_maid(db.session, out, nocommit=True)
+                    db.session.add(
+                        store_maid(db.session, out, model=model))
                 db.session.commit()
     elapsed_time = time.time() - start_time
     print("TOTAL: {} objects for {:d}m{:.2f}s"
@@ -212,12 +214,8 @@ def main_command(q2, w, fs):
 if __name__ == '__main__':
     # main_command()
 
-    # download_maid_amplitudes([0.5, 1], [1.5, 2], ["pi0 p"])
-
-    # W = np.arange(1.1, 2.00001, 0.1)
-
     download_maid_amplitudes(
-        np.arange(0,   5.00001, 0.1),
-        np.arange(1.1, 2.00001, 0.02),
+        np.arange(0,   5.00001, 0.2),  #  Q2
+        np.arange(1.1, 2.00001, 0.02), #  W
         ["pi0 p", "pi0 n", "pi+ n", "pi- p"],
     )
