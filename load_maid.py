@@ -25,7 +25,6 @@ class MAIDData(dict):
             text,
             re.M+re.S+re.X)
         Q2, W = mo.group(1, 2)
-        # print(Q2, W)
         self.Q2 = float(Q2)
         self.W  = float(W) / 1000  ##  MeV to GeV
 
@@ -141,7 +140,7 @@ def store_maid(ses, maid, model=None):
         # convert units since on MAID site H units are in 10^-3/m_pi+
         v = np.array(v) / 1000 / hep.m_pi
 
-        a.H = [None] + list(v)
+        a.H = v
         model.amplitudes.append(a)
     return model
 

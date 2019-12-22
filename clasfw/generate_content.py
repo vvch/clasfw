@@ -292,9 +292,9 @@ def generate_test_content(verbose=0):
                 #     q2=q2,
                 #     cos_theta=cos_θ,
                 # )
-                a1.H = [None] + [1 ]*Amplitude.number
-                a2.H = [None] + [1j]*Amplitude.number
-                # a3.H1 = [None, 1, -1, -1, 1, -1, 1]
+                a1.H = [1 ]*Amplitude.number
+                a2.H = [1j]*Amplitude.number
+                # a3.H1 = [1, -1, -1, 1, -1, 1]
                 m1.amplitudes.append(a1)
                 m2.amplitudes.append(a2)
                 # m3.amplitudes.append(a3)

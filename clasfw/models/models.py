@@ -165,15 +165,11 @@ class Amplitude(Base):
 
     @hybrid_property
     def H(self):
-        #  zero index is empty
-        return None, \
-            self.H1, self.H2, self.H3, \
-            self.H4, self.H5, self.H6
+        return self.H1, self.H2, self.H3, self.H4, self.H5, self.H6
 
     @H.setter
     def H(self, value):
-        self.H1, self.H2, self.H3, \
-        self.H4, self.H5, self.H6 = value[1:]  #  skip [0] index
+        self.H1, self.H2, self.H3, self.H4, self.H5, self.H6 = value
 
 
     __table_args__ = (

@@ -16,44 +16,47 @@ DOI:10.1007/BF01289506
 
 strfun_indexes = "T  L  TT  TL  TL'".split()
 
+
+#  "-1" here since H array indexes starts from 0
+
 def ampl_to_R_T_00(H):
     return (
-        np.abs(H[1])**2 +
-        np.abs(H[2])**2 +
-        np.abs(H[3])**2 +
-        np.abs(H[4])**2
+        np.abs(H[1-1])**2 +
+        np.abs(H[2-1])**2 +
+        np.abs(H[3-1])**2 +
+        np.abs(H[4-1])**2
     ) / 2
 
 
 def ampl_to_R_L_00(H):
     return (
-        np.abs(H[5])**2 +
-        np.abs(H[6])**2
+        np.abs(H[5-1])**2 +
+        np.abs(H[6-1])**2
     )
 
 
 def ampl_to_R_TL_00(H):
     return (
-        + H[5].conjugate() * H[1]
-        - H[5].conjugate() * H[4]
-        + H[6].conjugate() * H[2]
-        + H[6].conjugate() * H[3]
+        + H[5-1].conjugate() * H[1-1]
+        - H[5-1].conjugate() * H[4-1]
+        + H[6-1].conjugate() * H[2-1]
+        + H[6-1].conjugate() * H[3-1]
     ).real / np.sqrt(2)
 
 
 def ampl_to_R_TT_00(H):
     return (
-        - H[1].conjugate() * H[4]
-        + H[2].conjugate() * H[3]
+        - H[1-1].conjugate() * H[4-1]
+        + H[2-1].conjugate() * H[3-1]
     ).real
 
 
 def ampl_to_R_TLp_00(H):
     return (
-        - H[5].conjugate() * H[1]
-        + H[5].conjugate() * H[4]
-        - H[6].conjugate() * H[2]
-        - H[6].conjugate() * H[3]
+        - H[5-1].conjugate() * H[1-1]
+        + H[5-1].conjugate() * H[4-1]
+        - H[6-1].conjugate() * H[2-1]
+        - H[6-1].conjugate() * H[3-1]
     ).imag / np.sqrt(2)
 
 

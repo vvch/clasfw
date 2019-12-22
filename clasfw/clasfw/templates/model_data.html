@@ -70,7 +70,7 @@
 	<td>{{ a.w  |cpx }}</td>
 	<td>{{ a.cos_theta |cpx }}</td>
 	<td class="rsplit">{{ hep.W2xB(a.w, a.q2) |cpx }}</td>
-	{% for aa in a.H[1:] %}
+	{% for aa in a.H %}
 	<td>{{ aa|cpx }}</td>
 	{% endfor %}
 </tr>
