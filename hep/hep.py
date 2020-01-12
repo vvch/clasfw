@@ -55,7 +55,7 @@ def ε_T(W, Q2, E, ν=None):
         1 + 2*(1+ν2/Q2)*tg2θ2 )
 
 
-def σ_to_F1F2(σ, Q2, E, R, W=None, v=None):
+def σ_to_F1F2(σ, Q2, E, R, W=None, ν=None):
     σ *= GeVm2_per_mcb
     if ν is None:
         ν = W2nu(W, Q2)
