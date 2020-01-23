@@ -331,7 +331,7 @@ class InterpolateForm(BaseView):
                 nearest_Q2_hi = q2
 
                 # nearest_Q2_lo, nearest_Q2_hi = get_value_neighbours(q2, model, channel)
-                nearest_W_lo,  nearest_W_hi = get_value_neighbours(w, model, channel)
+                nearest_W_lo,  nearest_W_hi = get_value_neighbours(w, model, channel, Amplitude.w)
 
                 cos_θ_lo_v, resf_lo_v = get_theta_dependence(model, channel,
                     q2, nearest_W_lo, self.qu_index, self.qu_type)
@@ -464,7 +464,7 @@ class InterpolateForm2(InterpolateForm):
             nearest_Q2_hi = q2
 
             # nearest_Q2_lo, nearest_Q2_hi = get_value_neighbours(q2, model, channel)
-            nearest_W_lo,  nearest_W_hi = get_value_neighbours(w, model, channel)
+            nearest_W_lo,  nearest_W_hi = get_value_neighbours(w, model, channel, Amplitude.w)
 
             cos_θ_lo_v, resf_lo_v = get_theta_dependence(model, channel,
                 q2, nearest_W_lo, self.qu_index, self.qu_type)
