@@ -15,7 +15,7 @@ def cpx(value):
     """
     Format complex or real value or None
     """
-    return "{:.2g}".format(value) if value else value
+    return "{:.3g}".format(value) if value else value
 
 
 class qu:
