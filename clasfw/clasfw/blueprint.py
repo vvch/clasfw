@@ -1,8 +1,10 @@
-from flask import Blueprint, current_app
+from functools import partial
+from flask import Blueprint
+
+import hep
+import hep.amplitudes
 from .models import Quantity, Amplitude, Unit
 from ..utils import arxiv_url
-import hep, hep.amplitudes
-from functools import partial
 
 
 blueprint = Blueprint("clasfw", __name__,

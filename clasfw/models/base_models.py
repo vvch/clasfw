@@ -1,20 +1,19 @@
+import sqlalchemy
+from sqlalchemy.ext.declarative import declared_attr
+
+from database import Column, Integer, String, TIMESTAMP, Text, func
+
+
 __all__ = [
     'StatusMixin', 'DatesMixin', 'DictionaryMixin', 'ExtDictionaryMixin'
 ]
-
-from database import Base, Column, \
-        Integer, SmallInteger, String, TIMESTAMP, \
-        Text, LargeBinary, \
-        relationship, backref, deferred, func, desc
-from sqlalchemy.ext.declarative import declared_attr
 
 
 class StatusMixin:
     id             = Column(Integer, primary_key=True, autoincrement=True)
     status         = Column(Integer, default=0)
 
-import sqlalchemy
-from sqlalchemy import text
+
 class DatesMixin:
     # in MySQL should be first TIMESTAMP column
     mdate = Column(TIMESTAMP, nullable=False,

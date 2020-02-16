@@ -1,13 +1,7 @@
-import os
 import click
-
-from sqlalchemy import or_
-
-from .models import Amplitude, Model
-from .extensions import db
-import hep.amplitudes
 import flask_migrate
 
+from .extensions import db
 from .generate_content import create_dictionaries, generate_test_content, generate_all
 
 
@@ -15,7 +9,6 @@ def register(app):
     @app.cli.group()
     def gen():
         """Database content generation commands."""
-        pass
 
     @gen.command()
     @click.option('-v', '--verbose', count=True)

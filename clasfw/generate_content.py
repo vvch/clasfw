@@ -1,7 +1,8 @@
+import numpy as np
+
+import hep.amplitudes
 from .models import Model, Amplitude, Channel, Quantity, Unit
 from .extensions import db
-import numpy as np
-import hep.amplitudes
 
 
 def create_amplitude_qu(qu):
@@ -304,15 +305,13 @@ def generate_test_content(verbose=0):
     db.session.commit()
 
 
-def generate_all(verbose):
+def generate_all(verbose=0):
     create_dictionaries()
     generate_test_content(verbose)
 
 
 if __name__ == '__main__':
     from clasfw.app import create_app
-
-    import os
 
     app = create_app()
     # db.create_all()

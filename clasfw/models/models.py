@@ -2,16 +2,13 @@ __all__ = [
     'Amplitude', 'Model', 'Channel', 'Quantity', 'Unit'
 ]
 
-from database import Base, Column, \
-        Integer, SmallInteger, String, DateTime, Boolean, Float, \
-        Text, LargeBinary, \
-        ForeignKey, ForeignKeyConstraint, UniqueConstraint, \
-        relationship, backref, deferred, func, desc
-from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask import Markup
 
-from .base_models import StatusMixin, DatesMixin, DictionaryMixin, ExtDictionaryMixin
+from database import Base, Column, Integer, String, Float, Text, \
+        ForeignKey, UniqueConstraint, relationship, backref
+
+from .base_models import DatesMixin, DictionaryMixin, ExtDictionaryMixin
 
 
 class Channel(DatesMixin, ExtDictionaryMixin, Base):
@@ -24,6 +21,7 @@ class Unit(DatesMixin, ExtDictionaryMixin, Base):
 
 class Quantity(DatesMixin, ExtDictionaryMixin, Base):
     __tablename__  = 'quantities'
+
     unit_id        = Column(Integer, ForeignKey(Unit.id))
     # fixme: lazy loading of units causes DetachedInstanceError
     #   <Quantity> is not bound to a Session; lazy load operation of attribute 'unit' cannot proceed
@@ -171,7 +169,6 @@ class Amplitude(Base):
     def H(self, value):
         self.H1, self.H2, self.H3, self.H4, self.H5, self.H6 = value
 
-
     __table_args__ = (
         UniqueConstraint(
             channel_id, model_id,
@@ -182,7 +179,8 @@ class Amplitude(Base):
 
 
 if __name__ == '__main__':
-    import sys, sqlalchemy
+    import sys
+    import sqlalchemy
     print("Python version: " + sys.version)
     print("SQLAlchemy version: " + sqlalchemy.__version__)
     print("\nTables defined:\n\n" + "\n".join(Base.metadata.tables.keys()))

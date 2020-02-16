@@ -1,26 +1,24 @@
-from .blueprint import qu, blueprint as bp
+import copy
 from flask import current_app
+from flask import request, render_template, abort
+from flask.views import MethodView
 
-from .models import Model, Amplitude, Channel, Quantity
-from ..utils import equal_eps, to_json
-
-from flask import request, Response, url_for, send_file, redirect, \
-    render_template, render_template_string, Markup, abort
+import numpy as np
+import scipy.interpolate
 
 import hep
 import hep.amplitudes
 import hep.mandelstam
-
-from sqlalchemy import func, exc
-from sqlalchemy.orm import exc
-import numpy as np
-import scipy.interpolate
-import copy
-
+from load_maid import MAIDData
+from .blueprint import qu, blueprint as bp
+from .models import Amplitude
+from ..utils import equal_eps, to_json
 from ..extensions import db
 from .forms import create_form
 
-from flask.views import MethodView
+
+def tex(q):
+    return "${}$".format(q.wu_tex)
 
 
 class BaseView(MethodView):
@@ -35,22 +33,14 @@ class BaseView(MethodView):
                 self.template,
                 **self.context
             )
-        else:
-            return res
-
+        return res
 
     def prepare(self, *args, **kwargs):
         pass
 
-
     @classmethod
     def register_url(cls, app, rule, endpoint):
-        return app.add_url_rule(rule, view_func=cls.as_view(endpoint)) 
-
-
-
-def tex(q):
-    return "${}$".format(q.wu_tex)
+        return app.add_url_rule(rule, view_func=cls.as_view(endpoint))
 
 
 def get_value_neighbours(val, model, channel, field=None):
@@ -88,8 +78,7 @@ def get_theta_dependence(model, channel, Q2, W, ds_index=0, qu_type='respfunc'):
 
     is_respfunc = qu_type=='respfunc'
 
-    for i in range(len(ampls)):
-        ampl = ampls[i]
+    for i, ampl in enumerate(ampls):
         cos_theta_v[i] = ampl.cos_theta
         if is_respfunc:
             resf_v[i] = hep.amplitudes.ampl_to_R(ampl.H)[ds_index]
@@ -99,7 +88,7 @@ def get_theta_dependence(model, channel, Q2, W, ds_index=0, qu_type='respfunc'):
     return cos_theta_v, resf_v
 
 
-class InterpolateForm(BaseView):
+class InterpolateFormView(BaseView):
     def prepare(self, *args, **kwargs):
         InterpolateForm = create_form(db.session, qu)
         form = InterpolateForm(request.args)
@@ -113,7 +102,6 @@ class InterpolateForm(BaseView):
             return None
 
         return render_template("interpolate_form.html", form=form)
-
 
     def create_plot(self, form):
             model = form.model.data
@@ -210,17 +198,10 @@ class InterpolateForm(BaseView):
                 cθv_source = np.arange(c_min, c_max +ε, c_step)
                 cθv = hep.mandelstam.t_to_cos_theta(cθv_source, w, q2)
 
-
-            if 0:
-                grid_q2, grid_w, grid_cθ = np.mgrid[
-                    q2 : q2: 1j,
-                    w  : w : 1j,
-                    -1 : 1 : 0.1]
-            else:
-                grid_q2, grid_w, grid_cθ = np.array(np.meshgrid(
-                    q2, w, cθv
-                ))
-                # )).transpose((0, 2, 1))
+            grid_q2, grid_w, grid_cθ = np.array(np.meshgrid(
+                q2, w, cθv
+            ))
+            # )).transpose((0, 2, 1))
 
             # print('SHAPE OF POINTS', points.shape)
             # print(points)
@@ -323,71 +304,6 @@ class InterpolateForm(BaseView):
                     },
                 })
 
-
-            ## Comparison
-
-            if 0:
-                nearest_Q2_lo = q2
-                nearest_Q2_hi = q2
-
-                # nearest_Q2_lo, nearest_Q2_hi = get_value_neighbours(q2, model, channel)
-                nearest_W_lo,  nearest_W_hi = get_value_neighbours(w, model, channel, Amplitude.w)
-
-                cos_θ_lo_v, resf_lo_v = get_theta_dependence(model, channel,
-                    q2, nearest_W_lo, self.qu_index, self.qu_type)
-                cos_θ_hi_v, resf_hi_v = get_theta_dependence(model, channel,
-                    q2, nearest_W_hi, self.qu_index, self.qu_type)
-
-                if form.varset.data == 'theta':
-                    cos_θ_lo_v = np.rad2deg(np.arccos(cos_θ_lo_v))[::-1]
-                    cos_θ_hi_v = np.rad2deg(np.arccos(cos_θ_hi_v))[::-1]
-                    resf_lo_v = resf_lo_v[::-1]
-                    resf_hi_v = resf_hi_v[::-1]
-                elif form.varset.data == 't':
-                    cos_θ_lo_v = hep.mandelstam.cos_theta_to_t(
-                        cos_θ_lo_v, nearest_W_lo, q2)
-                    cos_θ_hi_v = hep.mandelstam.cos_theta_to_t(
-                        cos_θ_hi_v, nearest_W_hi, q2)
-
-                if self.use_maid_units and self.qu_type == 'amplitude':  # convert units to MAID compatible
-                    resf_lo_v *= 1000 * hep.m_pi
-                    resf_hi_v *= 1000 * hep.m_pi
-
-
-                self.plot['data'] += [{
-                    'mode': 'markers',
-                    'type': 'scatter',
-                    'name': 'Nearest Q²={} GeV², W={} GeV'
-                        .format(nearest_Q2_lo, nearest_W_lo),
-                    'x': cos_θ_lo_v,
-                    'y': resf_lo_v,
-                    'marker': {
-                        'symbol': 'triangle-down-open',
-                        'size': 10,
-                        'opacity': 0.5,
-                        'color': 'blue',
-                        'line': {
-                            'width': 1,
-                        },
-                    },
-                }, {
-                    'mode': 'markers',
-                    'type': 'scatter',
-                    'name': 'Nearest Q²={} GeV², W={} GeV'
-                        .format(nearest_Q2_hi, nearest_W_hi),
-                    'x': cos_θ_hi_v,
-                    'y': resf_hi_v,
-                    'marker': {
-                        'symbol': 'triangle-up-open',
-                        'size': 10,
-                        'opacity': 0.5,
-                        'color': 'green',
-                        'line': {
-                            'width': 1,
-                        },
-                    },
-                }]
-
             self.context.update(
                 # ampl=ampl,
                 ampl={
@@ -400,7 +316,6 @@ class InterpolateForm(BaseView):
             )
 
             if 0 and self.qu_type == 'amplitude':
-                from load_maid import MAIDData
                 maid = MAIDData.load_by_kinematics(Q2=q2, W=w, FS=channel.name)
                 cos_θ = np.array(list(maid.keys()))
                 H = np.array(list(maid.values()))
@@ -449,7 +364,7 @@ class InterpolateForm(BaseView):
                 }]
 
 
-class InterpolateForm2(InterpolateForm):
+class InterpolateFormCompareView(InterpolateFormView):
     def create_plot(self, form):
         super().create_plot(form)
         model = form.model.data
@@ -457,78 +372,75 @@ class InterpolateForm2(InterpolateForm):
         q2 = form.q2.data
         w = form.w.data
 
-        ## Comparison
+        nearest_Q2_lo = q2
+        nearest_Q2_hi = q2
 
-        if 1:
-            nearest_Q2_lo = q2
-            nearest_Q2_hi = q2
+        # nearest_Q2_lo, nearest_Q2_hi = get_value_neighbours(q2, model, channel)
+        nearest_W_lo,  nearest_W_hi = get_value_neighbours(w, model, channel, Amplitude.w)
 
-            # nearest_Q2_lo, nearest_Q2_hi = get_value_neighbours(q2, model, channel)
-            nearest_W_lo,  nearest_W_hi = get_value_neighbours(w, model, channel, Amplitude.w)
+        cos_θ_lo_v, resf_lo_v = get_theta_dependence(model, channel,
+            q2, nearest_W_lo, self.qu_index, self.qu_type)
+        cos_θ_hi_v, resf_hi_v = get_theta_dependence(model, channel,
+            q2, nearest_W_hi, self.qu_index, self.qu_type)
 
-            cos_θ_lo_v, resf_lo_v = get_theta_dependence(model, channel,
-                q2, nearest_W_lo, self.qu_index, self.qu_type)
-            cos_θ_hi_v, resf_hi_v = get_theta_dependence(model, channel,
-                q2, nearest_W_hi, self.qu_index, self.qu_type)
+        if form.varset.data == 'theta':
+            cos_θ_lo_v = np.rad2deg(np.arccos(cos_θ_lo_v))[::-1]
+            cos_θ_hi_v = np.rad2deg(np.arccos(cos_θ_hi_v))[::-1]
+            resf_lo_v = resf_lo_v[::-1]
+            resf_hi_v = resf_hi_v[::-1]
+        elif form.varset.data == 't':
+            cos_θ_lo_v = hep.mandelstam.cos_theta_to_t(
+                cos_θ_lo_v, nearest_W_lo, q2)
+            cos_θ_hi_v = hep.mandelstam.cos_theta_to_t(
+                cos_θ_hi_v, nearest_W_hi, q2)
 
-            if form.varset.data == 'theta':
-                cos_θ_lo_v = np.rad2deg(np.arccos(cos_θ_lo_v))[::-1]
-                cos_θ_hi_v = np.rad2deg(np.arccos(cos_θ_hi_v))[::-1]
-                resf_lo_v = resf_lo_v[::-1]
-                resf_hi_v = resf_hi_v[::-1]
-            elif form.varset.data == 't':
-                cos_θ_lo_v = hep.mandelstam.cos_theta_to_t(
-                    cos_θ_lo_v, nearest_W_lo, q2)
-                cos_θ_hi_v = hep.mandelstam.cos_theta_to_t(
-                    cos_θ_hi_v, nearest_W_hi, q2)
+        if self.use_maid_units and self.qu_type == 'amplitude':
+            # convert units to MAID compatible
+            resf_lo_v *= 1000 * hep.m_pi
+            resf_hi_v *= 1000 * hep.m_pi
 
-            if self.use_maid_units and self.qu_type == 'amplitude':  # convert units to MAID compatible
-                resf_lo_v *= 1000 * hep.m_pi
-                resf_hi_v *= 1000 * hep.m_pi
-
-
-            self.plot['data'] += [{
-                'mode': 'markers',
-                'type': 'scatter',
-                'name': 'Nearest Q²={} GeV², W={} GeV'
-                    .format(nearest_Q2_lo, nearest_W_lo),
-                'x': cos_θ_lo_v,
-                'y': resf_lo_v,
-                'marker': {
-                    'symbol': 'triangle-down-open',
-                    'size': 10,
-                    'opacity': 0.5,
-                    'color': 'blue',
-                    'line': {
-                        'width': 1,
-                    },
+        self.plot['data'] += [{
+            'mode': 'markers',
+            'type': 'scatter',
+            'name': 'Nearest Q²={} GeV², W={} GeV'
+                .format(nearest_Q2_lo, nearest_W_lo),
+            'x': cos_θ_lo_v,
+            'y': resf_lo_v,
+            'marker': {
+                'symbol': 'triangle-down-open',
+                'size': 10,
+                'opacity': 0.5,
+                'color': 'blue',
+                'line': {
+                    'width': 1,
                 },
-            }, {
-                'mode': 'markers',
-                'type': 'scatter',
-                'name': 'Nearest Q²={} GeV², W={} GeV'
-                    .format(nearest_Q2_hi, nearest_W_hi),
-                'x': cos_θ_hi_v,
-                'y': resf_hi_v,
-                'marker': {
-                    'symbol': 'triangle-up-open',
-                    'size': 10,
-                    'opacity': 0.5,
-                    'color': 'green',
-                    'line': {
-                        'width': 1,
-                    },
+            },
+        }, {
+            'mode': 'markers',
+            'type': 'scatter',
+            'name': 'Nearest Q²={} GeV², W={} GeV'
+                .format(nearest_Q2_hi, nearest_W_hi),
+            'x': cos_θ_hi_v,
+            'y': resf_hi_v,
+            'marker': {
+                'symbol': 'triangle-up-open',
+                'size': 10,
+                'opacity': 0.5,
+                'color': 'green',
+                'line': {
+                    'width': 1,
                 },
-            }]
+            },
+        }]
 
-        if 1 and self.qu_type == 'amplitude':
-            from load_maid import MAIDData
+        if self.qu_type == 'amplitude':
             maid = MAIDData.load_by_kinematics(
                 Q2=q2, W=w, FS=channel.name)
             cos_θ = np.array(list(maid.keys()))
             H = np.array(list(maid.values()))
             H = H[:,self.qu_index]
-            if not self.use_maid_units:  # convert units from MAID-specific to Gev^-1
+            if not self.use_maid_units:
+                # convert units from MAID-specific to Gev^-1
                 H /= 1000 * hep.m_pi
             if form.varset.data == 'theta':
                 cos_θ = np.rad2deg(np.arccos(cos_θ))[::-1]
@@ -572,8 +484,8 @@ class InterpolateForm2(InterpolateForm):
             }]
 
 
-InterpolateForm.register_url(bp,
+InterpolateFormView.register_url(bp,
     '/interpolate', 'interpolate_form')
 
-InterpolateForm2.register_url(bp,
+InterpolateFormCompareView.register_url(bp,
     '/interpolate_compare', 'interpolate_form_compare')

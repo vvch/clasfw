@@ -1,17 +1,16 @@
-from flask import Flask, request, render_template, render_template_string
+import os
+from flask import Flask, render_template
 
 from .settings import ProdConfig, DevConfig
 from .extensions import db, migrate, assets, debug_toolbar
 from .clasfw.blueprint import blueprint
 from .clasfw import views, views_comparison, views_interpolate
 
-import os
 
 def create_app(config_object=None):
     """An application factory"""
-    load_local_flag = False
+
     if config_object is None:
-        load_local_flag = True
         if os.environ.get('FLASK_ENV') == 'development':
             config_object = DevConfig
         # elif os.environ.get('FLASK_ENV') == 'production':
@@ -37,7 +36,6 @@ def create_app(config_object=None):
 
 def register_blueprints(app):
     app.register_blueprint(blueprint)
-    return None
 
 
 def register_extensions(app):
@@ -71,8 +69,6 @@ def register_extensions(app):
     #     debug_toolbar = DebugToolbarExtension()
     #     debug_toolbar.init_app(app)
 
-    return None
-
 
 def register_errorhandlers(app):
 
@@ -85,4 +81,3 @@ def register_errorhandlers(app):
     for errcode in [404, 500]:
     # for errcode in [401, 404, 500]:
         app.errorhandler(errcode)(render_error)
-    return None

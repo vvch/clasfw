@@ -1,7 +1,8 @@
-import numpy as np
-from sqlalchemy import func
 import re
 import json
+
+import numpy as np
+from sqlalchemy import func
 
 
 def complex_format(c, real_f="{:f}", imag_f=None):
@@ -33,3 +34,6 @@ def arxiv_url(arxiv):
         return "https://arxiv.org/abs/" + a
     raise ValueError('Not an arXiv link')
 
+
+def tex(q):
+    return "$${}$$".format(q.wu_tex)

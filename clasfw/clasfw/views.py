@@ -1,19 +1,13 @@
-from .blueprint import qu, blueprint as bp
-from flask import current_app
-
-from .models import Model, Amplitude, Channel, Quantity
-from ..utils import equal_eps
-
-from flask import request, Response, url_for, send_file, redirect, \
-    render_template, render_template_string, Markup, abort
+from flask import current_app, request, render_template, abort
+from sqlalchemy import func
+from sqlalchemy.orm import exc
+import numpy as np
 
 import hep
 import hep.amplitudes
-
-from sqlalchemy import func, exc
-from sqlalchemy.orm import exc
-import numpy as np
-import json
+from .blueprint import qu, blueprint as bp
+from .models import Model, Amplitude, Channel
+from ..utils import equal_eps, tex
 
 
 @bp.route('/')
@@ -123,10 +117,6 @@ def plotly_3dlabel(q):
     return q.name
 
 
-def tex(q):
-    return "$${}$$".format(q.wu_tex)
-
-
 @bp.route('/dsigma')
 def phi_dependence():
     channel_id= request.args.get('channel', type=int)
@@ -165,8 +155,6 @@ def phi_dependence():
                 # 'autosize': 'true',
                 'xaxis': {
                     'title': tex(qu.phi),
-                    # 'ticktext': [0, 1, '$\\frac{\\pi}{2}$', 2, 3, '$\\pi$', 4, '$\\frac{3\\pi}{2}$', 5, 6, '$2\\pi$'],
-                    # 'tickvals': [0, 1, np.pi/2,             2, 3, np.pi,    4, 3*np.pi/2,            5, 6, 2*np.pi],
                 },
                 'yaxis': {
                     'title': tex(qu.dsigma),
@@ -201,8 +189,7 @@ def phi_dependence():
         sig_M = np.zeros(shape=(len(ampls), len(phi)))
         cos_theta_v = np.zeros(shape=(len(ampls),))
 
-        for i in range(len(ampls)):
-            ampl = ampls[i]
+        for i, ampl in enumerate(ampls):
             cos_theta = ampl.cos_theta
             cos_theta_v[i] = ampl.cos_theta
             sig = hep.amplitudes.H_to_dsigma(

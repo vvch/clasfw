@@ -1,11 +1,9 @@
-from dotenv import load_dotenv, find_dotenv
-load_dotenv(find_dotenv())
-
 import re, requests, requests_cache
 import numpy as np
 from pprint import pprint
 import time
 from furl import furl
+from sqlalchemy.orm import exc
 
 from clasfw.models import Model, Amplitude, Channel
 import hep
@@ -14,7 +12,6 @@ import hep.amplitudes
 
 class MAIDData(dict):
     url = "https://maid.kph.uni-mainz.de/cgi-bin/maid1?switch=213&param2=1&param3=3&param50=3&value35=1&value36=2000&value37=0&value41=10&value42=180&param99=0&param11=1&param12=1&param13=1&param14=1&param15=1&param16=1&param17=1&param18=1&param19=1&param20=1&param21=1&param22=1&param23=1&param24=1&param25=1&param26=1&value11=1.0&value12=1.0&value13=1.0&value51=1.0&value52=1.0&value53=1.0&value54=1.0&value55=1.0&value56=1.0&value57=1.0&value58=1.0&value59=1.0&value60=1.0&value61=1.0&value62=1.0&value63=1.0&value64=1.0&value65=1.0&value66=1.0&value67=1.0&value68=1.0&value69=1.0&value70=1.0&value71=1.0&value72=1.0&value73=1.0&value74=1.0&value75=1.0&value76=1.0&value77=1.0&value78=1.0&value79=1.0&value80=1.0&value81=1.0&value82=1.0&value83=1.0&value84=1.0"
-
 
     def get_kinematics(self, text):
         mo = re.search(r"""
@@ -27,7 +24,6 @@ class MAIDData(dict):
         Q2, W = mo.group(1, 2)
         self.Q2 = float(Q2)
         self.W  = float(W) / 1000  ##  MeV to GeV
-
 
     @classmethod
     def parse(cls, text):
@@ -69,7 +65,6 @@ class MAIDData(dict):
         self = parse_block(t2, self)
         return self
 
-
     @classmethod
     def load(cls, url):
         if not hasattr(cls, 'ua'):
@@ -77,7 +72,6 @@ class MAIDData(dict):
                 'http_cache',
                 expire_after=60*60*24*30)  #  month
         return cls.parse(cls.ua.get(url).text)
-
 
     @classmethod
     def load_by_kinematics(cls, **kvargs):
@@ -108,8 +102,6 @@ class MAIDData(dict):
                     kvargs['Q2'], kvargs['W'], str(url)))
             raise
 
-
-from sqlalchemy.orm import exc
 
 def load_or_create_maid_model():
     try:
@@ -172,54 +164,57 @@ class MAIDObservables(MAIDData):
         return self
 
 
-from clasfw.app import create_app
 from clasfw.extensions import db
-import click
-
 
 def download_maid_amplitudes(q2, w, fs):
     start_time = time.time()
     counter = 0
     size = len(fs) * len(q2) * len(w)
-    app = create_app()
-    with app.test_request_context():
-        model = load_or_create_maid_model()
-        for FS in fs:
-            for Q2 in q2:
-                for W in w:
-                    out = MAIDData.load_by_kinematics(Q2=Q2, W=W, FS=FS)
-                    elapsed_time = time.time() - start_time
-                    counter += 1
-                    estimated_time = elapsed_time*size/counter - elapsed_time
-                    print("{}: Q2={}, W={}\t\tElapsed: {:d}:{:.1f}  \tEstimated: {:d}:{:.1f} \t{:4}/{}"
-                        .format(out.FS, out.Q2, out.W,
-                            int(elapsed_time/60), elapsed_time%60,
-                            int(estimated_time/60), estimated_time%60,
-                            counter, size))
-                    db.session.add(
-                        store_maid(db.session, out, model=model))
-                db.session.commit()
+    model = load_or_create_maid_model()
+    for FS in fs:
+        for Q2 in q2:
+            for W in w:
+                out = MAIDData.load_by_kinematics(Q2=Q2, W=W, FS=FS)
+                elapsed_time = time.time() - start_time
+                counter += 1
+                estimated_time = elapsed_time*size/counter - elapsed_time
+                print("{}: Q2={}, W={}\t\tElapsed: {:d}:{:.1f}  \tEstimated: {:d}:{:.1f} \t{:4}/{}"
+                    .format(out.FS, out.Q2, out.W,
+                        int(elapsed_time/60), elapsed_time%60,
+                        int(estimated_time/60), estimated_time%60,
+                        counter, size))
+                db.session.add(
+                    store_maid(db.session, out, model=model))
+            db.session.commit()
     elapsed_time = time.time() - start_time
     print("TOTAL: {} objects for {:d}m{:.1f}s"
         .format(counter, int(elapsed_time/60), elapsed_time%60))
 
 
-@click.command()
-@click.option("--Q2")
-@click.option("--W")
-@click.option("--FS", default="pi0 p")
-def main_command(q2, w, fs):
-    q2 = np.array(q2.split(','))
-    w  = np.array( w.split(','))
-    fs = [s.strip() for s in fs.split(',')]
-    download_maid_amplitudes(q2, w, fs)
-
-
 if __name__ == '__main__':
+
+    from dotenv import load_dotenv, find_dotenv
+    load_dotenv(find_dotenv())
+
+    from clasfw.app import create_app
+    import click
+
+    @click.command()
+    @click.option("--Q2")
+    @click.option("--W")
+    @click.option("--FS", default="pi0 p")
+    def main_command(q2, w, fs):
+        q2 = np.array(q2.split(','))
+        w  = np.array( w.split(','))
+        fs = [s.strip() for s in fs.split(',')]
+        download_maid_amplitudes(q2, w, fs)
+
     # main_command()
 
-    download_maid_amplitudes(
-        np.arange(0,   5.00001, 0.2),  #  Q2
-        np.arange(1.1, 2.00001, 0.02), #  W
-        ["pi0 p", "pi0 n", "pi+ n", "pi- p"],
-    )
+    app = create_app()
+    with app.test_request_context():
+        download_maid_amplitudes(
+            np.arange(0,   5.00001, 0.2),  #  Q2
+            np.arange(1.1, 2.00001, 0.02), #  W
+            ["pi0 p", "pi0 n", "pi+ n", "pi- p"],
+        )
