@@ -8,6 +8,7 @@ Flask >= 1.0
 Flask-SqlAlchemy >= 2.3  #  due to bugs in __tablename__ generation
 Flask-Migrate
 Flask-Assets
+WTForms-Alchemy
 
 requests_cache
 furl
@@ -19,6 +20,7 @@ flask-debugtoolbar >= 0.10.1
 # Testing
 
 pytest
+webtest
 
 
 ##  NON-PYTHON

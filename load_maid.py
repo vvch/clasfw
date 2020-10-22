@@ -1,13 +1,12 @@
 import re, requests, requests_cache
 import numpy as np
-from pprint import pprint
-import time
 from furl import furl
 from sqlalchemy.orm import exc
 
 from clasfw.models import Model, Amplitude, Channel
 import hep
 import hep.amplitudes
+from estimate_time import EstimateTime
 
 
 class MAIDData(dict):
@@ -167,28 +166,26 @@ class MAIDObservables(MAIDData):
 from clasfw.extensions import db
 
 def download_maid_amplitudes(q2, w, fs):
-    start_time = time.time()
-    counter = 0
-    size = len(fs) * len(q2) * len(w)
+    timer = EstimateTime(len(fs) * len(q2) * len(w))
     model = load_or_create_maid_model()
     for FS in fs:
         for Q2 in q2:
             for W in w:
                 out = MAIDData.load_by_kinematics(Q2=Q2, W=W, FS=FS)
-                elapsed_time = time.time() - start_time
-                counter += 1
-                estimated_time = elapsed_time*size/counter - elapsed_time
-                print("{}: Q2={}, W={}\t\tElapsed: {:d}:{:.1f}  \tEstimated: {:d}:{:.1f} \t{:4}/{}"
-                    .format(out.FS, out.Q2, out.W,
-                        int(elapsed_time/60), elapsed_time%60,
-                        int(estimated_time/60), estimated_time%60,
-                        counter, size))
                 db.session.add(
                     store_maid(db.session, out, model=model))
+                timer.update()
+                print("{}: Q2={}, W={}\t\t"
+                      "Elapsed: {}  \tEstimated: {} \t{:4}/{}"
+                    .format(out.FS, out.Q2, out.W,
+                        timer.elapsed_min_sec,
+                        timer.estimated_min_sec,
+                        timer.counter,
+                        timer.size))
             db.session.commit()
-    elapsed_time = time.time() - start_time
-    print("TOTAL: {} objects for {:d}m{:.1f}s"
-        .format(counter, int(elapsed_time/60), elapsed_time%60))
+    #timer.update()
+    print("TOTAL: {} objects for {}"
+        .format(timer.counter, timer.elapsed_min_sec))
 
 
 if __name__ == '__main__':
@@ -214,7 +211,8 @@ if __name__ == '__main__':
     app = create_app()
     with app.test_request_context():
         download_maid_amplitudes(
-            np.arange(0,   5.00001, 0.2),  #  Q2
-            np.arange(1.1, 2.00001, 0.02), #  W
+            ε = 0.00001
+            np.arange(0,   5 +ε, 0.2),  #  Q2
+            np.arange(1.1, 2 +ε, 0.02), #  W
             ["pi0 p", "pi0 n", "pi+ n", "pi- p"],
         )
