@@ -1,4 +1,6 @@
-import re, requests, requests_cache
+#!/usr/bin/python3
+
+import re, requests_cache
 import numpy as np
 from furl import furl
 from sqlalchemy.orm import exc
@@ -178,14 +180,14 @@ def download_maid_amplitudes(q2, w, fs):
                 print("{}: Q2={}, W={}\t\t"
                       "Elapsed: {}  \tEstimated: {} \t{:4}/{}"
                     .format(out.FS, out.Q2, out.W,
-                        timer.elapsed_min_sec,
-                        timer.estimated_min_sec,
+                        timer.elapsed,
+                        timer.estimated,
                         timer.counter,
                         timer.size))
             db.session.commit()
     #timer.update()
     print("TOTAL: {} objects for {}"
-        .format(timer.counter, timer.elapsed_min_sec))
+        .format(timer.counter, timer.elapsed))
 
 
 if __name__ == '__main__':
@@ -210,8 +212,8 @@ if __name__ == '__main__':
 
     app = create_app()
     with app.test_request_context():
+        ε = 0.00001
         download_maid_amplitudes(
-            ε = 0.00001
             np.arange(0,   5 +ε, 0.2),  #  Q2
             np.arange(1.1, 2 +ε, 0.02), #  W
             ["pi0 p", "pi0 n", "pi+ n", "pi- p"],
