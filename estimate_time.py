@@ -7,6 +7,16 @@ class EstimateTime:
         self.size = size
         self.counter = 0
         self.elapsed_s = 0
+        self.min_interval_to_output = 0  #  sec
+        self.last_output_elapsed = 0  #  sec
+
+    def may_output(self):
+        if self.elapsed_s - self.last_output_elapsed > self.min_interval_to_output \
+        or self.last_output_elapsed == 0:
+            self.last_output_elapsed = self.elapsed_s
+            return True
+        else:
+            return False
 
     @property
     def current(self):
@@ -49,6 +59,13 @@ class EstimateTime:
     #def estimated_hms(self):
         #return self.format_hms(self.elapsed_s)
 
+    @property
+    def percent(self):
+        return (self.counter / self.size)*100
+
+    @property
+    def speed(self):  #  per second
+        return (self.counter / self.elapsed_s)
 
 if __name__=='__main__':
 
