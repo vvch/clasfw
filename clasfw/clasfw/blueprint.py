@@ -42,18 +42,18 @@ class qu:
     @classmethod
     def load(cls):
         cls.Q2, cls.W, cls.cos_theta, cls.theta, cls.xB, cls.t, cls.phi, cls.dsigma, cls.Eb = (
-            Quantity.query.filter_by(name=s).one()
+            Quantity.by_name(s)
                 for s in "Q^2 W cos(theta) theta x_B t phi dsigma/dOmega E_b".split() )
         cls.mcb_sr, cls.deg = (
-            Unit.query.filter_by(name=s).one()
+            Unit.by_name(s)
                 for s in "mcb/sr deg".split() )
 
         for s in cls.respfunc_names:
-            q = Quantity.query.filter_by(name=s).one()
+            q = Quantity.by_name(s)
             cls.respfuncs.append(q)
 
         for s in cls.dsigma_names:
-            q = Quantity.query.filter_by(name=s).one()
+            q = Quantity.by_name(s)
             cls.dsigmas.append(q)
 
         cls.amplitudes = Quantity.query.filter(

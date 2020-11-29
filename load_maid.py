@@ -106,7 +106,7 @@ class MAIDData(dict):
 
 def load_or_create_maid_model():
     try:
-        m = Model.query.filter_by(name='maid').one()
+        m = Model.by_name('maid')
     except exc.NoResultFound:
         m = Model(
             name="maid",
@@ -120,7 +120,7 @@ def store_maid(ses, maid, model=None):
     FS = maid.FS
     if not FS:
         FS = 'pi0 p'
-    ch = Channel.query.filter_by(name=FS).one()
+    ch = Channel.by_name(FS)
     if model is None:
         model = load_or_create_maid_model()
     for k, v in maid.items():

@@ -76,7 +76,7 @@ def create_form(session, qu):
             widget          = widgets.ListWidget(prefix_label=False),
             # widget          = widgets.TableWidget(),
             get_label       = get_html_field,
-            default         = Quantity.query.filter_by(name=qu.respfunc_names[0]).one(),
+            default         = Quantity.by_name(qu.respfunc_names[0]),
             # default         = qu.respfuncs[0],
         )
 
@@ -91,7 +91,7 @@ def create_form(session, qu):
             # default         = Channel.query.filter_by(name='inclusive').all(),
             # default         = [''],
             # default         = 'pi0 p',
-            # default         = Channel.query.filter_by(name='pi0 p').one(),  ##  fixme!
+            # default         = Channel.by_name('pi0 p'),  ##  fixme!
             default         = Channel.query.first(),  ##  fixme!
         )
 

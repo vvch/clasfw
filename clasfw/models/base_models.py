@@ -13,6 +13,10 @@ class StatusMixin:
     id             = Column(Integer, primary_key=True, autoincrement=True)
     status         = Column(Integer, default=0)
 
+    @classmethod
+    def by_id(cls, id):
+        return cls.query.get(id).one()
+
 
 class DatesMixin:
     # in MySQL should be first TIMESTAMP column
@@ -47,6 +51,17 @@ class DictionaryMixin(StatusMixin):
     # __mapper_args__ = {
     #     'order_by': 'priority desc'
     # }
+
+    @classmethod
+    def by_name(cls, name):
+        return cls.query.filter_by(name=name).one()
+
+    @classmethod
+    def by_id_or_name(cls, name):
+        try:
+            return cls.by_id(int(name))
+        except ValueError:
+            return cls.by_name(name)
 
     def __repr__(self):
         return "<%s: %r>" % (self.__class__.__name__, self.name)
