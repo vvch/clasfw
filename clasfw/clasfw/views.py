@@ -121,8 +121,8 @@ def plotly_3dlabel(q):
 def phi_dependence():
     channel_id= request.args.get('channel', type=int)
     model_id  = request.args.get('model', type=int)
-    Q2        = request.args.get('q2', type=float)
     W         = request.args.get('w', type=float)
+    Q2        = request.args.get('q2', type=float)
     cos_theta = request.args.get('cos_theta', type=float, default=None)
     Eb        = request.args.get('Eb', type=float, default=10.6)
 
@@ -130,8 +130,8 @@ def phi_dependence():
         channel_id=channel_id,
         model_id=model_id,
     ).filter(
-        equal_eps(Amplitude.q2, Q2),
         equal_eps(Amplitude.w, W),
+        equal_eps(Amplitude.q2, Q2),
     )
 
     phi = np.linspace(0, 2*np.pi)
@@ -148,7 +148,7 @@ def phi_dependence():
 
         respfuncs = hep.amplitudes.ampl_to_R(ampl.H)
         sig = hep.amplitudes.R_to_dsigma(
-            Q2, W, eps_T, phi, h, respfuncs)
+            W, Q2, eps_T, phi, h, respfuncs)
 
         plot = {
             'layout': {
@@ -180,7 +180,7 @@ def phi_dependence():
             Eb=Eb,
             ampl=ampl,
             respfuncs=respfuncs,
-            dsigmas=respfuncs*hep.amplitudes.R_to_dsigma_factors(ampl.q2, ampl.w),
+            dsigmas=respfuncs*hep.amplitudes.R_to_dsigma_factors(ampl.w, ampl.q2),
         )
     else:  #  3D-plot
         ampls=ampl.all()
@@ -193,7 +193,7 @@ def phi_dependence():
             cos_theta = ampl.cos_theta
             cos_theta_v[i] = ampl.cos_theta
             sig = hep.amplitudes.H_to_dsigma(
-                Q2, W, eps_T, phi, h, ampl.H)
+                W, Q2, eps_T, phi, h, ampl.H)
             sig_M[i] = sig
 
         plot = {

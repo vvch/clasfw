@@ -65,8 +65,8 @@ def get_theta_dependence(model, channel, Q2, W, ds_index=0, qu_type='respfunc'):
         channel=channel,
         model=model,
     ).filter(
-        equal_eps(Amplitude.q2, Q2),
         equal_eps(Amplitude.w, W),
+        equal_eps(Amplitude.q2, Q2),
     )
 
     ampls=ampl.all()
@@ -107,15 +107,15 @@ class InterpolateFormView(BaseView):
             model = form.model.data
             quantity = form.quantity.data
             channel = form.channel.data
-            q2 = form.q2.data
             w = form.w.data
+            q2 = form.q2.data
 
             data = Amplitude.query.filter_by(
                 model=model,
                 channel=channel,
             ).values(
-                Amplitude.q2,
                 Amplitude.w,
+                Amplitude.q2,
                 Amplitude.cos_theta,
                 # Amplitude.H1,
                 Amplitude.H1r, Amplitude.H1j,
@@ -198,8 +198,8 @@ class InterpolateFormView(BaseView):
                 cθv_source = np.arange(c_min, c_max +ε, c_step)
                 cθv = hep.mandelstam.t_to_cos_theta(cθv_source, w, q2)
 
-            grid_q2, grid_w, grid_cθ = np.array(np.meshgrid(
-                q2, w, cθv
+            grid_w, grid_q2, grid_cθ = np.array(np.meshgrid(
+                w, q2, cθv
             ))
             # )).transpose((0, 2, 1))
 
@@ -210,7 +210,7 @@ class InterpolateFormView(BaseView):
 
             grid_R = scipy.interpolate.griddata(
                 points, data,
-                (grid_q2, grid_w, grid_cθ),
+                (grid_w, grid_q2, grid_cθ),
                 method='linear')
 
             try:
@@ -369,14 +369,14 @@ class InterpolateFormCompareView(InterpolateFormView):
         super().create_plot(form)
         model = form.model.data
         channel = form.channel.data
-        q2 = form.q2.data
         w = form.w.data
+        q2 = form.q2.data
 
         nearest_Q2_lo = q2
         nearest_Q2_hi = q2
 
-        # nearest_Q2_lo, nearest_Q2_hi = get_value_neighbours(q2, model, channel)
         nearest_W_lo,  nearest_W_hi = get_value_neighbours(w, model, channel, Amplitude.w)
+        # nearest_Q2_lo, nearest_Q2_hi = get_value_neighbours(q2, model, channel)
 
         cos_θ_lo_v, resf_lo_v = get_theta_dependence(model, channel,
             q2, nearest_W_lo, self.qu_index, self.qu_type)

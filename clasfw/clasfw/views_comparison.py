@@ -13,8 +13,8 @@ from ..utils import equal_eps, tex
 def compare():
     channel_id= request.args.get('channel', type=int)
     model_id  = request.args.get('model', type=int)
-    Q2        = request.args.get('q2', type=float)
     W         = request.args.get('w', type=float)
+    Q2        = request.args.get('q2', type=float)
     Eb        = request.args.get('Eb', type=float, default=10.6)
     ds_index  = request.args.get('obs', type=int, default=0)
 
@@ -22,8 +22,8 @@ def compare():
         channel_id=channel_id,
         model_id=model_id,
     ).filter(
-        equal_eps(Amplitude.q2, Q2),
         equal_eps(Amplitude.w, W),
+        equal_eps(Amplitude.q2, Q2),
     )
 
     # eps_T = hep.ε_T(W, Q2, Eb)
@@ -38,7 +38,7 @@ def compare():
 
     for i, ampl in enumerate(ampls):
         cos_theta_v[i] = ampl.cos_theta
-        ds = hep.amplitudes.ampl_to_R(ampl.H)*hep.amplitudes.R_to_dsigma_factors(ampl.q2, ampl.w)
+        ds = hep.amplitudes.ampl_to_R(ampl.H)*hep.amplitudes.R_to_dsigma_factors(ampl.w, ampl.q2)
         sig_v[i] = ds[ds_index]
 
     quantity = qu.dsigmas[ds_index]

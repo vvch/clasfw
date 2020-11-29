@@ -71,7 +71,7 @@ def ampl_to_R(H):
     ]) * mcb_per_GeVm2
 
 
-def R_to_dsigma_factors(Q2, W):
+def R_to_dsigma_factors(W, Q2):
     """
     dsigma_v [mcb/sr] = R_v [mcb/sr] * response_funcs_to_dsigmas(Q2, W)
     """
@@ -98,14 +98,14 @@ def R_to_dsigma_factors(Q2, W):
     ]) * ( p_m / k_γ_cm)
 
 
-def R_to_dsigma(Q2, W, eps_T, phi, h, response_funcs):
+def R_to_dsigma(W, Q2, eps_T, phi, h, response_funcs):
     """
     Calculate differential cross-section
     from response functions
     for specified kinematics
     """
 
-    dσ_T, dσ_L, dσ_TT, dσ_TL, dσ_TLp = response_funcs * R_to_dsigma_factors(Q2, W)
+    dσ_T, dσ_L, dσ_TT, dσ_TL, dσ_TLp = response_funcs * R_to_dsigma_factors(W, Q2)
 
     ## ε is virtual photon polarization parameter
     ε = eps_T
@@ -122,7 +122,7 @@ def R_to_dsigma(Q2, W, eps_T, phi, h, response_funcs):
     return ds
 
 
-def H_to_dsigma(Q2, W, eps_T, phi, h, H):
+def H_to_dsigma(W, Q2, eps_T, phi, h, H):
     return R_to_dsigma(
-        Q2, W, eps_T, phi, h,
+        W, Q2, eps_T, phi, h,
         ampl_to_R(H) )
