@@ -44,7 +44,7 @@ def W2xB(W, Q2):
 
 @np.vectorize
 def ε_T(W, Q2, E, ν=None):
-    if np.isclose(Q2, 0):
+    if np.isclose(Q2, 0):  #  avoid zero division when Q2=0
         return 0
     if ν is None:
         ν = W2nu(W, Q2)
@@ -99,6 +99,7 @@ def SigTot_from_Q2nuEF1F2(Q2, nu, E, F1, F2):
         Q2, nu, E,
         *SigTL_from_Q2nuEF1F2(Q2, nu, E, F1, F2))
 
+
 def F2_to_F1(F2, R, xB, Q2):
     ν = xB2nu(xB, Q2)
     ν2 = ν*ν
@@ -110,3 +111,15 @@ def F2_to_Sig(xB, F2, Q2, E, R):
     ν = xB2nu(xB, Q2)
     F1 = F2_to_F1(F2, R, xB, Q2)
     return SigTot_from_Q2nuEF1F2(Q2, ν, E, F1, F2)
+
+
+def Γ_ν(W, Q2, Eb, ε=None):
+    """
+    Virtual photon flux Γ_ν
+    Units: [μb/GeV³]
+    """
+    if ε is None:
+        ε = ε_T(W, Q2, Eb)
+    return \
+            ( alpha * W*(W**2 - M_p**2) )            /\
+    ( 4*np.pi * Eb**2 * M_p**2 * (1 - ε)*Q2 )
