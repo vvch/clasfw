@@ -38,7 +38,7 @@ def compare():
 
     for i, ampl in enumerate(ampls):
         cos_theta_v[i] = ampl.cos_theta
-        ds = hep.amplitudes.ampl_to_R(ampl.H)*hep.amplitudes.R_to_dsigma_factors(ampl.w, ampl.q2)
+        ds = hep.amplitudes.ampl_to_R(ampl.H)*hep.amplitudes.R_to_dsigma_factor(ampl.w, ampl.q2)
         sig_v[i] = ds[ds_index]
 
     quantity = qu.dsigmas[ds_index]

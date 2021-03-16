@@ -180,7 +180,7 @@ def phi_dependence():
             Eb=Eb,
             ampl=ampl,
             respfuncs=respfuncs,
-            dsigmas=respfuncs*hep.amplitudes.R_to_dsigma_factors(ampl.w, ampl.q2),
+            dsigmas=respfuncs*hep.amplitudes.R_to_dsigma_factor(ampl.w, ampl.q2),
         )
     else:  #  3D-plot
         ampls=ampl.all()
