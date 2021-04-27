@@ -1,6 +1,6 @@
 import numpy as np
 from numpy import sqrt, sin, cos
-from .hep import mcb_per_GeVm2, alpha, M_p, m_pi, m_pi0
+from .hep import mcb_per_GeVm2, alpha, M_p, M_p2, m_pi, m_pi0
 
 
 """
@@ -69,6 +69,16 @@ def ampl_to_R(H):
         ampl_to_R_TL_00(H),
         ampl_to_R_TLp_00(H),
     ]) * mcb_per_GeVm2
+
+
+def H56_maid_correction_factor(W, Q2):
+    """
+    Correction factor to multiply H5 and H6 helicity amplitudes
+    in order to avoid zero division uncertainty
+    """
+    omega_gamma = (W*W - Q2 - M_p2)  \
+                / (2 * W)
+    return np.sqrt(Q2) / omega_gamma
 
 
 def R_to_dsigma_factor(W, Q2):
