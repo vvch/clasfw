@@ -11,13 +11,15 @@ DOI:10.1007/BF01289506
     Photo- and Electroproduction of Eta Mesons
     Z.Phys.A352:327-343,1995
     p. 19. Appendix D.
+
+https://maid.kph.uni-mainz.de/maid2007/maid2007.html
 """
 
 
 strfun_indexes = "T  L  TT  TL  TL'".split()
 
 
-#  "-1" here since H array indexes starts from 0
+#  "-1" in H indexes down here since H array indexes starts from 0
 
 def ampl_to_R_T_00(H):
     return (
