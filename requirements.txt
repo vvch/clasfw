@@ -6,7 +6,7 @@ SQLAlchemy > 1.2, < 1.4
 
 Flask >= 1.0, < 2
 MarkupSafe < 2  #  compatibility with Jinja2 from Flask < 2
-Flask-SqlAlchemy >= 2.3  #  due to bugs in __tablename__ generation
+Flask-SqlAlchemy >= 2.3, < 3  #  >=2.3 due to bugs in __tablename__ generation; < 3 due to v3 requires sqlalchemy v1.4.18 minimum, and flask v2.2
 Flask-Migrate
 Flask-Assets
 WTForms-Alchemy
