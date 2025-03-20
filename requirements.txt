@@ -4,7 +4,7 @@ scipy
 python-dotenv
 SQLAlchemy > 1.2
 
-Flask >= 1.0
+Flask >= 1.0, < 2
 Flask-SqlAlchemy >= 2.3  #  due to bugs in __tablename__ generation
 Flask-Migrate
 Flask-Assets
