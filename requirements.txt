@@ -2,9 +2,10 @@ numpy
 scipy
 
 python-dotenv
-SQLAlchemy > 1.2
+SQLAlchemy > 1.2, < 1.4
 
-Flask >= 1.0
+Flask >= 1.0, < 2
+MarkupSafe < 2  #  compatibility with Jinja2 from Flask < 2
 Flask-SqlAlchemy >= 2.3  #  due to bugs in __tablename__ generation
 Flask-Migrate
 Flask-Assets
